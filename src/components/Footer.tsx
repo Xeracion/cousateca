@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -62,6 +61,11 @@ const Footer = () => {
               <li>
                 <Link to="/faq" className="text-gray-400 hover:text-rental-300">
                   Preguntas Frecuentes
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin" className="text-gray-400 hover:text-rental-300">
+                  Panel de Administrador
                 </Link>
               </li>
             </ul>

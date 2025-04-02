@@ -15,6 +15,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import CategoryDetail from "./pages/CategoryDetail";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import NotFound from "./pages/NotFound";
+import AdminPanel from "./pages/AdminPanel"; // New import
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/category/:id" element={<CategoryDetail />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/admin" element={<AdminPanel />} /> {/* New route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
