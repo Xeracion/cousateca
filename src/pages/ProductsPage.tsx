@@ -12,7 +12,7 @@ import { Sliders, Search } from "lucide-react";
 
 const ProductsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortOption, setSortOption] = useState<string>("featured");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -21,7 +21,7 @@ const ProductsPage = () => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCategory = !selectedCategory || product.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesCategory = selectedCategory === "all" || product.category.toLowerCase() === selectedCategory.toLowerCase();
     
     return matchesSearch && matchesCategory;
   });
@@ -78,9 +78,9 @@ const ProductsPage = () => {
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                      <SelectItem value="all">All Categories</SelectItem>
                       {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.name}>
+                        <SelectItem key={category.id} value={category.name.toLowerCase()}>
                           {category.name}
                         </SelectItem>
                       ))}
@@ -110,9 +110,9 @@ const ProductsPage = () => {
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.name}>
+                      <SelectItem key={category.id} value={category.name.toLowerCase()}>
                         {category.name}
                       </SelectItem>
                     ))}
@@ -151,7 +151,7 @@ const ProductsPage = () => {
                 className="mt-4 bg-rental-500 hover:bg-rental-600"
                 onClick={() => {
                   setSearchQuery("");
-                  setSelectedCategory("");
+                  setSelectedCategory("all");
                 }}
               >
                 Clear Filters
