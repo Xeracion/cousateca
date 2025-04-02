@@ -5,25 +5,25 @@ import { Star } from "lucide-react";
 const testimonials = [
   {
     id: 1,
-    name: "Sarah Johnson",
-    role: "Event Planner",
-    content: "RentMart has been a game-changer for my event planning business. The quality of their equipment is outstanding, and the rental process is seamless. I especially love the delivery and pickup service!",
+    name: "Sara Jiménez",
+    role: "Organizadora de Eventos",
+    content: "Cousateca ha sido un cambio revolucionario para mi negocio de organización de eventos. La calidad de su equipamiento es excepcional, y el proceso de alquiler es muy sencillo. ¡Me encanta especialmente el servicio de entrega y recogida!",
     avatar: "https://randomuser.me/api/portraits/women/12.jpg",
     rating: 5
   },
   {
     id: 2,
-    name: "David Lee",
-    role: "Photography Enthusiast",
-    content: "I was able to try out expensive camera equipment before making a purchase. The staff was knowledgeable and helped me choose the right gear for my needs. Highly recommend!",
+    name: "David López",
+    role: "Entusiasta de la Fotografía",
+    content: "Pude probar equipos de cámara caros antes de hacer una compra. El personal era conocedor y me ayudó a elegir el equipo adecuado para mis necesidades. ¡Muy recomendable!",
     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
     rating: 5
   },
   {
     id: 3,
-    name: "Emily Chen",
-    role: "Weekend Adventurer",
-    content: "Rented camping gear for a last-minute trip and everything was in perfect condition. The prices were reasonable and it saved me from having to buy equipment I'd rarely use.",
+    name: "Elena Moreno",
+    role: "Aventurera de Fin de Semana",
+    content: "Alquilé equipo de camping para un viaje de última hora y todo estaba en perfectas condiciones. Los precios eran razonables y me ahorró tener que comprar equipamiento que rara vez usaría.",
     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
     rating: 4
   }
@@ -34,9 +34,9 @@ const Testimonials = () => {
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">What Our Customers Say</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Lo Que Dicen Nuestros Clientes</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Don't just take our word for it. Here's what customers think about their RentMart experience.
+            No solo tomes nuestra palabra. Esto es lo que los clientes piensan sobre su experiencia con Cousateca.
           </p>
         </div>
         
