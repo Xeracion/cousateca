@@ -7,8 +7,29 @@ import { categories } from "@/data/categories";
 import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import { Link } from "react-router-dom";
+import { Laptop, Bike, Tent, PartyPopper, Music, Hammer } from "lucide-react";
 
 const CategoriesPage = () => {
+  // Helper function to get the correct icon
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "laptop":
+        return <Laptop className="h-6 w-6 text-rental-500" />;
+      case "bicycle":
+        return <Bike className="h-6 w-6 text-rental-500" />;
+      case "tent":
+        return <Tent className="h-6 w-6 text-rental-500" />;
+      case "party-popper":
+        return <PartyPopper className="h-6 w-6 text-rental-500" />;
+      case "music":
+        return <Music className="h-6 w-6 text-rental-500" />;
+      case "hammer":
+        return <Hammer className="h-6 w-6 text-rental-500" />;
+      default:
+        return <Laptop className="h-6 w-6 text-rental-500" />;
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -32,18 +53,7 @@ const CategoriesPage = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                   <div className="flex items-center mb-4 md:mb-0">
                     <div className="bg-rental-50 p-3 rounded-full mr-4">
-                      {/* We'll reuse the icon mapping logic from CategoryCard component */}
-                      {(() => {
-                        const iconMapping = {
-                          laptop: <img src="https://api.iconify.design/lucide:laptop.svg" alt="Laptop" className="h-6 w-6 text-rental-500" />,
-                          bicycle: <img src="https://api.iconify.design/lucide:bicycle.svg" alt="Bicycle" className="h-6 w-6 text-rental-500" />,
-                          tent: <img src="https://api.iconify.design/lucide:tent.svg" alt="Tent" className="h-6 w-6 text-rental-500" />,
-                          "party-popper": <img src="https://api.iconify.design/lucide:party-popper.svg" alt="Party Popper" className="h-6 w-6 text-rental-500" />,
-                          music: <img src="https://api.iconify.design/lucide:music.svg" alt="Music" className="h-6 w-6 text-rental-500" />,
-                          hammer: <img src="https://api.iconify.design/lucide:hammer.svg" alt="Hammer" className="h-6 w-6 text-rental-500" />,
-                        };
-                        return iconMapping[category.icon] || iconMapping.laptop;
-                      })()}
+                      {getIcon(category.icon)}
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold">{category.name}</h2>

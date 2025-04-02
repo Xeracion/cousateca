@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Category } from "@/data/categories";
 import { 
   Laptop, 
-  Bicycle, 
+  Bike,
   Tent, 
   PartyPopper, 
   Music, 
@@ -25,7 +25,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
       case "laptop":
         return <Laptop size={40} className="text-rental-500" />;
       case "bicycle":
-        return <Bicycle size={40} className="text-rental-500" />;
+        return <Bike size={40} className="text-rental-500" />;
       case "tent":
         return <Tent size={40} className="text-rental-500" />;
       case "party-popper":

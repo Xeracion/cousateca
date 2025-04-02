@@ -8,7 +8,7 @@ import { categories } from "@/data/categories";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Laptop, Bike, Tent, PartyPopper, Music, Hammer } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const CategoryDetail = () => {
@@ -17,6 +17,26 @@ const CategoryDetail = () => {
   
   // Find the category
   const category = categories.find((cat) => cat.id === id);
+  
+  // Helper function to get the correct icon
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "laptop":
+        return <Laptop className="h-8 w-8 text-rental-500" />;
+      case "bicycle":
+        return <Bike className="h-8 w-8 text-rental-500" />;
+      case "tent":
+        return <Tent className="h-8 w-8 text-rental-500" />;
+      case "party-popper":
+        return <PartyPopper className="h-8 w-8 text-rental-500" />;
+      case "music":
+        return <Music className="h-8 w-8 text-rental-500" />;
+      case "hammer":
+        return <Hammer className="h-8 w-8 text-rental-500" />;
+      default:
+        return <Laptop className="h-8 w-8 text-rental-500" />;
+    }
+  };
   
   if (!category) {
     return (
@@ -77,18 +97,7 @@ const CategoryDetail = () => {
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center">
               <div className="bg-rental-50 p-4 rounded-full mr-6 mb-4 md:mb-0">
-                {/* We'll reuse the icon mapping logic */}
-                {(() => {
-                  const iconMapping = {
-                    laptop: <img src="https://api.iconify.design/lucide:laptop.svg" alt="Laptop" className="h-8 w-8 text-rental-500" />,
-                    bicycle: <img src="https://api.iconify.design/lucide:bicycle.svg" alt="Bicycle" className="h-8 w-8 text-rental-500" />,
-                    tent: <img src="https://api.iconify.design/lucide:tent.svg" alt="Tent" className="h-8 w-8 text-rental-500" />,
-                    "party-popper": <img src="https://api.iconify.design/lucide:party-popper.svg" alt="Party Popper" className="h-8 w-8 text-rental-500" />,
-                    music: <img src="https://api.iconify.design/lucide:music.svg" alt="Music" className="h-8 w-8 text-rental-500" />,
-                    hammer: <img src="https://api.iconify.design/lucide:hammer.svg" alt="Hammer" className="h-8 w-8 text-rental-500" />,
-                  };
-                  return iconMapping[category.icon] || iconMapping.laptop;
-                })()}
+                {getIcon(category.icon)}
               </div>
               <div>
                 <h1 className="text-3xl font-bold mb-2">{category.name}</h1>
