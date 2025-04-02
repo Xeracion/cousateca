@@ -8,9 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('es-ES', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -22,7 +22,7 @@ export function calculateTotalPrice(dailyPrice: number, startDate: Date, endDate
 }
 
 export function formatDate(date: Date): string {
-  return format(date, 'MMM dd, yyyy');
+  return format(date, 'dd MMM, yyyy');
 }
 
 export function getDefaultEndDate(startDate: Date): Date {

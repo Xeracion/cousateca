@@ -22,7 +22,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         />
         {product.featured && (
           <div className="absolute top-2 left-2 bg-rental-500 text-white text-xs font-semibold px-2 py-1 rounded">
-            Featured
+            Destacado
           </div>
         )}
       </div>
@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span className="text-sm font-medium">{product.rating}</span>
           </div>
           <span className="text-sm text-gray-500 ml-1">
-            ({product.reviewCount} reviews)
+            ({product.reviewCount} reseñas)
           </span>
         </div>
         <h3 className="font-semibold text-lg mb-1 line-clamp-1">{product.name}</h3>
@@ -45,14 +45,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <Calendar className="h-4 w-4 text-rental-500" />
           <div>
             <p className="font-bold text-lg">{formatCurrency(product.dailyPrice)}</p>
-            <p className="text-xs text-gray-500">per day</p>
+            <p className="text-xs text-gray-500">por día</p>
           </div>
         </div>
       </CardContent>
       <CardFooter className="pt-0">
         <Link to={`/product/${product.id}`} className="w-full">
           <Button className="w-full bg-rental-500 hover:bg-rental-600">
-            View Details
+            Ver Detalles
           </Button>
         </Link>
       </CardFooter>

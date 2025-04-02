@@ -63,10 +63,10 @@ const ProductDetail = () => {
         <Navbar />
         <main className="flex-grow container mx-auto px-4 py-12">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-            <p className="mb-6">Sorry, we couldn't find the product you're looking for.</p>
+            <h1 className="text-2xl font-bold mb-4">Producto No Encontrado</h1>
+            <p className="mb-6">Lo sentimos, no pudimos encontrar el producto que estás buscando.</p>
             <Button onClick={() => navigate("/products")}>
-              Browse All Products
+              Explorar Todos los Productos
             </Button>
           </div>
         </main>
@@ -80,7 +80,7 @@ const ProductDetail = () => {
   
   const handleAddToCart = () => {
     if (!product.availability) {
-      toast.error("This product is currently unavailable");
+      toast.error("Este producto no está disponible actualmente");
       return;
     }
     
@@ -101,9 +101,9 @@ const ProductDetail = () => {
         <div className="container mx-auto px-4">
           {/* Breadcrumbs */}
           <div className="flex items-center text-sm text-gray-500 mb-6">
-            <a href="/" className="hover:text-rental-500">Home</a>
+            <a href="/" className="hover:text-rental-500">Inicio</a>
             <ChevronRight className="h-4 w-4 mx-1" />
-            <a href="/products" className="hover:text-rental-500">Products</a>
+            <a href="/products" className="hover:text-rental-500">Productos</a>
             <ChevronRight className="h-4 w-4 mx-1" />
             <span>{product.name}</span>
           </div>
@@ -119,7 +119,7 @@ const ProductDetail = () => {
                         <div className="aspect-square overflow-hidden">
                           <img 
                             src={image} 
-                            alt={`${product.name} - Image ${index + 1}`} 
+                            alt={`${product.name} - Imagen ${index + 1}`} 
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -141,7 +141,7 @@ const ProductDetail = () => {
                   >
                     <img 
                       src={image} 
-                      alt={`Thumbnail ${index + 1}`} 
+                      alt={`Miniatura ${index + 1}`} 
                       className="w-16 h-16 object-cover"
                     />
                   </div>
@@ -159,7 +159,7 @@ const ProductDetail = () => {
                     <span className="font-medium">{product.rating}</span>
                   </div>
                   <span className="text-gray-500 ml-1">
-                    ({product.reviewCount} reviews)
+                    ({product.reviewCount} reseñas)
                   </span>
                   <Separator orientation="vertical" className="mx-3 h-5" />
                   <span className="text-gray-700">{product.category}</span>
@@ -169,41 +169,41 @@ const ProductDetail = () => {
                 
                 <Tabs defaultValue="daily">
                   <TabsList className="mb-4">
-                    <TabsTrigger value="daily">Daily</TabsTrigger>
-                    <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                    <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                    <TabsTrigger value="daily">Diario</TabsTrigger>
+                    <TabsTrigger value="weekly">Semanal</TabsTrigger>
+                    <TabsTrigger value="monthly">Mensual</TabsTrigger>
                   </TabsList>
                   <TabsContent value="daily" className="space-y-4">
                     <div className="flex items-center">
                       <DollarSign className="h-5 w-5 text-rental-500 mr-1" />
                       <span className="text-2xl font-bold">
-                        {formatCurrency(product.dailyPrice)} / day
+                        {formatCurrency(product.dailyPrice)} / día
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Perfect for short-term needs or trying before you buy.
+                      Perfecto para necesidades a corto plazo o para probar antes de comprar.
                     </p>
                   </TabsContent>
                   <TabsContent value="weekly" className="space-y-4">
                     <div className="flex items-center">
                       <DollarSign className="h-5 w-5 text-rental-500 mr-1" />
                       <span className="text-2xl font-bold">
-                        {formatCurrency(product.weeklyPrice)} / week
+                        {formatCurrency(product.weeklyPrice)} / semana
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Save {Math.round((1 - (product.weeklyPrice / (product.dailyPrice * 7))) * 100)}% compared to daily rates.
+                      Ahorra {Math.round((1 - (product.weeklyPrice / (product.dailyPrice * 7))) * 100)}% en comparación con las tarifas diarias.
                     </p>
                   </TabsContent>
                   <TabsContent value="monthly" className="space-y-4">
                     <div className="flex items-center">
                       <DollarSign className="h-5 w-5 text-rental-500 mr-1" />
                       <span className="text-2xl font-bold">
-                        {formatCurrency(product.monthlyPrice)} / month
+                        {formatCurrency(product.monthlyPrice)} / mes
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Save {Math.round((1 - (product.monthlyPrice / (product.dailyPrice * 30))) * 100)}% compared to daily rates.
+                      Ahorra {Math.round((1 - (product.monthlyPrice / (product.dailyPrice * 30))) * 100)}% en comparación con las tarifas diarias.
                     </p>
                   </TabsContent>
                 </Tabs>
@@ -212,7 +212,7 @@ const ProductDetail = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <p className="font-medium mb-2">Start Date</p>
+                    <p className="font-medium mb-2">Fecha de Inicio</p>
                     <Calendar
                       mode="single"
                       selected={startDate}
@@ -230,7 +230,7 @@ const ProductDetail = () => {
                     />
                   </div>
                   <div>
-                    <p className="font-medium mb-2">End Date</p>
+                    <p className="font-medium mb-2">Fecha de Fin</p>
                     <Calendar
                       mode="single"
                       selected={endDate}
@@ -243,21 +243,21 @@ const ProductDetail = () => {
                 
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-700">Duration:</span>
-                    <span className="font-medium">{rentalDays} days</span>
+                    <span className="text-gray-700">Duración:</span>
+                    <span className="font-medium">{rentalDays} días</span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-700">Dates:</span>
+                    <span className="text-gray-700">Fechas:</span>
                     <span className="font-medium">
                       {formatDate(startDate)} - {formatDate(endDate)}
                     </span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-700">Daily Rate:</span>
+                    <span className="text-gray-700">Tarifa Diaria:</span>
                     <span className="font-medium">{formatCurrency(product.dailyPrice)}</span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-700">Security Deposit:</span>
+                    <span className="text-gray-700">Depósito de Seguridad:</span>
                     <span className="font-medium">{formatCurrency(product.deposit)}</span>
                   </div>
                   <Separator className="my-3" />
@@ -266,7 +266,7 @@ const ProductDetail = () => {
                     <span>{formatCurrency(totalPrice)}</span>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    Security deposit is refundable upon return in good condition.
+                    El depósito de seguridad es reembolsable al devolverse en buenas condiciones.
                   </p>
                 </div>
                 
@@ -275,7 +275,7 @@ const ProductDetail = () => {
                   disabled={!product.availability}
                   onClick={handleAddToCart}
                 >
-                  {product.availability ? "Add to Cart" : "Currently Unavailable"}
+                  {product.availability ? "Añadir al Carrito" : "Actualmente No Disponible"}
                 </Button>
               </div>
               
@@ -285,8 +285,8 @@ const ProductDetail = () => {
                   <CardContent className="p-4 flex items-center">
                     <Truck className="h-8 w-8 text-rental-500 mr-3" />
                     <div>
-                      <h3 className="font-medium">Fast Delivery</h3>
-                      <p className="text-sm text-gray-600">Within 24 hours</p>
+                      <h3 className="font-medium">Entrega Rápida</h3>
+                      <p className="text-sm text-gray-600">En 24 horas</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -294,8 +294,8 @@ const ProductDetail = () => {
                   <CardContent className="p-4 flex items-center">
                     <Shield className="h-8 w-8 text-rental-500 mr-3" />
                     <div>
-                      <h3 className="font-medium">Insured Items</h3>
-                      <p className="text-sm text-gray-600">Safe & protected</p>
+                      <h3 className="font-medium">Artículos Asegurados</h3>
+                      <p className="text-sm text-gray-600">Seguros y protegidos</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -303,8 +303,8 @@ const ProductDetail = () => {
                   <CardContent className="p-4 flex items-center">
                     <Clock className="h-8 w-8 text-rental-500 mr-3" />
                     <div>
-                      <h3 className="font-medium">Flexible Terms</h3>
-                      <p className="text-sm text-gray-600">Easy extensions</p>
+                      <h3 className="font-medium">Términos Flexibles</h3>
+                      <p className="text-sm text-gray-600">Extensiones fáciles</p>
                     </div>
                   </CardContent>
                 </Card>
