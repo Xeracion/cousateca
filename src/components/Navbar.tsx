@@ -19,23 +19,23 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold text-rental-500">RentMart</span>
+              <span className="text-xl font-bold text-rental-500">Cousateca</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-700 hover:text-rental-500 font-medium">
-              Home
+              Inicio
             </Link>
             <Link to="/products" className="text-gray-700 hover:text-rental-500 font-medium">
-              All Products
+              Todos los Productos
             </Link>
             <Link to="/categories" className="text-gray-700 hover:text-rental-500 font-medium">
-              Categories
+              Categorías
             </Link>
             <Link to="/how-it-works" className="text-gray-700 hover:text-rental-500 font-medium">
-              How It Works
+              Cómo Funciona
             </Link>
           </nav>
 
@@ -45,7 +45,7 @@ const Navbar = () => {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input 
                 type="search" 
-                placeholder="Search products..." 
+                placeholder="Buscar productos..." 
                 className="pl-8 pr-4 py-2 w-full" 
               />
             </div>
@@ -87,13 +87,13 @@ const Navbar = () => {
               <SheetContent>
                 <div className="flex flex-col h-full">
                   <div className="mb-8 mt-6">
-                    <span className="text-xl font-bold text-rental-500">RentMart</span>
+                    <span className="text-xl font-bold text-rental-500">Cousateca</span>
                   </div>
                   <div className="relative w-full mb-6">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                     <Input 
                       type="search" 
-                      placeholder="Search products..." 
+                      placeholder="Buscar productos..." 
                       className="pl-8 pr-4 py-2 w-full" 
                     />
                   </div>
@@ -102,31 +102,31 @@ const Navbar = () => {
                       to="/" 
                       className="text-gray-700 hover:text-rental-500 font-medium py-2"
                     >
-                      Home
+                      Inicio
                     </Link>
                     <Link 
                       to="/products" 
                       className="text-gray-700 hover:text-rental-500 font-medium py-2"
                     >
-                      All Products
+                      Todos los Productos
                     </Link>
                     <Link 
                       to="/categories" 
                       className="text-gray-700 hover:text-rental-500 font-medium py-2"
                     >
-                      Categories
+                      Categorías
                     </Link>
                     <Link 
                       to="/how-it-works" 
                       className="text-gray-700 hover:text-rental-500 font-medium py-2"
                     >
-                      How It Works
+                      Cómo Funciona
                     </Link>
                     <Link 
                       to="/auth" 
                       className="text-gray-700 hover:text-rental-500 font-medium py-2"
                     >
-                      Account
+                      Cuenta
                     </Link>
                   </nav>
                 </div>

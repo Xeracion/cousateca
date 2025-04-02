@@ -46,7 +46,7 @@ const ProductsPage = () => {
       <Navbar />
       <main className="flex-grow bg-gray-50 py-10">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8">All Products</h1>
+          <h1 className="text-3xl font-bold mb-8">Todos los Productos</h1>
           
           {/* Search and Filter Bar */}
           <div className="bg-white p-4 rounded-lg shadow-sm mb-8">
@@ -55,7 +55,7 @@ const ProductsPage = () => {
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="Buscar productos..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -69,16 +69,16 @@ const ProductsPage = () => {
                   className="md:hidden"
                 >
                   <Sliders className="h-4 w-4 mr-2" />
-                  Filters
+                  Filtros
                 </Button>
                 
                 <div className="hidden md:flex gap-2">
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="All Categories" />
+                      <SelectValue placeholder="Todas las Categorías" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="all">Todas las Categorías</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.name.toLowerCase()}>
                           {category.name}
@@ -89,13 +89,13 @@ const ProductsPage = () => {
                   
                   <Select value={sortOption} onValueChange={setSortOption}>
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Sort By" />
+                      <SelectValue placeholder="Ordenar Por" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="featured">Featured</SelectItem>
-                      <SelectItem value="price-low">Price: Low to High</SelectItem>
-                      <SelectItem value="price-high">Price: High to Low</SelectItem>
-                      <SelectItem value="rating">Highest Rated</SelectItem>
+                      <SelectItem value="featured">Destacados</SelectItem>
+                      <SelectItem value="price-low">Precio: Menor a Mayor</SelectItem>
+                      <SelectItem value="price-high">Precio: Mayor a Menor</SelectItem>
+                      <SelectItem value="rating">Mejor Valorados</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -107,10 +107,10 @@ const ProductsPage = () => {
               <div className="mt-4 md:hidden grid grid-cols-2 gap-4">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Categories" />
+                    <SelectValue placeholder="Todas las Categorías" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="all">Todas las Categorías</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.name.toLowerCase()}>
                         {category.name}
@@ -121,13 +121,13 @@ const ProductsPage = () => {
                 
                 <Select value={sortOption} onValueChange={setSortOption}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Sort By" />
+                    <SelectValue placeholder="Ordenar Por" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="featured">Featured</SelectItem>
-                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                    <SelectItem value="price-high">Price: High to Low</SelectItem>
-                    <SelectItem value="rating">Highest Rated</SelectItem>
+                    <SelectItem value="featured">Destacados</SelectItem>
+                    <SelectItem value="price-low">Precio: Menor a Mayor</SelectItem>
+                    <SelectItem value="price-high">Precio: Mayor a Menor</SelectItem>
+                    <SelectItem value="rating">Mejor Valorados</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -143,9 +143,9 @@ const ProductsPage = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <h3 className="text-xl font-semibold mb-2">No products found</h3>
+              <h3 className="text-xl font-semibold mb-2">No se encontraron productos</h3>
               <p className="text-gray-600">
-                Try adjusting your search or filters to find what you're looking for.
+                Intenta ajustar tu búsqueda o filtros para encontrar lo que estás buscando.
               </p>
               <Button 
                 className="mt-4 bg-rental-500 hover:bg-rental-600"
@@ -154,7 +154,7 @@ const ProductsPage = () => {
                   setSelectedCategory("all");
                 }}
               >
-                Clear Filters
+                Limpiar Filtros
               </Button>
             </div>
           )}

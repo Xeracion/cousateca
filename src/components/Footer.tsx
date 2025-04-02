@@ -17,10 +17,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-xl font-bold mb-4 text-rental-300">RentMart</h3>
+            <h3 className="text-xl font-bold mb-4 text-rental-300">Cousateca</h3>
             <p className="text-gray-400 mb-4">
-              Rent high-quality products for any occasion. We offer a wide selection
-              of items at affordable prices with convenient delivery and pickup options.
+              Alquila productos de alta calidad para cualquier ocasión. Ofrecemos una amplia 
+              selección de artículos a precios asequibles con opciones convenientes de entrega y recogida.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-rental-300">
@@ -37,31 +37,31 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-gray-400 hover:text-rental-300">
-                  Home
+                  Inicio
                 </Link>
               </li>
               <li>
                 <Link to="/products" className="text-gray-400 hover:text-rental-300">
-                  All Products
+                  Todos los Productos
                 </Link>
               </li>
               <li>
                 <Link to="/categories" className="text-gray-400 hover:text-rental-300">
-                  Categories
+                  Categorías
                 </Link>
               </li>
               <li>
                 <Link to="/how-it-works" className="text-gray-400 hover:text-rental-300">
-                  How It Works
+                  Cómo Funciona
                 </Link>
               </li>
               <li>
                 <Link to="/faq" className="text-gray-400 hover:text-rental-300">
-                  FAQ
+                  Preguntas Frecuentes
                 </Link>
               </li>
             </ul>
@@ -69,42 +69,42 @@ const Footer = () => {
 
           {/* Contact Information */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+            <h3 className="text-lg font-semibold mb-4">Contáctanos</h3>
             <ul className="space-y-3">
               <li className="flex items-start">
                 <MapPin className="mr-2 h-5 w-5 text-rental-300 flex-shrink-0" />
                 <span className="text-gray-400">
-                  123 Rental Street, San Francisco, CA 94103
+                  Calle Alquiler 123, Madrid, 28001
                 </span>
               </li>
               <li className="flex items-center">
                 <Phone className="mr-2 h-5 w-5 text-rental-300 flex-shrink-0" />
-                <span className="text-gray-400">(123) 456-7890</span>
+                <span className="text-gray-400">(+34) 91 123 45 67</span>
               </li>
               <li className="flex items-center">
                 <Mail className="mr-2 h-5 w-5 text-rental-300 flex-shrink-0" />
-                <span className="text-gray-400">support@rentmart.com</span>
+                <span className="text-gray-400">info@cousateca.com</span>
               </li>
             </ul>
           </div>
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
+            <h3 className="text-lg font-semibold mb-4">Boletín</h3>
             <p className="text-gray-400 mb-4">
-              Subscribe to get special offers, free giveaways, and updates.
+              Suscríbete para recibir ofertas especiales, sorteos gratuitos y actualizaciones.
             </p>
             <form className="flex flex-col space-y-2">
               <input
                 type="email"
-                placeholder="Your email address"
+                placeholder="Tu dirección de email"
                 className="bg-gray-800 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-rental-500"
               />
               <button
                 type="submit"
                 className="bg-rental-500 hover:bg-rental-600 text-white py-2 px-4 rounded-md transition duration-200"
               >
-                Subscribe
+                Suscribirse
               </button>
             </form>
           </div>
@@ -113,14 +113,14 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-10 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} RentMart. All rights reserved.
+              &copy; {new Date().getFullYear()} Cousateca. Todos los derechos reservados.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <Link to="/privacy" className="text-gray-400 hover:text-rental-300 text-sm">
-                Privacy Policy
+                Política de Privacidad
               </Link>
               <Link to="/terms" className="text-gray-400 hover:text-rental-300 text-sm">
-                Terms of Service
+                Términos de Servicio
               </Link>
             </div>
           </div>
