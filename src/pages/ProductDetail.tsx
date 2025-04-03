@@ -7,11 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { 
   Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+  CardContent
 } from "@/components/ui/card";
 import {
   Carousel,
@@ -26,6 +22,11 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { getProductById } from "@/data/products";
 import { 
@@ -43,6 +44,9 @@ import {
   formatDate, 
   getDefaultEndDate 
 } from "@/lib/utils";
+import { DateRange } from "react-day-picker";
+import { format, addDays, differenceInDays } from "date-fns";
+import { es } from "date-fns/locale";
 import { toast } from "sonner";
 
 const ProductDetail = () => {
@@ -52,8 +56,10 @@ const ProductDetail = () => {
   
   const product = getProductById(id || "");
   
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(getDefaultEndDate(new Date()));
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: getDefaultEndDate(new Date())
+  });
   const [activeImage, setActiveImage] = useState(0);
   
   if (!product) {
@@ -74,8 +80,15 @@ const ProductDetail = () => {
     );
   }
   
-  const rentalDays = calculateTotalPrice(1, startDate, endDate) / product.dailyPrice;
-  const totalPrice = calculateTotalPrice(product.dailyPrice, startDate, endDate);
+  // Calcular la duración del alquiler en días
+  const rentalDays = dateRange?.from && dateRange?.to 
+    ? differenceInDays(dateRange.to, dateRange.from) + 1 
+    : 1;
+  
+  // Calcular el precio total
+  const totalPrice = dateRange?.from && dateRange?.to 
+    ? product.dailyPrice * rentalDays 
+    : product.dailyPrice;
   
   const handleAddToCart = () => {
     if (!product.availability) {
@@ -83,11 +96,16 @@ const ProductDetail = () => {
       return;
     }
     
+    if (!dateRange?.from || !dateRange?.to) {
+      toast.error("Por favor selecciona fechas de inicio y fin");
+      return;
+    }
+    
     addToCart({
       product,
       rentalDays,
-      startDate,
-      endDate,
+      startDate: dateRange.from,
+      endDate: dateRange.to,
     });
     
     navigate("/cart");
@@ -199,35 +217,38 @@ const ProductDetail = () => {
                 
                 <Separator className="my-6" />
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div>
-                    <p className="font-medium mb-2">Fecha de Inicio</p>
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={(date) => {
-                        if (date) {
-                          setStartDate(date);
-                          // Ensure end date is after start date
-                          if (date > endDate) {
-                            setEndDate(getDefaultEndDate(date));
-                          }
-                        }
-                      }}
-                      disabled={(date) => date < new Date()}
-                      className="border rounded-md p-3"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-medium mb-2">Fecha de Fin</p>
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={(date) => date && setEndDate(date)}
-                      disabled={(date) => date < startDate}
-                      className="border rounded-md p-3"
-                    />
-                  </div>
+                <div className="mb-6">
+                  <p className="font-medium mb-2">Selecciona fechas de alquiler</p>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start text-left font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateRange?.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "d MMM, yyyy", { locale: es })} -{" "}
+                              {format(dateRange.to, "d MMM, yyyy", { locale: es })}
+                            </>
+                          ) : (
+                            format(dateRange.from, "d MMM, yyyy", { locale: es })
+                          )
+                        ) : (
+                          <span>Selecciona fechas de alquiler</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={dateRange?.from}
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        numberOfMonths={2}
+                        disabled={(date) => date < new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
@@ -238,7 +259,11 @@ const ProductDetail = () => {
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-700">Fechas:</span>
                     <span className="font-medium">
-                      {formatDate(startDate)} - {formatDate(endDate)}
+                      {dateRange?.from && dateRange?.to ? (
+                        <>
+                          {format(dateRange.from, "d MMM, yyyy", { locale: es })} - {format(dateRange.to, "d MMM, yyyy", { locale: es })}
+                        </>
+                      ) : "No seleccionado"}
                     </span>
                   </div>
                   <div className="flex justify-between mb-2">
