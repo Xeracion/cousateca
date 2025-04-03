@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,8 +98,8 @@
 .hero-gradient {
   background: linear-gradient(
     to bottom,
-    rgba(0, 175, 178, 0.8),
-    rgba(0, 175, 178, 0.4)
+    rgba(29, 63, 186, 0.8),
+    rgba(29, 63, 186, 0.4)
   );
 }
 
@@ -109,4 +110,20 @@
 .product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.floating-animation {
+  animation: float 6s ease-in-out infinite;
 }
