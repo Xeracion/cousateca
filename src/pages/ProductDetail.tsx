@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,32 +11,73 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { getProductById } from "@/data/products";
 import { Calendar as CalendarIcon, ChevronRight, Truck, Shield, DollarSign, Clock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { calculateTotalPrice, formatCurrency, formatDate, getDefaultEndDate } from "@/lib/utils";
+import { formatCurrency, formatDate, getDefaultEndDate } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 import { format, addDays, differenceInDays } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
+
 const ProductDetail = () => {
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const {
-    addToCart
-  } = useCart();
-  const product = getProductById(id || "");
+  const { addToCart } = useCart();
+  const [product, setProduct] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
     to: getDefaultEndDate(new Date())
   });
   const [activeImage, setActiveImage] = useState(0);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('productos')
+          .select(`
+            *,
+            categoria:categoria_id (
+              id,
+              nombre
+            )
+          `)
+          .eq('id', id)
+          .single();
+        
+        if (error) throw error;
+        setProduct(data);
+      } catch (error: any) {
+        console.error("Error al cargar el producto:", error);
+        toast.error("No se pudo cargar el producto");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow container mx-auto px-4 py-12">
+          <div className="text-center">
+            <p>Cargando producto...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (!product) {
-    return <div className="flex flex-col min-h-screen">
+    return (
+      <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow container mx-auto px-4 py-12">
           <div className="text-center">
@@ -46,16 +89,18 @@ const ProductDetail = () => {
           </div>
         </main>
         <Footer />
-      </div>;
+      </div>
+    );
   }
 
   // Calcular la duración del alquiler en días
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 1;
 
   // Calcular el precio total
-  const totalPrice = dateRange?.from && dateRange?.to ? product.dailyPrice * rentalDays : product.dailyPrice;
+  const totalPrice = dateRange?.from && dateRange?.to ? product.precio_diario * rentalDays : product.precio_diario;
+
   const handleAddToCart = () => {
-    if (!product.availability) {
+    if (!product.disponible) {
       toast.error("Este producto no está disponible actualmente");
       return;
     }
@@ -71,7 +116,9 @@ const ProductDetail = () => {
     });
     navigate("/cart");
   };
-  return <div className="flex flex-col min-h-screen">
+
+  return (
+    <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow bg-gray-50 py-10">
         <div className="container mx-auto px-4">
@@ -81,7 +128,7 @@ const ProductDetail = () => {
             <ChevronRight className="h-4 w-4 mx-1" />
             <a href="/products" className="hover:text-rental-500">Productos</a>
             <ChevronRight className="h-4 w-4 mx-1" />
-            <span>{product.name}</span>
+            <span>{product.nombre}</span>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -90,30 +137,38 @@ const ProductDetail = () => {
               <div className="bg-white rounded-lg overflow-hidden mb-4">
                 <Carousel>
                   <CarouselContent>
-                    {product.images.map((image, index) => <CarouselItem key={index}>
+                    {product.imagenes.map((image: string, index: number) => (
+                      <CarouselItem key={index}>
                         <div className="aspect-square overflow-hidden">
-                          <img src={image} alt={`${product.name} - Imagen ${index + 1}`} className="w-full h-full object-cover" />
+                          <img src={image} alt={`${product.nombre} - Imagen ${index + 1}`} className="w-full h-full object-cover" />
                         </div>
-                      </CarouselItem>)}
+                      </CarouselItem>
+                    ))}
                   </CarouselContent>
                   <CarouselPrevious />
                   <CarouselNext />
                 </Carousel>
               </div>
               <div className="flex space-x-2">
-                {product.images.map((image, index) => <div key={index} className={`cursor-pointer border-2 rounded-md overflow-hidden ${activeImage === index ? "border-rental-500" : "border-transparent"}`} onClick={() => setActiveImage(index)}>
+                {product.imagenes.map((image: string, index: number) => (
+                  <div 
+                    key={index} 
+                    className={`cursor-pointer border-2 rounded-md overflow-hidden ${activeImage === index ? "border-rental-500" : "border-transparent"}`} 
+                    onClick={() => setActiveImage(index)}
+                  >
                     <img src={image} alt={`Miniatura ${index + 1}`} className="w-16 h-16 object-cover" />
-                  </div>)}
+                  </div>
+                ))}
               </div>
             </div>
             
             {/* Product Info and Rental Options */}
             <div>
               <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
-                <h1 className="text-2xl sm:text-3xl font-bold mb-4">{product.name}</h1>
-                <p className="text-gray-700 mb-4">{product.category}</p>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-4">{product.nombre}</h1>
+                <p className="text-gray-700 mb-4">{product.categoria?.nombre || 'Categoría no disponible'}</p>
                 
-                <p className="text-gray-700 mb-6">{product.description}</p>
+                <p className="text-gray-700 mb-6">{product.descripcion}</p>
                 
                 <Tabs defaultValue="daily">
                   <TabsList className="mb-4">
@@ -123,9 +178,8 @@ const ProductDetail = () => {
                   </TabsList>
                   <TabsContent value="daily" className="space-y-4">
                     <div className="flex items-center">
-                      
                       <span className="text-2xl font-bold">
-                        {formatCurrency(product.dailyPrice)} / día
+                        {formatCurrency(product.precio_diario)} / día
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
@@ -136,22 +190,22 @@ const ProductDetail = () => {
                     <div className="flex items-center">
                       <DollarSign className="h-5 w-5 text-rental-500 mr-1" />
                       <span className="text-2xl font-bold">
-                        {formatCurrency(product.weeklyPrice)} / semana
+                        {formatCurrency(product.precio_semanal)} / semana
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Ahorra {Math.round((1 - product.weeklyPrice / (product.dailyPrice * 7)) * 100)}% en comparación con las tarifas diarias.
+                      Ahorra {Math.round((1 - product.precio_semanal / (product.precio_diario * 7)) * 100)}% en comparación con las tarifas diarias.
                     </p>
                   </TabsContent>
                   <TabsContent value="monthly" className="space-y-4">
                     <div className="flex items-center">
                       <DollarSign className="h-5 w-5 text-rental-500 mr-1" />
                       <span className="text-2xl font-bold">
-                        {formatCurrency(product.monthlyPrice)} / mes
+                        {formatCurrency(product.precio_mensual)} / mes
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Ahorra {Math.round((1 - product.monthlyPrice / (product.dailyPrice * 30)) * 100)}% en comparación con las tarifas diarias.
+                      Ahorra {Math.round((1 - product.precio_mensual / (product.precio_diario * 30)) * 100)}% en comparación con las tarifas diarias.
                     </p>
                   </TabsContent>
                 </Tabs>
@@ -164,20 +218,30 @@ const ProductDetail = () => {
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-start text-left font-normal">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange?.from ? dateRange.to ? <>
-                              {format(dateRange.from, "d MMM, yyyy", {
-                          locale: es
-                        })} -{" "}
-                              {format(dateRange.to, "d MMM, yyyy", {
-                          locale: es
-                        })}
-                            </> : format(dateRange.from, "d MMM, yyyy", {
-                        locale: es
-                      }) : <span>Selecciona fechas de alquiler</span>}
+                        {dateRange?.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "d MMM, yyyy", { locale: es })} -{" "}
+                              {format(dateRange.to, "d MMM, yyyy", { locale: es })}
+                            </>
+                          ) : (
+                            format(dateRange.from, "d MMM, yyyy", { locale: es })
+                          )
+                        ) : (
+                          <span>Selecciona fechas de alquiler</span>
+                        )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2} disabled={date => date < new Date()} />
+                      <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={dateRange?.from}
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        numberOfMonths={2}
+                        disabled={(date) => date < new Date()}
+                      />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -190,22 +254,22 @@ const ProductDetail = () => {
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-700">Fechas:</span>
                     <span className="font-medium">
-                      {dateRange?.from && dateRange?.to ? <>
-                          {format(dateRange.from, "d MMM, yyyy", {
-                        locale: es
-                      })} - {format(dateRange.to, "d MMM, yyyy", {
-                        locale: es
-                      })}
-                        </> : "No seleccionado"}
+                      {dateRange?.from && dateRange?.to ? (
+                        <>
+                          {format(dateRange.from, "d MMM, yyyy", { locale: es })} - {format(dateRange.to, "d MMM, yyyy", { locale: es })}
+                        </>
+                      ) : (
+                        "No seleccionado"
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-700">Tarifa Diaria:</span>
-                    <span className="font-medium">{formatCurrency(product.dailyPrice)}</span>
+                    <span className="font-medium">{formatCurrency(product.precio_diario)}</span>
                   </div>
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-700">Depósito de Seguridad:</span>
-                    <span className="font-medium">{formatCurrency(product.deposit)}</span>
+                    <span className="font-medium">{formatCurrency(product.deposito)}</span>
                   </div>
                   <Separator className="my-3" />
                   <div className="flex justify-between font-bold">
@@ -217,8 +281,12 @@ const ProductDetail = () => {
                   </p>
                 </div>
                 
-                <Button className="w-full bg-rental-500 hover:bg-rental-600" disabled={!product.availability} onClick={handleAddToCart}>
-                  {product.availability ? "Añadir al Carrito" : "Actualmente No Disponible"}
+                <Button 
+                  className="w-full bg-rental-500 hover:bg-rental-600" 
+                  disabled={!product.disponible} 
+                  onClick={handleAddToCart}
+                >
+                  {product.disponible ? "Añadir al Carrito" : "Actualmente No Disponible"}
                 </Button>
               </div>
               
@@ -257,6 +325,8 @@ const ProductDetail = () => {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default ProductDetail;

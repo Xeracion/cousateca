@@ -1,12 +1,48 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
-import { getFeaturedProducts } from "@/data/products";
+import { useToast } from "@/components/ui/use-toast";
 
 const FeaturedProducts = () => {
-  const featuredProducts = getFeaturedProducts();
+  const { toast } = useToast();
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('productos')
+          .select(`
+            *,
+            categoria:categoria_id (
+              id,
+              nombre
+            )
+          `)
+          .eq('destacado', true)
+          .eq('disponible', true)
+          .limit(6);
+        
+        if (error) throw error;
+        setFeaturedProducts(data || []);
+      } catch (error: any) {
+        console.error("Error al cargar productos destacados:", error);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los productos destacados",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchFeaturedProducts();
+  }, [toast]);
   
   return (
     <section className="py-12 bg-gray-50">
@@ -23,11 +59,21 @@ const FeaturedProducts = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600">Cargando productos destacados...</p>
+          </div>
+        ) : featuredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600">No hay productos destacados disponibles actualmente.</p>
+          </div>
+        )}
       </div>
     </section>
   );
