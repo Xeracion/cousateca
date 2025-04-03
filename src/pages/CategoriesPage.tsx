@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,39 @@ import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import { Link } from "react-router-dom";
 import { Laptop, Bike, Tent, PartyPopper, Music, Hammer } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const CategoriesPage = () => {
+  const [dbProducts, setDbProducts] = useState([]);
+  const [dbCategories, setDbCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch categories
+        const { data: categoriesData } = await supabase
+          .from('categories')
+          .select('*')
+          .order('nombre');
+          
+        // Fetch products
+        const { data: productsData } = await supabase
+          .from('productos')
+          .select('*');
+          
+        if (categoriesData) setDbCategories(categoriesData);
+        if (productsData) setDbProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
   // Helper function to get the correct icon
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -33,14 +65,26 @@ const CategoriesPage = () => {
   const mapProductData = (product: any) => {
     return {
       id: product.id,
-      nombre: product.nombre,
-      descripcion_corta: product.descripcion_corta,
-      precio_diario: product.precio_diario,
-      imagenes: product.imagenes,
-      destacado: product.destacado,
-      categoria: product.categoria
+      name: product.nombre,
+      shortDescription: product.descripcion_corta,
+      dailyPrice: product.precio_diario,
+      images: product.imagenes,
+      featured: product.destacado,
+      category: product.categoria_id
     };
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow bg-gray-50 py-10 flex justify-center items-center">
+          <p>Cargando categorías...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
