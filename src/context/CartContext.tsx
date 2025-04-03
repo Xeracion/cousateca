@@ -40,7 +40,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }));
         setItems(itemsWithDateObjects);
       } catch (error) {
-        console.error("Failed to parse cart from localStorage", error);
+        console.error("Error al cargar el carrito desde localStorage", error);
       }
     }
   }, []);
@@ -76,22 +76,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updatedItems = [...items];
       updatedItems[existingItemIndex] = newItem;
       setItems(updatedItems);
-      toast.success("Rental dates updated in cart");
+      toast.success("Fechas de alquiler actualizadas en el carrito");
     } else {
       // Add new item
       setItems([...items, newItem]);
-      toast.success("Item added to cart");
+      toast.success("Producto añadido al carrito");
     }
   };
 
   const removeFromCart = (productId: string) => {
     setItems(items.filter((item) => item.product.id !== productId));
-    toast.info("Item removed from cart");
+    toast.info("Producto eliminado del carrito");
   };
 
   const clearCart = () => {
     setItems([]);
-    toast.info("Cart cleared");
+    toast.info("Carrito vaciado");
   };
 
   return (
@@ -113,7 +113,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
+    throw new Error("useCart debe usarse dentro de un CartProvider");
   }
   return context;
 };

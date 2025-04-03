@@ -31,20 +31,20 @@ const CartPage = () => {
         <Navbar />
         <main className="flex-grow bg-gray-50 py-10">
           <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+            <h1 className="text-3xl font-bold mb-8">Tu Carrito</h1>
             <Card>
               <CardContent className="p-8 flex flex-col items-center justify-center">
                 <ShoppingCart className="h-12 w-12 text-gray-400 mb-4" />
-                <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+                <h2 className="text-xl font-semibold mb-2">Tu carrito está vacío</h2>
                 <p className="text-gray-600 mb-6 text-center max-w-md">
-                  Looks like you haven't added any rental items to your cart yet.
-                  Start browsing our products to find what you need.
+                  Parece que aún no has añadido ningún artículo de alquiler a tu carrito.
+                  Empieza a explorar nuestros productos para encontrar lo que necesitas.
                 </p>
                 <Button 
                   className="bg-rental-500 hover:bg-rental-600"
                   onClick={() => navigate("/products")}
                 >
-                  Browse Products
+                  Explorar Productos
                 </Button>
               </CardContent>
             </Card>
@@ -60,7 +60,7 @@ const CartPage = () => {
       <Navbar />
       <main className="flex-grow bg-gray-50 py-10">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+          <h1 className="text-3xl font-bold mb-8">Tu Carrito</h1>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
@@ -71,9 +71,9 @@ const CartPage = () => {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Product</TableHead>
-                          <TableHead>Rental Period</TableHead>
-                          <TableHead>Price</TableHead>
+                          <TableHead>Producto</TableHead>
+                          <TableHead>Período de Alquiler</TableHead>
+                          <TableHead>Precio</TableHead>
                           <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
@@ -110,7 +110,7 @@ const CartPage = () => {
                                 </span>
                               </div>
                               <p className="text-sm text-gray-500 mt-1">
-                                {item.rentalDays} days
+                                {item.rentalDays} días
                               </p>
                             </TableCell>
                             <TableCell>
@@ -118,7 +118,7 @@ const CartPage = () => {
                                 {formatCurrency(item.product.dailyPrice * item.rentalDays)}
                               </div>
                               <p className="text-sm text-gray-500">
-                                {formatCurrency(item.product.dailyPrice)} / day
+                                {formatCurrency(item.product.dailyPrice)} / día
                               </p>
                             </TableCell>
                             <TableCell>
@@ -126,6 +126,7 @@ const CartPage = () => {
                                 variant="ghost" 
                                 size="icon"
                                 onClick={() => removeFromCart(item.product.id)}
+                                aria-label="Eliminar del carrito"
                               >
                                 <Trash2 className="h-4 w-4 text-gray-500" />
                               </Button>
@@ -160,6 +161,7 @@ const CartPage = () => {
                                 variant="ghost" 
                                 size="icon"
                                 onClick={() => removeFromCart(item.product.id)}
+                                aria-label="Eliminar del carrito"
                               >
                                 <Trash2 className="h-4 w-4 text-gray-500" />
                               </Button>
@@ -171,7 +173,7 @@ const CartPage = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <p className="text-sm text-gray-500">Rental Period</p>
+                            <p className="text-sm text-gray-500">Período de Alquiler</p>
                             <div className="flex items-center mt-1">
                               <Calendar className="h-4 w-4 text-rental-500 mr-2" />
                               <div className="text-sm">
@@ -180,16 +182,16 @@ const CartPage = () => {
                               </div>
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                              {item.rentalDays} days
+                              {item.rentalDays} días
                             </p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500">Price</p>
+                            <p className="text-sm text-gray-500">Precio</p>
                             <div className="font-medium mt-1">
                               {formatCurrency(item.product.dailyPrice * item.rentalDays)}
                             </div>
                             <p className="text-xs text-gray-500">
-                              {formatCurrency(item.product.dailyPrice)} / day
+                              {formatCurrency(item.product.dailyPrice)} / día
                             </p>
                           </div>
                         </div>
@@ -197,19 +199,19 @@ const CartPage = () => {
                     ))}
                   </div>
                   
-                  <div className="flex justify-between mt-6">
+                  <div className="flex flex-col sm:flex-row justify-between mt-6 gap-4 sm:gap-0">
                     <Button 
                       variant="outline" 
                       className="text-gray-600"
                       onClick={() => clearCart()}
                     >
-                      Clear Cart
+                      Vaciar Carrito
                     </Button>
                     <Button 
                       className="bg-rental-500 hover:bg-rental-600"
                       onClick={() => navigate("/products")}
                     >
-                      Continue Shopping
+                      Seguir Comprando
                     </Button>
                   </div>
                 </CardContent>
@@ -218,9 +220,9 @@ const CartPage = () => {
             
             {/* Order Summary */}
             <div>
-              <Card>
+              <Card className="sticky top-20">
                 <CardContent className="p-6">
-                  <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+                  <h2 className="text-xl font-bold mb-4">Resumen del Pedido</h2>
                   
                   <div className="space-y-3 mb-6">
                     <div className="flex justify-between">
@@ -228,11 +230,11 @@ const CartPage = () => {
                       <span>{formatCurrency(totalPrice)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Security Deposit</span>
+                      <span className="text-gray-600">Fianza</span>
                       <span>{formatCurrency(totalDeposit)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Delivery Fee</span>
+                      <span className="text-gray-600">Gastos de Envío</span>
                       <span>{formatCurrency(10)}</span>
                     </div>
                   </div>
@@ -247,22 +249,22 @@ const CartPage = () => {
                   <div className="bg-yellow-50 border border-yellow-100 rounded-md p-3 mb-6 flex items-start">
                     <AlertCircle className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-yellow-700">
-                      Security deposits are fully refundable when items are returned in their original condition.
+                      Las fianzas son totalmente reembolsables cuando los artículos se devuelven en su estado original.
                     </p>
                   </div>
                   
                   <Button className="w-full bg-rental-500 hover:bg-rental-600 mb-3">
-                    Proceed to Checkout
+                    Proceder al Pago
                   </Button>
                   
                   <p className="text-xs text-gray-500 text-center">
-                    By proceeding, you agree to our 
+                    Al continuar, aceptas nuestros 
                     <Link to="/terms" className="text-rental-500 hover:underline mx-1">
-                      Terms of Service
+                      Términos de Servicio
                     </Link>
-                    and
+                    y
                     <Link to="/privacy" className="text-rental-500 hover:underline mx-1">
-                      Privacy Policy
+                      Política de Privacidad
                     </Link>
                   </p>
                 </CardContent>

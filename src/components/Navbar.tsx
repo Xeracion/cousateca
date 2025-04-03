@@ -7,10 +7,11 @@ import { ShoppingCart, Search, Menu, X, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navbar = () => {
   const { itemCount } = useCart();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b">
@@ -50,7 +51,7 @@ const Navbar = () => {
               />
             </div>
             <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" aria-label="Carrito">
                 <ShoppingCart className="h-5 w-5" />
                 {itemCount > 0 && (
                   <Badge className="absolute -top-2 -right-2 bg-rental-500 text-white">
@@ -60,7 +61,7 @@ const Navbar = () => {
               </Button>
             </Link>
             <Link to="/auth">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label="Mi cuenta">
                 <User className="h-5 w-5" />
               </Button>
             </Link>
@@ -69,7 +70,7 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <div className="flex md:hidden">
             <Link to="/cart" className="mr-2">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative" aria-label="Carrito">
                 <ShoppingCart className="h-5 w-5" />
                 {itemCount > 0 && (
                   <Badge className="absolute -top-2 -right-2 bg-rental-500 text-white">
@@ -80,7 +81,7 @@ const Navbar = () => {
             </Link>
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label="Menú">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -126,7 +127,7 @@ const Navbar = () => {
                       to="/auth" 
                       className="text-gray-700 hover:text-rental-500 font-medium py-2"
                     >
-                      Cuenta
+                      Mi Cuenta
                     </Link>
                   </nav>
                 </div>

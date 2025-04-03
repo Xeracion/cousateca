@@ -2,6 +2,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { addDays, differenceInDays, format } from "date-fns";
+import { es } from "date-fns/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -24,7 +25,7 @@ export function calculateTotalPrice(dailyPrice: number, startDate: Date, endDate
 }
 
 export function formatDate(date: Date): string {
-  return format(date, 'dd MMM, yyyy');
+  return format(date, 'dd MMM, yyyy', { locale: es });
 }
 
 export function getDefaultEndDate(startDate: Date): Date {
