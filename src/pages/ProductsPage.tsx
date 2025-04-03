@@ -1,8 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { products, Product } from "@/data/products";
+import { useToast } from "@/components/ui/use-toast";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,34 +11,103 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { categories } from "@/data/categories";
 import { Sliders, Search } from "lucide-react";
 
+interface Product {
+  id: string;
+  nombre: string;
+  categoria_id: string;
+  descripcion: string;
+  descripcion_corta: string;
+  precio_diario: number;
+  precio_semanal: number;
+  precio_mensual: number;
+  deposito: number;
+  imagenes: string[];
+  disponible: boolean;
+  destacado: boolean;
+  valoracion: number;
+  num_valoraciones: number;
+  categoria?: {
+    id: string;
+    nombre: string;
+  };
+}
+
 const ProductsPage = () => {
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortOption, setSortOption] = useState<string>("featured");
   const [showFilters, setShowFilters] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
 
-  // Filter products based on search query and category
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase());
+  // Cargar productos y categorías de Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Cargar categorías
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('categories')
+          .select('id, nombre');
+        
+        if (categoriesError) throw categoriesError;
+        setDbCategories(categoriesData || []);
+        
+        // Cargar productos con categorías
+        const { data: productsData, error: productsError } = await supabase
+          .from('productos')
+          .select(`
+            *,
+            categoria:categoria_id (
+              id,
+              nombre
+            )
+          `)
+          .eq('disponible', true);
+        
+        if (productsError) throw productsError;
+        setProducts(productsData || []);
+      } catch (error: any) {
+        toast({
+          title: "Error al cargar datos",
+          description: error.message,
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    const matchesCategory = selectedCategory === "all" || product.category.toLowerCase() === selectedCategory.toLowerCase();
+    fetchData();
+  }, [toast]);
+
+  // Filtrar productos basado en búsqueda y categoría
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = 
+      product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.descripcion.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.descripcion_corta.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = 
+      selectedCategory === "all" || 
+      (product.categoria && product.categoria.id === selectedCategory);
     
     return matchesSearch && matchesCategory;
   });
 
-  // Sort products based on selected sort option
+  // Ordenar productos según el criterio seleccionado
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortOption) {
       case "price-low":
-        return a.dailyPrice - b.dailyPrice;
+        return a.precio_diario - b.precio_diario;
       case "price-high":
-        return b.dailyPrice - a.dailyPrice;
+        return b.precio_diario - a.precio_diario;
       case "rating":
-        return b.rating - a.rating;
+        return b.valoracion - a.valoracion;
       case "featured":
       default:
-        return b.featured ? 1 : -1;
+        return b.destacado ? 1 : -1;
     }
   });
 
@@ -79,9 +149,9 @@ const ProductsPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todas las Categorías</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.name.toLowerCase()}>
-                          {category.name}
+                      {dbCategories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.nombre}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -111,9 +181,9 @@ const ProductsPage = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas las Categorías</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.name.toLowerCase()}>
-                        {category.name}
+                    {dbCategories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.nombre}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -135,7 +205,11 @@ const ProductsPage = () => {
           </div>
           
           {/* Products Grid */}
-          {sortedProducts.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Cargando productos...</p>
+            </div>
+          ) : sortedProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {sortedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />

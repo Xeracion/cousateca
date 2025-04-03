@@ -56,13 +56,13 @@ const CategoriesPage = () => {
                       {getIcon(category.icon)}
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold">{category.name}</h2>
-                      <p className="text-gray-600">{category.description}</p>
+                      <h2 className="text-2xl font-bold">{category.nombre_es}</h2>
+                      <p className="text-gray-600">{category.descripcion_es}</p>
                     </div>
                   </div>
                   <Link to={`/category/${category.id}`}>
                     <Button variant="outline" className="border-rental-500 text-rental-500 hover:bg-rental-50">
-                      Ver Todos los {category.name}
+                      Ver Todos los {category.nombre_es}
                     </Button>
                   </Link>
                 </div>

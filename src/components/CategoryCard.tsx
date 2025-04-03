@@ -9,8 +9,7 @@ import {
   Tent, 
   PartyPopper, 
   Music, 
-  Hammer,
-  LucideIcon
+  Hammer
 } from "lucide-react";
 
 interface CategoryCardProps {
@@ -46,8 +45,8 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
           <div className="mb-4">
             {getIcon(category.icon)}
           </div>
-          <h3 className="font-medium text-lg mb-2">{category.name}</h3>
-          <p className="text-sm text-gray-500">{category.description}</p>
+          <h3 className="font-medium text-lg mb-2">{category.nombre_es}</h3>
+          <p className="text-sm text-gray-500">{category.descripcion_es}</p>
         </CardContent>
       </Card>
     </Link>
