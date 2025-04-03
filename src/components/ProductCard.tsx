@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Product } from "@/data/products";
 import { formatCurrency } from "@/lib/utils";
 
@@ -27,15 +27,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
       </div>
       <CardContent className="flex-grow pt-4">
-        <div className="flex items-center mb-2">
-          <div className="flex items-center">
-            <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500 mr-1" />
-            <span className="text-sm font-medium">{product.rating}</span>
-          </div>
-          <span className="text-sm text-gray-500 ml-1">
-            ({product.reviewCount} reseñas)
-          </span>
-        </div>
         <h3 className="font-semibold text-lg mb-1 line-clamp-1">{product.name}</h3>
         <p className="text-gray-500 text-sm mb-2">{product.category}</p>
         <p className="text-sm text-gray-700 line-clamp-2 mb-3">

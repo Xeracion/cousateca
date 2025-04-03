@@ -30,7 +30,6 @@ import { Separator } from "@/components/ui/separator";
 import { getProductById } from "@/data/products";
 import { 
   Calendar as CalendarIcon, 
-  Star, 
   ChevronRight, 
   Truck, 
   Shield, 
@@ -152,18 +151,8 @@ const ProductDetail = () => {
             {/* Product Info and Rental Options */}
             <div>
               <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
-                <h1 className="text-2xl sm:text-3xl font-bold mb-2">{product.name}</h1>
-                <div className="flex items-center mb-4">
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 mr-1" />
-                    <span className="font-medium">{product.rating}</span>
-                  </div>
-                  <span className="text-gray-500 ml-1">
-                    ({product.reviewCount} reseñas)
-                  </span>
-                  <Separator orientation="vertical" className="mx-3 h-5" />
-                  <span className="text-gray-700">{product.category}</span>
-                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-4">{product.name}</h1>
+                <p className="text-gray-700 mb-4">{product.category}</p>
                 
                 <p className="text-gray-700 mb-6">{product.description}</p>
                 
