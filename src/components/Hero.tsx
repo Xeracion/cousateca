@@ -11,10 +11,7 @@ const Hero = () => {
       <div className="relative z-10 container mx-auto px-4 py-24 sm:py-32">
         <div className="max-w-2xl text-white">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">¿Por qué comprar cuando puedes alquilar?</h1>
-          <p className="text-lg sm:text-xl mb-8 text-white/90">
-            ¿Por qué comprar cuando puedes alquilar? Accede a productos premium a una fracción del costo.
-            Desde electrónica hasta equipamiento para exteriores, tenemos todo lo que necesitas.
-          </p>
+          <p className="text-lg sm:text-xl mb-8 text-white/90">Ahórrate el trastero y accede a productos premium a una fracción del costo. Desde electrónica hasta equipamiento para exteriores, tenemos todo lo que necesitas.</p>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <Link to="/products">
               <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100 w-full sm:w-auto">
