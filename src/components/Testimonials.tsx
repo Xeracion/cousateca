@@ -6,7 +6,7 @@ const testimonials = [
   {
     id: 1,
     name: "Sara Jiménez",
-    role: "Organizadora de Eventos",
+    role: "Organizadora de eventos",
     content: "Cousateca ha sido un cambio revolucionario para mi negocio de organización de eventos. La calidad de su equipamiento es excepcional, y el proceso de alquiler es muy sencillo. ¡Me encanta especialmente el servicio de entrega y recogida!",
     avatar: "https://randomuser.me/api/portraits/women/12.jpg",
     rating: 5
@@ -14,7 +14,7 @@ const testimonials = [
   {
     id: 2,
     name: "David López",
-    role: "Entusiasta de la Fotografía",
+    role: "Entusiasta de la fotografía",
     content: "Pude probar equipos de cámara caros antes de hacer una compra. El personal era conocedor y me ayudó a elegir el equipo adecuado para mis necesidades. ¡Muy recomendable!",
     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
     rating: 5
@@ -22,7 +22,7 @@ const testimonials = [
   {
     id: 3,
     name: "Elena Moreno",
-    role: "Aventurera de Fin de Semana",
+    role: "Aventurera de fin de semana",
     content: "Alquilé equipo de camping para un viaje de última hora y todo estaba en perfectas condiciones. Los precios eran razonables y me ahorró tener que comprar equipamiento que rara vez usaría.",
     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
     rating: 4
@@ -34,7 +34,7 @@ const Testimonials = () => {
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Lo Que Dicen Nuestros Clientes</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Lo que dicen nuestros clientes</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             No solo tomes nuestra palabra. Esto es lo que los clientes piensan sobre su experiencia con Cousateca.
           </p>

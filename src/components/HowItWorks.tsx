@@ -6,22 +6,22 @@ const HowItWorks = () => {
   const steps = [
     {
       icon: <Search className="h-10 w-10 text-rental-500" />,
-      title: "Buscar y Seleccionar",
+      title: "Buscar y seleccionar",
       description: "Explora nuestro catálogo de productos de alta calidad y elige lo que necesitas."
     },
     {
       icon: <Calendar className="h-10 w-10 text-rental-500" />,
-      title: "Elegir Período de Alquiler",
+      title: "Elegir período de alquiler",
       description: "Selecciona las fechas de alquiler deseadas y revisa las opciones de precios."
     },
     {
       icon: <Truck className="h-10 w-10 text-rental-500" />,
-      title: "Entrega y Recogida",
+      title: "Entrega y recogida",
       description: "Entregaremos los artículos en tu ubicación y los recogeremos cuando hayas terminado."
     },
     {
       icon: <ThumbsUp className="h-10 w-10 text-rental-500" />,
-      title: "Disfrutar y Devolver",
+      title: "Disfrutar y devolver",
       description: "Utiliza los productos y devuélvelos en buen estado cuando finalice tu alquiler."
     }
   ];
@@ -30,7 +30,7 @@ const HowItWorks = () => {
     <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Cómo Funciona Cousateca</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Cómo funciona Cousateca</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Alquilar productos de alta calidad nunca ha sido tan fácil. 
             Nuestro sencillo proceso te permite obtener lo que necesitas, cuando lo necesitas.
