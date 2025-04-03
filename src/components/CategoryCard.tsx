@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 interface CategoryCardProps {
-  category: Category;
+  category: Category | any;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {

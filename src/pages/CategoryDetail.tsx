@@ -32,8 +32,8 @@ const CategoryDetail = () => {
   const [sortOrder, setSortOrder] = useState("featured");
   const [maxPrice, setMaxPrice] = useState(1000);
   const [loading, setLoading] = useState(true);
-  const [dbProducts, setDbProducts] = useState([]);
-  const [dbCategories, setDbCategories] = useState([]);
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
 
   const category = categories.find(c => c.id === id);
   
@@ -76,6 +76,13 @@ const CategoryDetail = () => {
   const mapProductData = (product: any) => {
     return {
       id: product.id,
+      nombre: product.nombre,
+      descripcion_corta: product.descripcion_corta,
+      precio_diario: product.precio_diario,
+      imagenes: product.imagenes,
+      destacado: product.destacado,
+      categoria_id: product.categoria_id,
+      // Also include legacy format for compatibility
       name: product.nombre,
       shortDescription: product.descripcion_corta,
       dailyPrice: product.precio_diario,
@@ -178,7 +185,7 @@ const CategoryDetail = () => {
               
               {/* Price range filter */}
               <div className="w-full md:w-48">
-                <Label htmlFor="price-range">Precio máximo: ${priceRange.max}</Label>
+                <Label htmlFor="price-range">Precio máximo: {priceRange.max} €</Label>
                 <Input 
                   id="price-range" 
                   type="range" 
@@ -223,7 +230,7 @@ const CategoryDetail = () => {
           {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={mapProductData(product)} />
               ))}
             </div>
           ) : (

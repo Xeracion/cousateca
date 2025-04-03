@@ -1,68 +1,75 @@
+
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Search, Calendar, CreditCard, Truck, ThumbsUp, ArrowRight, CheckCircle } from "lucide-react";
+
 const HowItWorksPage = () => {
   const steps = [{
     icon: <Search className="h-12 w-12 text-rental-500" />,
-    title: "Browse & Select",
-    description: "Browse our catalog of high-quality products and select the items you need for your project, event, or temporary use.",
-    details: ["Filter products by category, price, and availability", "View detailed product specifications and images", "Read reviews from other customers", "Compare different options"]
+    title: "Buscar y Seleccionar",
+    description: "Explora nuestro catálogo de productos de alta calidad y selecciona los artículos que necesitas para tu proyecto, evento o uso temporal.",
+    details: ["Filtra productos por categoría, precio y disponibilidad", "Visualiza especificaciones detalladas e imágenes", "Lee opiniones de otros clientes", "Compara diferentes opciones"]
   }, {
     icon: <Calendar className="h-12 w-12 text-rental-500" />,
-    title: "Choose Rental Period",
-    description: "Select your desired rental dates and review our flexible pricing options for daily, weekly, or monthly rentals.",
-    details: ["Select start and end dates on our interactive calendar", "See real-time availability for your chosen dates", "View transparent pricing based on rental duration", "Modify dates as needed before checkout"]
+    title: "Elegir Período de Alquiler",
+    description: "Selecciona las fechas de alquiler deseadas y revisa nuestras opciones de precios flexibles para alquileres diarios, semanales o mensuales.",
+    details: ["Selecciona fechas de inicio y fin en nuestro calendario interactivo", "Comprueba la disponibilidad en tiempo real", "Visualiza precios transparentes basados en la duración", "Modifica las fechas según sea necesario antes de finalizar"]
   }, {
     icon: <CreditCard className="h-12 w-12 text-rental-500" />,
-    title: "Secure Checkout",
-    description: "Complete your order with our secure checkout process, including refundable security deposit and delivery options.",
-    details: ["Provide delivery information", "Pay security deposit (fully refundable upon return)", "Choose delivery time slots that work for you", "Receive instant confirmation and receipt"]
+    title: "Pago Seguro",
+    description: "Completa tu pedido con nuestro proceso de pago seguro, incluyendo depósito de seguridad reembolsable y opciones de entrega.",
+    details: ["Proporciona información de entrega", "Paga depósito de seguridad (totalmente reembolsable)", "Elige franjas horarias de entrega que te convengan", "Recibe confirmación y recibo instantáneos"]
   }, {
     icon: <Truck className="h-12 w-12 text-rental-500" />,
-    title: "Delivery & Pickup",
-    description: "We'll deliver your rental items to your specified location and pick them up when your rental period ends.",
-    details: ["Receive SMS notifications about delivery status", "Professional delivery team handles setup if needed", "Flexible delivery windows to accommodate your schedule", "Schedule pickup at your convenience"]
+    title: "Entrega y Recogida",
+    description: "Entregaremos tus artículos alquilados en la ubicación especificada y los recogeremos cuando finalice tu período de alquiler.",
+    details: ["Recibe notificaciones SMS sobre el estado de la entrega", "Equipo de entrega profesional que se encarga de la instalación si es necesario", "Ventanas de entrega flexibles para adaptarse a tu horario", "Programa la recogida según tu conveniencia"]
   }, {
     icon: <ThumbsUp className="h-12 w-12 text-rental-500" />,
-    title: "Enjoy & Return",
-    description: "Use your rented items worry-free, knowing that normal wear and tear is covered. Return them when you're done.",
-    details: ["Access to customer support throughout your rental period", "Option to extend your rental if needed", "Simple return process with our pickup service", "Quick security deposit refund after return"]
+    title: "Disfrutar y Devolver",
+    description: "Utiliza tus artículos alquilados sin preocupaciones, sabiendo que el desgaste normal está cubierto. Devuélvelos cuando hayas terminado.",
+    details: ["Acceso a atención al cliente durante todo el período de alquiler", "Opción de extender tu alquiler si es necesario", "Proceso de devolución simple con nuestro servicio de recogida", "Reembolso rápido del depósito de seguridad tras la devolución"]
   }];
+  
   const faqs = [{
-    question: "What if I need to extend my rental period?",
-    answer: "You can easily extend your rental through your account dashboard or by contacting our customer service team. Extensions are subject to availability."
+    question: "¿Qué sucede si necesito extender mi período de alquiler?",
+    answer: "Puedes extender fácilmente tu alquiler a través del panel de control de tu cuenta o contactando con nuestro equipo de atención al cliente. Las extensiones están sujetas a disponibilidad."
   }, {
-    question: "How does the security deposit work?",
-    answer: "We collect a security deposit at checkout that is fully refundable when items are returned in their original condition, allowing for normal wear and tear. Your deposit will be refunded within 3-5 business days after return."
+    question: "¿Cómo funciona el depósito de seguridad?",
+    answer: "Cobramos un depósito de seguridad en el momento del pago que es totalmente reembolsable cuando los artículos se devuelven en su estado original, permitiendo el desgaste normal. Tu depósito será reembolsado dentro de 3-5 días hábiles después de la devolución."
   }, {
-    question: "What happens if something gets damaged?",
-    answer: "Minor wear and tear is expected and covered. For significant damage, a portion of the security deposit may be retained. We assess each situation individually and maintain transparent communication."
+    question: "¿Qué pasa si algo se daña?",
+    answer: "El desgaste menor es esperado y está cubierto. Para daños significativos, una parte del depósito de seguridad puede ser retenida. Evaluamos cada situación individualmente y mantenemos una comunicación transparente."
   }, {
-    question: "Can I cancel or modify my rental order?",
-    answer: "Yes, orders can be modified or canceled up to 24 hours before the scheduled delivery time with a full refund. Changes made less than 24 hours may incur a small fee."
+    question: "¿Puedo cancelar o modificar mi pedido de alquiler?",
+    answer: "Sí, los pedidos pueden ser modificados o cancelados hasta 24 horas antes de la hora de entrega programada con un reembolso completo. Los cambios realizados con menos de 24 horas pueden incurrir en una pequeña tarifa."
   }, {
-    question: "Do you deliver everywhere?",
-    answer: "We currently deliver to most major metro areas. Enter your zip code during checkout to confirm availability in your area."
+    question: "¿Entregáis en todas partes?",
+    answer: "Actualmente entregamos en la mayoría de las áreas metropolitanas principales. Introduce tu código postal durante el pago para confirmar la disponibilidad en tu área."
   }, {
-    question: "What condition are the rental items in?",
-    answer: "All our rental items are professionally maintained and sanitized between rentals. We only offer products that meet our high-quality standards."
+    question: "¿En qué estado están los artículos de alquiler?",
+    answer: "Todos nuestros artículos de alquiler son mantenidos profesionalmente y desinfectados entre alquileres. Solo ofrecemos productos que cumplen con nuestros altos estándares de calidad."
   }];
-  return <div className="flex flex-col min-h-screen">
+  
+  return (
+    <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="bg-rental-500 text-white py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Como funciona la Cousateca</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Cómo funciona la Cousateca</h1>
             <p className="text-xl max-w-2xl mx-auto mb-8">
-              Renting high-quality products has never been easier.
-              Our simple process ensures you get what you need, when you need it.
+              Alquilar productos de alta calidad nunca ha sido tan fácil.
+              Nuestro proceso simple asegura que obtengas lo que necesitas, cuando lo necesitas.
             </p>
             <Link to="/products">
-              <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100">Encuentra la Cousa que estabas buscando</Button>
+              <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100">
+                Encuentra la Cousa que estabas buscando
+              </Button>
             </Link>
           </div>
         </section>
@@ -71,7 +78,8 @@ const HowItWorksPage = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              {steps.map((step, index) => <div key={index} className="mb-16 last:mb-0">
+              {steps.map((step, index) => (
+                <div key={index} className="mb-16 last:mb-0">
                   <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                     <div className="bg-rental-50 p-5 rounded-full flex-shrink-0">
                       {step.icon}
@@ -85,19 +93,24 @@ const HowItWorksPage = () => {
                       </div>
                       <p className="text-gray-600 mb-4">{step.description}</p>
                       <ul className="space-y-2">
-                        {step.details.map((detail, i) => <li key={i} className="flex items-start">
+                        {step.details.map((detail, i) => (
+                          <li key={i} className="flex items-start">
                             <CheckCircle className="h-5 w-5 text-rental-500 mr-2 flex-shrink-0 mt-0.5" />
                             <span>{detail}</span>
-                          </li>)}
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
                   
                   {/* Arrow connector between steps */}
-                  {index < steps.length - 1 && <div className="flex justify-center my-8">
+                  {index < steps.length - 1 && (
+                    <div className="flex justify-center my-8">
                       <ArrowRight className="h-8 w-8 text-gray-300" />
-                    </div>}
-                </div>)}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -105,13 +118,15 @@ const HowItWorksPage = () => {
         {/* FAQ Section */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold text-center mb-12">Preguntas Frecuentes</h2>
             <div className="max-w-3xl mx-auto">
               <div className="grid gap-6">
-                {faqs.map((faq, index) => <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
+                {faqs.map((faq, index) => (
+                  <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
                     <h3 className="text-xl font-semibold mb-3">{faq.question}</h3>
                     <p className="text-gray-600">{faq.answer}</p>
-                  </div>)}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -122,17 +137,17 @@ const HowItWorksPage = () => {
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-4">¿Listo para empezar a alquilar?</h2>
             <p className="text-xl max-w-2xl mx-auto mb-8">
-              Browse our extensive collection of high-quality rental products and find exactly what you need.
+              Explora nuestra extensa colección de productos de alta calidad y encuentra exactamente lo que necesitas.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/products">
                 <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100 w-full sm:w-auto">
-                  Browse Products
+                  Explorar Productos
                 </Button>
               </Link>
               <Link to="/categories">
                 <Button size="lg" variant="outline" className="border-white text-white hover:bg-rental-600 w-full sm:w-auto">
-                  View Categories
+                  Ver Categorías
                 </Button>
               </Link>
             </div>
@@ -140,6 +155,8 @@ const HowItWorksPage = () => {
         </section>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default HowItWorksPage;

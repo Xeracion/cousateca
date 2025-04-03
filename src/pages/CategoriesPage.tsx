@@ -4,15 +4,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/data/categories";
-import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import { Link } from "react-router-dom";
 import { Laptop, Bike, Tent, PartyPopper, Music, Hammer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const CategoriesPage = () => {
-  const [dbProducts, setDbProducts] = useState([]);
-  const [dbCategories, setDbCategories] = useState([]);
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -65,6 +64,13 @@ const CategoriesPage = () => {
   const mapProductData = (product: any) => {
     return {
       id: product.id,
+      nombre: product.nombre,
+      descripcion_corta: product.descripcion_corta,
+      precio_diario: product.precio_diario,
+      imagenes: product.imagenes,
+      destacado: product.destacado,
+      categoria_id: product.categoria_id,
+      // Also include legacy format for compatibility
       name: product.nombre,
       shortDescription: product.descripcion_corta,
       dailyPrice: product.precio_diario,
@@ -126,7 +132,7 @@ const CategoriesPage = () => {
                 {categoryProducts.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {categoryProducts.slice(0, 4).map((product) => (
-                      <ProductCard key={product.id} product={product} />
+                      <ProductCard key={product.id} product={mapProductData(product)} />
                     ))}
                   </div>
                 ) : (
