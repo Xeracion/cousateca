@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { categories } from "@/data/categories";
 import ProductCard from "@/components/ProductCard";
 import { Link } from "react-router-dom";
 import { Laptop, Bike, Tent, PartyPopper, Music, Hammer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { categories } from "@/data/categories";
+import { products as staticProducts } from "@/data/products";
 
 const CategoriesPage = () => {
   const [dbProducts, setDbProducts] = useState<any[]>([]);
@@ -105,10 +106,10 @@ const CategoriesPage = () => {
           </p>
           
           {categories.map((category) => {
-            // Get products for this category
-            const categoryProducts = products.filter(
-              (product) => product.category.toLowerCase() === category.name.toLowerCase()
-            );
+            // Get products for this category from database or fallback to static data
+            const categoryProducts = dbProducts.length > 0 
+              ? dbProducts.filter(product => product.categoria_id === category.id)
+              : staticProducts.filter(product => product.category.toLowerCase() === category.name.toLowerCase());
             
             return (
               <section key={category.id} className="mb-16 last:mb-0">
