@@ -1,17 +1,10 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
 const Hero = () => {
-  return (
-    <div className="relative overflow-hidden bg-white">
+  return <div className="relative overflow-hidden bg-white">
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1740&auto=format&fit=crop" 
-          alt="Hero background" 
-          className="w-full h-full object-cover"
-        />
+        <img src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1740&auto=format&fit=crop" alt="Hero background" className="w-full h-full object-cover" />
         <div className="absolute inset-0 hero-gradient"></div>
       </div>
       
@@ -31,15 +24,13 @@ const Hero = () => {
               </Button>
             </Link>
             <Link to="/how-it-works">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="border-white text-white w-full sm:w-auto bg-transparent">
                 Cómo funciona
               </Button>
             </Link>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Hero;
