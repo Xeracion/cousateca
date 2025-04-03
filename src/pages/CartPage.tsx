@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -15,15 +15,54 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useCart } from "@/context/CartContext";
-import { Calendar, ShoppingCart, Trash2, AlertCircle } from "lucide-react";
+import { Calendar, ShoppingCart, Trash2, AlertCircle, Loader2 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const CartPage = () => {
   const { items, removeFromCart, clearCart, totalPrice } = useCart();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   
   // Calculate total deposit amount
-  const totalDeposit = items.reduce((sum, item) => sum + item.product.deposit, 0);
+  const totalDeposit = items.reduce((sum, item) => {
+    const deposit = item.product.deposit || 0;
+    return sum + deposit;
+  }, 0);
+  
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      // Check for user authentication
+      const { data: { user } } = await supabase.auth.getUser();
+      let email = user?.email;
+      
+      // If not authenticated, we'll proceed as a guest checkout
+      if (!email) {
+        email = "guest@example.com"; // This could be replaced with a prompt for email
+      }
+      
+      // Call our Stripe checkout function
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { 
+          cartItems: items,
+          customerEmail: email
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Redirect to Stripe checkout
+      window.location.href = data.url;
+      
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      toast.error('Hubo un problema al procesar tu pago. Por favor intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   if (items.length === 0) {
     return (
@@ -253,8 +292,19 @@ const CartPage = () => {
                     </p>
                   </div>
                   
-                  <Button className="w-full bg-rental-500 hover:bg-rental-600 mb-3">
-                    Proceder al Pago
+                  <Button 
+                    className="w-full bg-rental-500 hover:bg-rental-600 mb-3"
+                    onClick={handleCheckout}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Procesando...
+                      </>
+                    ) : (
+                      "Proceder al Pago"
+                    )}
                   </Button>
                   
                   <p className="text-xs text-gray-500 text-center">

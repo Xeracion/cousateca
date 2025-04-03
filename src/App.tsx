@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import AdminPanel from "./pages/AdminPanel";
 import AuthPage from "./pages/AuthPage";
 import UserProfilePage from "./pages/UserProfilePage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
