@@ -18,7 +18,8 @@ export function formatCurrency(amount: number): string {
 }
 
 export function calculateTotalPrice(dailyPrice: number, startDate: Date, endDate: Date): number {
-  const days = differenceInDays(endDate, startDate) + 1; // Include both start and end date
+  // Calculate the exact difference in days between the two dates
+  const days = Math.max(1, differenceInDays(endDate, startDate) + 1); // Ensure minimum 1 day and include both start and end dates
   return dailyPrice * days;
 }
 
