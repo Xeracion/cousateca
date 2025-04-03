@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -36,6 +35,19 @@ const CategoryDetail = () => {
       default:
         return <Laptop className="h-8 w-8 text-rental-500" />;
     }
+  };
+  
+  // Helper function to map DB product to frontend product schema
+  const mapProductData = (product: any) => {
+    return {
+      id: product.id,
+      nombre: product.nombre,
+      descripcion_corta: product.descripcion_corta,
+      precio_diario: product.precio_diario,
+      imagenes: product.imagenes,
+      destacado: product.destacado,
+      categoria: product.categoria
+    };
   };
   
   if (!category) {

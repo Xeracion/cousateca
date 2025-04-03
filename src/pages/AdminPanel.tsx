@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { categories } from "@/data/categories";
@@ -227,10 +227,24 @@ const AdminPanel = () => {
           description: "El producto se ha actualizado correctamente"
         });
       } else {
-        // Crear nuevo producto
+        // Crear nuevo producto - Asegurarse de que todos los campos requeridos existen
+        const completeProduct = {
+          nombre: productForm.nombre || '',
+          categoria_id: productForm.categoria_id || '',
+          descripcion: productForm.descripcion || '',
+          descripcion_corta: productForm.descripcion_corta || '',
+          precio_diario: productForm.precio_diario || 0,
+          precio_semanal: productForm.precio_semanal || 0,
+          precio_mensual: productForm.precio_mensual || 0,
+          deposito: productForm.deposito || 0,
+          imagenes: productForm.imagenes || [''],
+          disponible: productForm.disponible !== undefined ? productForm.disponible : true,
+          destacado: productForm.destacado !== undefined ? productForm.destacado : false
+        };
+        
         const { data, error } = await supabase
           .from('productos')
-          .insert([productForm]);
+          .insert([completeProduct]);
         
         if (error) throw error;
         
@@ -288,10 +302,16 @@ const AdminPanel = () => {
           description: "La categoría se ha actualizado correctamente"
         });
       } else {
-        // Crear nueva categoría
+        // Crear nueva categoría - Asegurarse de que todos los campos requeridos existen
+        const completeCategory = {
+          nombre: categoryForm.nombre || '',
+          descripcion: categoryForm.descripcion || '',
+          imagen_url: categoryForm.imagen_url || ''
+        };
+        
         const { data, error } = await supabase
           .from('categories')
-          .insert([categoryForm]);
+          .insert([completeCategory]);
         
         if (error) throw error;
         

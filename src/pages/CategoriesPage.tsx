@@ -1,4 +1,3 @@
-
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -28,6 +27,19 @@ const CategoriesPage = () => {
       default:
         return <Laptop className="h-6 w-6 text-rental-500" />;
     }
+  };
+
+  // Helper function to map DB product to frontend product schema
+  const mapProductData = (product: any) => {
+    return {
+      id: product.id,
+      nombre: product.nombre,
+      descripcion_corta: product.descripcion_corta,
+      precio_diario: product.precio_diario,
+      imagenes: product.imagenes,
+      destacado: product.destacado,
+      categoria: product.categoria
+    };
   };
 
   return (
