@@ -11,12 +11,12 @@ const Categories = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Browse Categories</h2>
-            <p className="text-gray-600">Find the perfect products for your needs</p>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Explora Categorías</h2>
+            <p className="text-gray-600">Encuentra los productos perfectos para tus necesidades</p>
           </div>
           <Link to="/categories">
             <Button variant="outline" className="mt-4 md:mt-0 border-rental-500 text-rental-500 hover:bg-rental-50">
-              All Categories
+              Todas las Categorías
             </Button>
           </Link>
         </div>

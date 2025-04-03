@@ -35,11 +35,11 @@ const CategoriesPage = () => {
       <Navbar />
       <main className="flex-grow bg-gray-50 py-10">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8">Product Categories</h1>
+          <h1 className="text-3xl font-bold mb-8">Categorías de Productos</h1>
           
           <p className="text-gray-600 max-w-3xl mb-12">
-            Browse our extensive range of rental products organized by category. 
-            From electronics to outdoor gear, we have high-quality items to suit your needs.
+            Navega por nuestra extensa gama de productos para alquilar, organizados por categoría. 
+            Desde electrónica hasta equipamiento para exteriores, tenemos artículos de alta calidad que se adaptan a tus necesidades.
           </p>
           
           {categories.map((category) => {
@@ -62,7 +62,7 @@ const CategoriesPage = () => {
                   </div>
                   <Link to={`/category/${category.id}`}>
                     <Button variant="outline" className="border-rental-500 text-rental-500 hover:bg-rental-50">
-                      View All {category.name}
+                      Ver Todos los {category.name}
                     </Button>
                   </Link>
                 </div>
@@ -76,11 +76,11 @@ const CategoriesPage = () => {
                 ) : (
                   <div className="bg-white p-8 rounded-lg text-center">
                     <p className="text-gray-600 mb-4">
-                      No products available in this category yet.
+                      Aún no hay productos disponibles en esta categoría.
                     </p>
                     <Link to="/products">
                       <Button className="bg-rental-500 hover:bg-rental-600">
-                        Browse All Products
+                        Explorar Todos los Productos
                       </Button>
                     </Link>
                   </div>
