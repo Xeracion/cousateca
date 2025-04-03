@@ -1,17 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
-  MapPin, 
-  Phone, 
-  Mail
-} from "lucide-react";
-
+import { Facebook, Twitter, Instagram, MapPin, Phone, Mail } from "lucide-react";
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white pt-12 pb-8">
+  return <footer className="bg-gray-900 text-white pt-12 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -36,7 +27,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
+            <h3 className="text-lg font-semibold mb-4">Enlaces rápidos</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-gray-400 hover:text-rental-300">
@@ -77,9 +68,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start">
                 <MapPin className="mr-2 h-5 w-5 text-rental-300 flex-shrink-0" />
-                <span className="text-gray-400">
-                  Calle Alquiler 123, Madrid, 28001
-                </span>
+                <span className="text-gray-400">Almendra 9, Ferrol</span>
               </li>
               <li className="flex items-center">
                 <Phone className="mr-2 h-5 w-5 text-rental-300 flex-shrink-0" />
@@ -99,15 +88,8 @@ const Footer = () => {
               Suscríbete para recibir ofertas especiales, sorteos gratuitos y actualizaciones.
             </p>
             <form className="flex flex-col space-y-2">
-              <input
-                type="email"
-                placeholder="Tu dirección de email"
-                className="bg-gray-800 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-rental-500"
-              />
-              <button
-                type="submit"
-                className="bg-rental-500 hover:bg-rental-600 text-white py-2 px-4 rounded-md transition duration-200"
-              >
+              <input type="email" placeholder="Tu dirección de email" className="bg-gray-800 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-rental-500" />
+              <button type="submit" className="bg-rental-500 hover:bg-rental-600 text-white py-2 px-4 rounded-md transition duration-200">
                 Suscribirse
               </button>
             </form>
@@ -130,8 +112,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
