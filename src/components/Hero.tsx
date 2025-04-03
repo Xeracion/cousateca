@@ -10,9 +10,7 @@ const Hero = () => {
       
       <div className="relative z-10 container mx-auto px-4 py-24 sm:py-32">
         <div className="max-w-2xl text-white">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            Alquila productos de calidad para cualquier ocasión
-          </h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">¿Por qué comprar cuando puedes alquilar?</h1>
           <p className="text-lg sm:text-xl mb-8 text-white/90">
             ¿Por qué comprar cuando puedes alquilar? Accede a productos premium a una fracción del costo.
             Desde electrónica hasta equipamiento para exteriores, tenemos todo lo que necesitas.
