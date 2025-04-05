@@ -39,7 +39,9 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
                   <div className="flex items-center">
                     <div className="w-16 h-16 rounded-md overflow-hidden mr-4 flex-shrink-0">
                       <img 
-                        src={item.product.images[0]} 
+                        src={item.product.images && item.product.images.length > 0 
+                          ? item.product.images[0] 
+                          : "/placeholder.svg"} 
                         alt={item.product.name}
                         className="w-full h-full object-cover" 
                       />
@@ -99,7 +101,9 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
             <div className="flex mb-4">
               <div className="w-20 h-20 rounded-md overflow-hidden mr-4 flex-shrink-0">
                 <img 
-                  src={item.product.images[0]} 
+                  src={item.product.images && item.product.images.length > 0 
+                    ? item.product.images[0] 
+                    : "/placeholder.svg"} 
                   alt={item.product.name}
                   className="w-full h-full object-cover" 
                 />
