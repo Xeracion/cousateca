@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import ProductForm from './ProductForm';
 
 // Interfaces
@@ -43,6 +46,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   categories,
   onProductsChange
 }) => {
+  const { toast } = useToast();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -66,7 +70,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     if (searchQuery) {
       const filtered = products.filter(product => 
         product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.descripcion.toLowerCase().includes(searchQuery.toLowerCase())
+        product.descripcion?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredProducts(filtered);
     } else {
@@ -94,13 +98,97 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   };
 
   const handleDeleteProduct = async (id: string) => {
-    // Implement your delete logic here
-    console.log('Delete product with id:', id);
+    if (window.confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+      try {
+        const { error } = await supabase
+          .from('productos')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Producto eliminado",
+          description: "El producto ha sido eliminado correctamente"
+        });
+        
+        onProductsChange();
+      } catch (error: any) {
+        toast({
+          title: "Error al eliminar el producto",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleSaveProduct = async () => {
-    // Implement your save logic here
-    console.log('Save product:', productForm);
+    try {
+      if (!productForm.nombre || !productForm.categoria_id || !productForm.precio_diario) {
+        throw new Error("Por favor, completa los campos obligatorios");
+      }
+      
+      if (isEditingProduct && selectedProduct) {
+        // Update existing product
+        const { error } = await supabase
+          .from('productos')
+          .update({
+            nombre: productForm.nombre,
+            categoria_id: productForm.categoria_id,
+            descripcion: productForm.descripcion,
+            descripcion_corta: productForm.descripcion_corta,
+            precio_diario: productForm.precio_diario,
+            precio_semanal: productForm.precio_semanal,
+            precio_mensual: productForm.precio_mensual,
+            deposito: productForm.deposito,
+            imagenes: productForm.imagenes,
+            disponible: productForm.disponible,
+            destacado: productForm.destacado
+          })
+          .eq('id', selectedProduct.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Producto actualizado",
+          description: "El producto ha sido actualizado correctamente"
+        });
+      } else {
+        // Create new product
+        const { error } = await supabase
+          .from('productos')
+          .insert({
+            nombre: productForm.nombre,
+            categoria_id: productForm.categoria_id,
+            descripcion: productForm.descripcion,
+            descripcion_corta: productForm.descripcion_corta,
+            precio_diario: productForm.precio_diario,
+            precio_semanal: productForm.precio_semanal,
+            precio_mensual: productForm.precio_mensual,
+            deposito: productForm.deposito,
+            imagenes: productForm.imagenes,
+            disponible: productForm.disponible,
+            destacado: productForm.destacado
+          });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Producto creado",
+          description: "El producto ha sido creado correctamente"
+        });
+      }
+      
+      setIsProductDialogOpen(false);
+      onProductsChange();
+    } catch (error: any) {
+      toast({
+        title: "Error al guardar el producto",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
   return (

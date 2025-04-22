@@ -16,6 +16,8 @@ const AdminPanel = () => {
   const [error, setError] = useState('');
   const [products, setProducts] = useState<any[]>([]);
   const [dbCategories, setDbCategories] = useState<any[]>([]);
+  const [localLogin, setLocalLogin] = useState(false);
+  const [localAdmin, setLocalAdmin] = useState(false);
 
   // Manejar inicio de sesión manual
   const handleLogin = (e: React.FormEvent) => {
@@ -26,8 +28,8 @@ const AdminPanel = () => {
         title: "Inicio de sesión exitoso",
         description: "Bienvenido al panel de administración"
       });
-      setIsLoggedIn(true);
-      setIsAdmin(true);
+      setLocalLogin(true);
+      setLocalAdmin(true);
       setError('');
       loadData();
     } else {
@@ -76,13 +78,17 @@ const AdminPanel = () => {
     );
   }
 
-  if (isLoggedIn && !isAdmin) {
+  // User is either logged in via Supabase or local admin credentials
+  const isUserAdmin = isAdmin || localAdmin;
+  const isUserLoggedIn = isLoggedIn || localLogin;
+
+  if (isUserLoggedIn && !isUserAdmin) {
     return <Navigate to="/" />;
   }
 
   return (
     <AdminLayout>
-      {isLoggedIn && isAdmin ? (
+      {isUserAdmin ? (
         <AdminContent 
           loadData={loadData}
           products={products}

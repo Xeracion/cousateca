@@ -1,9 +1,12 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import CategoryForm from './CategoryForm';
 
 // Interfaces
@@ -25,6 +28,7 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
   categories,
   onCategoriesChange
 }) => {
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
@@ -53,20 +57,85 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
   // Manejar eliminar categoría
   const handleDeleteCategory = async (id: string) => {
     if (window.confirm("¿Estás seguro de que quieres eliminar esta categoría? Esto puede afectar a los productos asociados.")) {
-      // Lógica para eliminar la categoría
-      console.log(`Deleting category with id: ${id}`);
-      // Después de eliminar, recargar las categorías
-      onCategoriesChange();
+      try {
+        const { error } = await supabase
+          .from('categories')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Categoría eliminada",
+          description: "La categoría ha sido eliminada correctamente"
+        });
+        
+        onCategoriesChange();
+      } catch (error: any) {
+        toast({
+          title: "Error al eliminar la categoría",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
     }
   };
 
   // Manejar guardar categoría
   const handleSaveCategory = async () => {
-    // Lógica para guardar la categoría
-    console.log('Saving category', categoryForm);
-    // Después de guardar, recargar las categorías
-    onCategoriesChange();
-    setIsCategoryDialogOpen(false);
+    try {
+      if (!categoryForm.nombre_es) {
+        throw new Error("El nombre de la categoría es obligatorio");
+      }
+      
+      if (isEditingCategory && selectedCategory) {
+        // Update existing category
+        const { error } = await supabase
+          .from('categories')
+          .update({
+            nombre: categoryForm.nombre_es, // Keep both fields in sync
+            nombre_es: categoryForm.nombre_es,
+            descripcion: categoryForm.descripcion_es, // Keep both fields in sync
+            descripcion_es: categoryForm.descripcion_es,
+            imagen_url: categoryForm.imagen_url
+          })
+          .eq('id', selectedCategory.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Categoría actualizada",
+          description: "La categoría ha sido actualizada correctamente"
+        });
+      } else {
+        // Create new category
+        const { error } = await supabase
+          .from('categories')
+          .insert({
+            nombre: categoryForm.nombre_es, // Keep both fields in sync
+            nombre_es: categoryForm.nombre_es,
+            descripcion: categoryForm.descripcion_es, // Keep both fields in sync
+            descripcion_es: categoryForm.descripcion_es,
+            imagen_url: categoryForm.imagen_url
+          });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Categoría creada",
+          description: "La categoría ha sido creada correctamente"
+        });
+      }
+      
+      setIsCategoryDialogOpen(false);
+      onCategoriesChange();
+    } catch (error: any) {
+      toast({
+        title: "Error al guardar la categoría",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
   return (
