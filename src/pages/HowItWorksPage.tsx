@@ -1,9 +1,11 @@
+
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Search, Calendar, CreditCard, Truck, ThumbsUp, ArrowRight, CheckCircle } from "lucide-react";
+import { Search, Calendar, CreditCard, User, ThumbsUp, ArrowRight, CheckCircle } from "lucide-react";
+
 const HowItWorksPage = () => {
   const steps = [{
     icon: <Search className="h-12 w-12 text-rental-500" />,
@@ -18,19 +20,20 @@ const HowItWorksPage = () => {
   }, {
     icon: <CreditCard className="h-12 w-12 text-rental-500" />,
     title: "Pago Seguro",
-    description: "Completa tu pedido con nuestro proceso de pago seguro, incluyendo depósito de seguridad reembolsable y opciones de entrega.",
-    details: ["Proporciona información de entrega", "Paga depósito de seguridad (totalmente reembolsable)", "Elige franjas horarias de entrega que te convengan", "Recibe confirmación y recibo instantáneos"]
+    description: "Completa tu pedido con nuestro proceso de pago seguro, incluyendo depósito de seguridad reembolsable.",
+    details: ["Proporciona información de contacto", "Paga depósito de seguridad (totalmente reembolsable)", "Elige el método de pago que prefieras", "Recibe confirmación y recibo instantáneos"]
   }, {
-    icon: <Truck className="h-12 w-12 text-rental-500" />,
-    title: "Entrega y Recogida",
-    description: "Entregaremos tus artículos alquilados en la ubicación especificada y los recogeremos cuando finalice tu período de alquiler.",
-    details: ["Recibe notificaciones SMS sobre el estado de la entrega", "Equipo de entrega profesional que se encarga de la instalación si es necesario", "Ventanas de entrega flexibles para adaptarse a tu horario", "Programa la recogida según tu conveniencia"]
+    icon: <User className="h-12 w-12 text-rental-500" />,
+    title: "Recogida y Devolución",
+    description: "Visita la ubicación física de Xeración para recoger tus artículos alquilados y devuélvelos al finalizar tu período de alquiler.",
+    details: ["Recibe notificaciones recordatorias sobre fechas de recogida y devolución", "Acude a Xeración en el horario establecido", "Presenta tu identificación para recoger los productos", "Devuelve los productos en buen estado al finalizar el alquiler"]
   }, {
     icon: <ThumbsUp className="h-12 w-12 text-rental-500" />,
     title: "Disfrutar y Devolver",
     description: "Utiliza tus artículos alquilados sin preocupaciones, sabiendo que el desgaste normal está cubierto. Devuélvelos cuando hayas terminado.",
-    details: ["Acceso a atención al cliente durante todo el período de alquiler", "Opción de extender tu alquiler si es necesario", "Proceso de devolución simple con nuestro servicio de recogida", "Reembolso rápido del depósito de seguridad tras la devolución"]
+    details: ["Acceso a atención al cliente durante todo el período de alquiler", "Opción de extender tu alquiler si es necesario", "Proceso de devolución simple en nuestra ubicación física", "Reembolso rápido del depósito de seguridad tras la devolución"]
   }];
+  
   const faqs = [{
     question: "¿Qué sucede si necesito extender mi período de alquiler?",
     answer: "Puedes extender fácilmente tu alquiler a través del panel de control de tu cuenta o contactando con nuestro equipo de atención al cliente. Las extensiones están sujetas a disponibilidad."
@@ -42,14 +45,15 @@ const HowItWorksPage = () => {
     answer: "El desgaste menor es esperado y está cubierto. Para daños significativos, una parte del depósito de seguridad puede ser retenida. Evaluamos cada situación individualmente y mantenemos una comunicación transparente."
   }, {
     question: "¿Puedo cancelar o modificar mi pedido de alquiler?",
-    answer: "Sí, los pedidos pueden ser modificados o cancelados hasta 24 horas antes de la hora de entrega programada con un reembolso completo. Los cambios realizados con menos de 24 horas pueden incurrir en una pequeña tarifa."
+    answer: "Sí, los pedidos pueden ser modificados o cancelados hasta 24 horas antes de la hora de recogida programada con un reembolso completo. Los cambios realizados con menos de 24 horas pueden incurrir en una pequeña tarifa."
   }, {
-    question: "¿Entregáis en todas partes?",
-    answer: "Actualmente entregamos en la mayoría de las áreas metropolitanas principales. Introduce tu código postal durante el pago para confirmar la disponibilidad en tu área."
+    question: "¿Dónde está ubicado Xeración?",
+    answer: "Nuestra ubicación física se encuentra en [DIRECCIÓN DE XERACIÓN]. Puedes visitarnos durante nuestro horario de atención para recoger y devolver los productos alquilados."
   }, {
     question: "¿En qué estado están los artículos de alquiler?",
     answer: "Todos nuestros artículos de alquiler son mantenidos profesionalmente y desinfectados entre alquileres. Solo ofrecemos productos que cumplen con nuestros altos estándares de calidad."
   }];
+  
   return <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow">
@@ -144,4 +148,5 @@ const HowItWorksPage = () => {
       <Footer />
     </div>;
 };
+
 export default HowItWorksPage;

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Search, Calendar, Truck, ThumbsUp } from "lucide-react";
+import { Search, Calendar, User, ThumbsUp } from "lucide-react";
 
 const HowItWorks = () => {
   const steps = [
@@ -15,9 +15,9 @@ const HowItWorks = () => {
       description: "Selecciona las fechas de alquiler deseadas y revisa las opciones de precios."
     },
     {
-      icon: <Truck className="h-10 w-10 text-rental-500" />,
-      title: "Entrega y recogida",
-      description: "Entregaremos los artículos en tu ubicación y los recogeremos cuando hayas terminado."
+      icon: <User className="h-10 w-10 text-rental-500" />,
+      title: "Recoger y devolver",
+      description: "Visita nuestra ubicación en Xeración para recoger y devolver los productos."
     },
     {
       icon: <ThumbsUp className="h-10 w-10 text-rental-500" />,
