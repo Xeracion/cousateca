@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { CartItem } from "@/context/CartContext";
@@ -26,7 +25,7 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Producto</TableHead>
+              <TableHead className="w-[40%]">Producto</TableHead>
               <TableHead>Período de Alquiler</TableHead>
               <TableHead>Precio</TableHead>
               <TableHead></TableHead>
@@ -37,11 +36,9 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
               <TableRow key={item.product.id}>
                 <TableCell>
                   <div className="flex items-center">
-                    <div className="w-16 h-16 rounded-md overflow-hidden mr-4 flex-shrink-0">
+                    <div className="w-20 h-20 rounded-md overflow-hidden mr-4 flex-shrink-0">
                       <img 
-                        src={item.product.images && item.product.images.length > 0 
-                          ? item.product.images[0] 
-                          : "/placeholder.svg"} 
+                        src={item.product.images?.[0] || "/placeholder.svg"} 
                         alt={item.product.name}
                         className="w-full h-full object-cover" 
                       />
@@ -53,9 +50,11 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
                       >
                         {item.product.name}
                       </Link>
-                      <p className="text-sm text-gray-500">
-                        {item.product.category}
-                      </p>
+                      {item.product.category && (
+                        <p className="text-sm text-gray-500">
+                          {item.product.category}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </TableCell>
@@ -99,11 +98,9 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
         {items.map((item) => (
           <div key={item.product.id} className="border-b pb-6 last:border-0 last:pb-0">
             <div className="flex mb-4">
-              <div className="w-20 h-20 rounded-md overflow-hidden mr-4 flex-shrink-0">
+              <div className="w-24 h-24 rounded-md overflow-hidden mr-4 flex-shrink-0">
                 <img 
-                  src={item.product.images && item.product.images.length > 0 
-                    ? item.product.images[0] 
-                    : "/placeholder.svg"} 
+                  src={item.product.images?.[0] || "/placeholder.svg"} 
                   alt={item.product.name}
                   className="w-full h-full object-cover" 
                 />

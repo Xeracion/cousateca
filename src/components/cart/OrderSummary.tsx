@@ -27,16 +27,13 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
   const handleCheckout = async () => {
     setLoading(true);
     try {
-      // Check for user authentication
       const { data: { user } } = await supabase.auth.getUser();
       let email = user?.email;
       
-      // If not authenticated, we'll proceed as a guest checkout
       if (!email) {
-        email = "guest@example.com"; // This could be replaced with a prompt for email
+        email = "guest@example.com";
       }
       
-      // Call our Stripe checkout function
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           cartItems: items,
@@ -46,7 +43,6 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
       
       if (error) throw error;
       
-      // Redirect to Stripe checkout
       window.location.href = data.url;
       
     } catch (error) {
@@ -71,23 +67,19 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
             <span className="text-gray-600">Fianza</span>
             <span>{formatCurrency(totalDeposit)}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Gastos de Envío</span>
-            <span>{formatCurrency(10)}</span>
-          </div>
         </div>
         
         <Separator className="my-4" />
         
         <div className="flex justify-between font-bold text-lg mb-6">
           <span>Total</span>
-          <span>{formatCurrency(totalPrice + totalDeposit + 10)}</span>
+          <span>{formatCurrency(totalPrice + totalDeposit)}</span>
         </div>
         
         <div className="bg-yellow-50 border border-yellow-100 rounded-md p-3 mb-6 flex items-start">
           <AlertCircle className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-yellow-700">
-            Las fianzas son totalmente reembolsables cuando los artículos se devuelven en su estado original.
+            La fianza es un depósito de seguridad que se cobra junto con el alquiler.
           </p>
         </div>
         

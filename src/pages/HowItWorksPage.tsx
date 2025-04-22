@@ -1,4 +1,3 @@
-
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -19,19 +18,19 @@ const HowItWorksPage = () => {
     details: ["Selecciona fechas de inicio y fin en nuestro calendario interactivo", "Comprueba la disponibilidad en tiempo real", "Visualiza precios transparentes basados en la duración", "Modifica las fechas según sea necesario antes de finalizar"]
   }, {
     icon: <CreditCard className="h-12 w-12 text-rental-500" />,
-    title: "Pago Seguro",
-    description: "Completa tu pedido con nuestro proceso de pago seguro, incluyendo depósito de seguridad reembolsable.",
-    details: ["Proporciona información de contacto", "Paga depósito de seguridad (totalmente reembolsable)", "Elige el método de pago que prefieras", "Recibe confirmación y recibo instantáneos"]
+    title: "Pago y Fianza",
+    description: "Completa tu pedido con nuestro proceso de pago seguro, incluyendo el depósito de fianza.",
+    details: ["Proporciona información de contacto", "Paga el alquiler y la fianza", "Elige el método de pago que prefieras", "Recibe confirmación y recibo instantáneos"]
   }, {
     icon: <User className="h-12 w-12 text-rental-500" />,
     title: "Recogida y Devolución",
-    description: "Visita la ubicación física de Xeración para recoger tus artículos alquilados y devuélvelos al finalizar tu período de alquiler.",
-    details: ["Recibe notificaciones recordatorias sobre fechas de recogida y devolución", "Acude a Xeración en el horario establecido", "Presenta tu identificación para recoger los productos", "Devuelve los productos en buen estado al finalizar el alquiler"]
+    description: "Visita nuestra ubicación física para recoger y devolver los artículos alquilados.",
+    details: ["Recibe notificaciones recordatorias sobre fechas de recogida y devolución", "Visítanos en Rúa Almendra 9, Ferrol", "Presenta tu identificación para recoger los productos", "Devuelve los productos en buen estado al finalizar el alquiler"]
   }, {
     icon: <ThumbsUp className="h-12 w-12 text-rental-500" />,
-    title: "Disfrutar y Devolver",
-    description: "Utiliza tus artículos alquilados sin preocupaciones, sabiendo que el desgaste normal está cubierto. Devuélvelos cuando hayas terminado.",
-    details: ["Acceso a atención al cliente durante todo el período de alquiler", "Opción de extender tu alquiler si es necesario", "Proceso de devolución simple en nuestra ubicación física", "Reembolso rápido del depósito de seguridad tras la devolución"]
+    title: "¡A disfrutar!",
+    description: "Utiliza los artículos alquilados según tus necesidades durante el período establecido.",
+    details: ["Acceso a atención al cliente durante todo el período de alquiler", "Opción de extender tu alquiler si es necesario (sujeto a disponibilidad)", "Proceso de devolución simple en nuestra ubicación física", "Contribuye compartiendo tu experiencia"]
   }];
   
   const faqs = [{
