@@ -1,11 +1,9 @@
-
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Search, Calendar, CreditCard, Truck, ThumbsUp, ArrowRight, CheckCircle } from "lucide-react";
-
 const HowItWorksPage = () => {
   const steps = [{
     icon: <Search className="h-12 w-12 text-rental-500" />,
@@ -33,7 +31,6 @@ const HowItWorksPage = () => {
     description: "Utiliza tus artículos alquilados sin preocupaciones, sabiendo que el desgaste normal está cubierto. Devuélvelos cuando hayas terminado.",
     details: ["Acceso a atención al cliente durante todo el período de alquiler", "Opción de extender tu alquiler si es necesario", "Proceso de devolución simple con nuestro servicio de recogida", "Reembolso rápido del depósito de seguridad tras la devolución"]
   }];
-  
   const faqs = [{
     question: "¿Qué sucede si necesito extender mi período de alquiler?",
     answer: "Puedes extender fácilmente tu alquiler a través del panel de control de tu cuenta o contactando con nuestro equipo de atención al cliente. Las extensiones están sujetas a disponibilidad."
@@ -53,9 +50,7 @@ const HowItWorksPage = () => {
     question: "¿En qué estado están los artículos de alquiler?",
     answer: "Todos nuestros artículos de alquiler son mantenidos profesionalmente y desinfectados entre alquileres. Solo ofrecemos productos que cumplen con nuestros altos estándares de calidad."
   }];
-  
-  return (
-    <div className="flex flex-col min-h-screen">
+  return <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow">
         {/* Hero Section */}
@@ -78,8 +73,7 @@ const HowItWorksPage = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              {steps.map((step, index) => (
-                <div key={index} className="mb-16 last:mb-0">
+              {steps.map((step, index) => <div key={index} className="mb-16 last:mb-0">
                   <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                     <div className="bg-rental-50 p-5 rounded-full flex-shrink-0">
                       {step.icon}
@@ -93,24 +87,19 @@ const HowItWorksPage = () => {
                       </div>
                       <p className="text-gray-600 mb-4">{step.description}</p>
                       <ul className="space-y-2">
-                        {step.details.map((detail, i) => (
-                          <li key={i} className="flex items-start">
+                        {step.details.map((detail, i) => <li key={i} className="flex items-start">
                             <CheckCircle className="h-5 w-5 text-rental-500 mr-2 flex-shrink-0 mt-0.5" />
                             <span>{detail}</span>
-                          </li>
-                        ))}
+                          </li>)}
                       </ul>
                     </div>
                   </div>
                   
                   {/* Arrow connector between steps */}
-                  {index < steps.length - 1 && (
-                    <div className="flex justify-center my-8">
+                  {index < steps.length - 1 && <div className="flex justify-center my-8">
                       <ArrowRight className="h-8 w-8 text-gray-300" />
-                    </div>
-                  )}
-                </div>
-              ))}
+                    </div>}
+                </div>)}
             </div>
           </div>
         </section>
@@ -121,12 +110,10 @@ const HowItWorksPage = () => {
             <h2 className="text-3xl font-bold text-center mb-12">Preguntas Frecuentes</h2>
             <div className="max-w-3xl mx-auto">
               <div className="grid gap-6">
-                {faqs.map((faq, index) => (
-                  <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
+                {faqs.map((faq, index) => <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
                     <h3 className="text-xl font-semibold mb-3">{faq.question}</h3>
                     <p className="text-gray-600">{faq.answer}</p>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </div>
           </div>
@@ -146,7 +133,7 @@ const HowItWorksPage = () => {
                 </Button>
               </Link>
               <Link to="/categories">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-rental-600 w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="border-white hover:bg-rental-600 w-full sm:w-auto text-gray-50">
                   Ver Categorías
                 </Button>
               </Link>
@@ -155,8 +142,6 @@ const HowItWorksPage = () => {
         </section>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default HowItWorksPage;
