@@ -1,17 +1,11 @@
-
 import React, { useState } from "react";
-import { Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import ReviewCard from "./reviews/ReviewCard";
+import ReviewForm from "./reviews/ReviewForm";
 
 const Testimonials = () => {
   const { toast } = useToast();
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recentReviews, setRecentReviews] = useState<any[]>([]);
 
@@ -41,10 +35,13 @@ const Testimonials = () => {
     */
   }, []);
 
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!name || !comment) {
+  const handleSubmitReview = async (review: {
+    name: string;
+    role: string;
+    comment: string;
+    rating: number;
+  }) => {
+    if (!review.name || !review.comment) {
       toast({
         title: "Error",
         description: "Por favor, completa todos los campos requeridos",
@@ -56,31 +53,21 @@ const Testimonials = () => {
     setIsSubmitting(true);
     
     try {
-      // For now, we'll just show a success message
-      // The actual database insert will work once the 'reviews' table is created
-      
       toast({
         title: "¡Gracias por tu opinión!",
         description: "Tu reseña ha sido recibida correctamente (tabla de reviews pendiente de crear)"
       });
       
-      // Add the review to local state for now
       const newReview = {
         id: Date.now().toString(),
-        name,
-        role,
-        content: comment,
-        rating,
+        name: review.name,
+        role: review.role,
+        content: review.comment,
+        rating: review.rating,
         created_at: new Date().toISOString()
       };
       
       setRecentReviews([newReview, ...recentReviews].slice(0, 3));
-      
-      // Reset form
-      setRating(5);
-      setComment('');
-      setName('');
-      setRole('');
       
     } catch (error: any) {
       toast({
@@ -107,26 +94,7 @@ const Testimonials = () => {
         {recentReviews.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {recentReviews.map((review) => (
-              <div 
-                key={review.id} 
-                className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`h-4 w-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
-                    />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-6 italic">"{review.content}"</p>
-                <div className="flex items-center">
-                  <div>
-                    <h4 className="font-semibold">{review.name}</h4>
-                    <p className="text-sm text-gray-600">{review.role}</p>
-                  </div>
-                </div>
-              </div>
+              <ReviewCard key={review.id} review={review} />
             ))}
           </div>
         ) : (
@@ -137,74 +105,7 @@ const Testimonials = () => {
         
         <div className="bg-white p-8 rounded-lg shadow-sm max-w-2xl mx-auto">
           <h3 className="text-xl font-bold mb-6">Comparte tu experiencia</h3>
-          
-          <form onSubmit={handleSubmitReview}>
-            <div className="mb-6">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-rental-500"
-                required
-              />
-            </div>
-            
-            <div className="mb-6">
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                Ocupación o rol
-              </label>
-              <input
-                type="text"
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-rental-500"
-              />
-            </div>
-            
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Valoración <span className="text-red-500">*</span>
-              </label>
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-8 w-8 cursor-pointer ${
-                      star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-                    }`}
-                    onClick={() => setRating(star)}
-                  />
-                ))}
-              </div>
-            </div>
-            
-            <div className="mb-6">
-              <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
-                Tu comentario <span className="text-red-500">*</span>
-              </label>
-              <Textarea
-                id="comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-rental-500"
-                rows={4}
-                required
-              />
-            </div>
-            
-            <Button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="w-full bg-rental-500 hover:bg-rental-600"
-            >
-              {isSubmitting ? 'Enviando...' : 'Enviar reseña'}
-            </Button>
-          </form>
+          <ReviewForm onSubmit={handleSubmitReview} isSubmitting={isSubmitting} />
         </div>
       </div>
     </section>
