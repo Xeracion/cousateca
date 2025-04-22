@@ -47,7 +47,7 @@ const HowItWorksPage = () => {
     answer: "Sí, los pedidos pueden ser modificados o cancelados hasta 24 horas antes de la hora de recogida programada con un reembolso completo. Los cambios realizados con menos de 24 horas pueden incurrir en una pequeña tarifa."
   }, {
     question: "¿Dónde está ubicado Xeración?",
-    answer: "Nuestra ubicación física se encuentra en [DIRECCIÓN DE XERACIÓN]. Puedes visitarnos durante nuestro horario de atención para recoger y devolver los productos alquilados."
+    answer: "Nuestra ubicación física se encuentra en Rúa Almendra 9, Ferrol. Puedes visitarnos durante nuestro horario de atención para recoger y devolver los productos alquilados."
   }, {
     question: "¿En qué estado están los artículos de alquiler?",
     answer: "Todos nuestros artículos de alquiler son mantenidos profesionalmente y desinfectados entre alquileres. Solo ofrecemos productos que cumplen con nuestros altos estándares de calidad."

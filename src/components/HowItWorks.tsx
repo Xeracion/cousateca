@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Search, Calendar, User, ThumbsUp } from "lucide-react";
 
@@ -17,7 +16,7 @@ const HowItWorks = () => {
     {
       icon: <User className="h-10 w-10 text-rental-500" />,
       title: "Recoger y devolver",
-      description: "Visita nuestra ubicación en Xeración para recoger y devolver los productos."
+      description: "Visita nuestra ubicación en Rúa Almendra 9, Ferrol, para recoger y devolver los productos."
     },
     {
       icon: <ThumbsUp className="h-10 w-10 text-rental-500" />,
