@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -30,7 +29,9 @@ interface Product {
 interface Category {
   id: string;
   nombre: string;
+  nombre_es: string;
   descripcion: string;
+  descripcion_es: string;
   imagen_url?: string;
 }
 
@@ -75,7 +76,9 @@ const AdminPanel = () => {
   // Estado del formulario de categoría
   const [categoryForm, setCategoryForm] = useState<Partial<Category>>({
     nombre: '',
+    nombre_es: '',
     descripcion: '',
+    descripcion_es: '',
     imagen_url: ''
   });
 
@@ -180,6 +183,10 @@ const AdminPanel = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    alert("Para recuperar tu contraseña, contacta al administrador del sistema.");
+  };
+
   // Filtrar productos según la búsqueda
   useEffect(() => {
     if (searchQuery) {
@@ -276,15 +283,22 @@ const AdminPanel = () => {
   // Manejar guardar categoría
   const handleSaveCategory = async () => {
     try {
-      if (!categoryForm.nombre) {
-        throw new Error("El nombre de la categoría es obligatorio");
+      if (!categoryForm.nombre || !categoryForm.nombre_es) {
+        throw new Error("El nombre de la categoría es obligatorio en ambos idiomas");
       }
       
       if (isEditingCategory && selectedCategory) {
         // Actualizar categoría existente
         const { data, error } = await supabase
           .from('categories')
-          .update(categoryForm)
+          .update({
+            nombre: categoryForm.nombre,
+            nombre_es: categoryForm.nombre_es,
+            descripcion: categoryForm.descripcion,
+            descripcion_es: categoryForm.descripcion_es,
+            imagen_url: categoryForm.imagen_url,
+            updated_at: new Date()
+          })
           .eq('id', selectedCategory.id);
         
         if (error) throw error;
@@ -297,7 +311,9 @@ const AdminPanel = () => {
         // Crear nueva categoría - Asegurarse de que todos los campos requeridos existen
         const completeCategory = {
           nombre: categoryForm.nombre || '',
+          nombre_es: categoryForm.nombre_es || '',
           descripcion: categoryForm.descripcion || '',
+          descripcion_es: categoryForm.descripcion_es || '',
           imagen_url: categoryForm.imagen_url || ''
         };
         
@@ -316,7 +332,9 @@ const AdminPanel = () => {
       // Reiniciar formulario y recargar datos
       setCategoryForm({
         nombre: '',
+        nombre_es: '',
         descripcion: '',
+        descripcion_es: '',
         imagen_url: ''
       });
       setIsEditingCategory(false);
@@ -411,7 +429,9 @@ const AdminPanel = () => {
     setSelectedCategory(category);
     setCategoryForm({
       nombre: category.nombre,
+      nombre_es: category.nombre_es,
       descripcion: category.descripcion,
+      descripcion_es: category.descripcion_es,
       imagen_url: category.imagen_url
     });
     setIsEditingCategory(true);
@@ -501,22 +521,25 @@ const AdminPanel = () => {
   }
 
   // Formulario de inicio de sesión
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow flex items-center justify-center px-4 py-8">
-        <LoginForm 
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-          error={error}
-          handleLogin={handleLogin}
-        />
-      </main>
-      <Footer />
-    </div>
-  );
+  if (!isLoggedIn) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center px-4 py-8">
+          <LoginForm 
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+            error={error}
+            handleLogin={handleLogin}
+            handleForgotPassword={handleForgotPassword}
+          />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 };
 
 export default AdminPanel;

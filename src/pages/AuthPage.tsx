@@ -20,6 +20,8 @@ const AuthPage = () => {
   const [nombre, setNombre] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("login");
+  const [resetEmail, setResetEmail] = useState("");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,16 +92,46 @@ const AuthPage = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Correo enviado",
+        description: "Se ha enviado un correo con instrucciones para restablecer tu contraseña.",
+      });
+      setActiveTab("login");
+    } catch (error: any) {
+      toast({
+        title: "Error al enviar correo",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow bg-gray-50 py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto">
-            <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="login">Iniciar Sesión</TabsTrigger>
                 <TabsTrigger value="register">Registrarse</TabsTrigger>
+                <TabsTrigger value="reset">Olvidé mi contraseña</TabsTrigger>
               </TabsList>
               
               <TabsContent value="login">
@@ -152,6 +184,15 @@ const AuthPage = () => {
                             )}
                           </button>
                         </div>
+                      </div>
+                      <div className="text-right">
+                        <button
+                          type="button"
+                          className="text-sm text-rental-500 hover:text-rental-600"
+                          onClick={() => setActiveTab("reset")}
+                        >
+                          ¿Olvidaste tu contraseña?
+                        </button>
                       </div>
                     </CardContent>
                     <CardFooter>
@@ -240,6 +281,53 @@ const AuthPage = () => {
                         disabled={loading}
                       >
                         {loading ? "Creando cuenta..." : "Registrarse"}
+                      </Button>
+                    </CardFooter>
+                  </form>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="reset">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Restablecer contraseña</CardTitle>
+                    <CardDescription>
+                      Ingresa tu email y te enviaremos instrucciones para restablecer tu contraseña
+                    </CardDescription>
+                  </CardHeader>
+                  <form onSubmit={handleForgotPassword}>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reset-email">Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="reset-email"
+                            type="email"
+                            placeholder="tu@email.com"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            className="pl-9"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex flex-col space-y-2">
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-rental-500 hover:bg-rental-600"
+                        disabled={loading}
+                      >
+                        {loading ? "Enviando..." : "Enviar instrucciones"}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setActiveTab("login")}
+                      >
+                        Volver al inicio de sesión
                       </Button>
                     </CardFooter>
                   </form>

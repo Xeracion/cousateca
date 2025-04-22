@@ -11,7 +11,9 @@ import { Image } from "lucide-react";
 interface Category {
   id: string;
   nombre: string;
+  nombre_es: string;
   descripcion: string;
+  descripcion_es: string;
   imagen_url?: string;
 }
 
@@ -33,23 +35,45 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   return (
     <div className="grid gap-4 py-4">
       <div className="space-y-2">
-        <Label htmlFor="cat_nombre">Nombre *</Label>
+        <Label htmlFor="cat_nombre">Nombre (Español) *</Label>
         <Input
           id="cat_nombre"
-          value={categoryForm.nombre || ''}
-          onChange={(e) => setCategoryForm({...categoryForm, nombre: e.target.value})}
-          placeholder="Nombre de la categoría"
+          value={categoryForm.nombre_es || ''}
+          onChange={(e) => setCategoryForm({...categoryForm, nombre_es: e.target.value, nombre: e.target.value})}
+          placeholder="Nombre de la categoría en español"
           required
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="cat_descripcion">Descripción</Label>
+        <Label htmlFor="cat_nombre_en">Nombre (Inglés) *</Label>
+        <Input
+          id="cat_nombre_en"
+          value={categoryForm.nombre || ''}
+          onChange={(e) => setCategoryForm({...categoryForm, nombre: e.target.value})}
+          placeholder="Nombre de la categoría en inglés"
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="cat_descripcion_es">Descripción (Español)</Label>
+        <Textarea
+          id="cat_descripcion_es"
+          value={categoryForm.descripcion_es || ''}
+          onChange={(e) => setCategoryForm({...categoryForm, descripcion_es: e.target.value})}
+          placeholder="Descripción de la categoría en español"
+          rows={3}
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="cat_descripcion">Descripción (Inglés)</Label>
         <Textarea
           id="cat_descripcion"
           value={categoryForm.descripcion || ''}
           onChange={(e) => setCategoryForm({...categoryForm, descripcion: e.target.value})}
-          placeholder="Descripción de la categoría"
+          placeholder="Descripción de la categoría en inglés"
           rows={3}
         />
       </div>

@@ -11,6 +11,7 @@ interface LoginFormProps {
   setPassword: React.Dispatch<React.SetStateAction<string>>;
   error: string;
   handleLogin: (e: React.FormEvent) => void;
+  handleForgotPassword?: () => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -19,7 +20,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
   password,
   setPassword,
   error,
-  handleLogin
+  handleLogin,
+  handleForgotPassword
 }) => {
   return (
     <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
@@ -55,6 +57,17 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <Button type="submit" className="w-full">
           Iniciar Sesión
         </Button>
+        {handleForgotPassword && (
+          <div className="text-center mt-4">
+            <button 
+              type="button" 
+              onClick={handleForgotPassword}
+              className="text-rental-500 hover:text-rental-600 text-sm"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );
