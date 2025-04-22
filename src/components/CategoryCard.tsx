@@ -12,7 +12,7 @@ import {
   Hammer,
   BookOpen,
   Camera,
-  GameController,
+  Gamepad,
   Shirt,
   Utensils,
   Brush
@@ -45,7 +45,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
     } else if (nameLower.includes('foto') || nameLower.includes('cámara') || nameLower.includes('camera')) {
       return <Camera size={40} className="text-rental-500" />;
     } else if (nameLower.includes('juego') || nameLower.includes('game')) {
-      return <GameController size={40} className="text-rental-500" />;
+      return <Gamepad size={40} className="text-rental-500" />;
     } else if (nameLower.includes('ropa') || nameLower.includes('clothing')) {
       return <Shirt size={40} className="text-rental-500" />;
     } else if (nameLower.includes('cocina') || nameLower.includes('kitchen')) {
@@ -65,7 +65,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
         case "hammer": return <Hammer size={40} className="text-rental-500" />;
         case "book": return <BookOpen size={40} className="text-rental-500" />;
         case "camera": return <Camera size={40} className="text-rental-500" />;
-        case "game": return <GameController size={40} className="text-rental-500" />;
+        case "game": return <Gamepad size={40} className="text-rental-500" />;
         case "shirt": return <Shirt size={40} className="text-rental-500" />;
         case "kitchen": return <Utensils size={40} className="text-rental-500" />;
         case "art": return <Brush size={40} className="text-rental-500" />;

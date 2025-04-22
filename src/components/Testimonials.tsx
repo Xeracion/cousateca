@@ -16,23 +16,30 @@ const Testimonials = () => {
   const [recentReviews, setRecentReviews] = useState<any[]>([]);
 
   React.useEffect(() => {
+    // Instead of fetching from a non-existent table, we'll use local state for now
+    // The table will need to be created in Supabase before it can be used
+    setRecentReviews([]);
+    
+    // This commented code will work once the 'reviews' table is created
+    /*
+    const fetchRecentReviews = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('reviews')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+        if (data) setRecentReviews(data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+    
     fetchRecentReviews();
+    */
   }, []);
-
-  const fetchRecentReviews = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('reviews')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3);
-
-      if (error) throw error;
-      if (data) setRecentReviews(data);
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
-    }
-  };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,21 +56,25 @@ const Testimonials = () => {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
-        .from('reviews')
-        .insert({
-          name,
-          role,
-          content: comment,
-          rating,
-        });
-      
-      if (error) throw error;
+      // For now, we'll just show a success message
+      // The actual database insert will work once the 'reviews' table is created
       
       toast({
         title: "¡Gracias por tu opinión!",
-        description: "Tu reseña ha sido enviada correctamente"
+        description: "Tu reseña ha sido recibida correctamente (tabla de reviews pendiente de crear)"
       });
+      
+      // Add the review to local state for now
+      const newReview = {
+        id: Date.now().toString(),
+        name,
+        role,
+        content: comment,
+        rating,
+        created_at: new Date().toISOString()
+      };
+      
+      setRecentReviews([newReview, ...recentReviews].slice(0, 3));
       
       // Reset form
       setRating(5);
@@ -71,8 +82,6 @@ const Testimonials = () => {
       setName('');
       setRole('');
       
-      // Refresh reviews
-      fetchRecentReviews();
     } catch (error: any) {
       toast({
         title: "Error al enviar la reseña",
