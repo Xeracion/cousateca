@@ -78,8 +78,7 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nombre (Español)</TableHead>
-                <TableHead>Nombre (Inglés)</TableHead>
+                <TableHead>Nombre</TableHead>
                 <TableHead>Descripción</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -89,8 +88,7 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
                 categories.map(category => (
                   <TableRow key={category.id}>
                     <TableCell className="font-medium">{category.nombre_es}</TableCell>
-                    <TableCell>{category.nombre}</TableCell>
-                    <TableCell>{category.descripcion_es || category.descripcion}</TableCell>
+                    <TableCell>{category.descripcion_es || ''}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
                         <Button 
@@ -114,7 +112,7 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-4">
+                  <TableCell colSpan={3} className="text-center py-4">
                     No hay categorías disponibles
                   </TableCell>
                 </TableRow>

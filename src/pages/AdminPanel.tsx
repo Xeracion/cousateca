@@ -283,8 +283,8 @@ const AdminPanel = () => {
   // Manejar guardar categoría
   const handleSaveCategory = async () => {
     try {
-      if (!categoryForm.nombre || !categoryForm.nombre_es) {
-        throw new Error("El nombre de la categoría es obligatorio en ambos idiomas");
+      if (!categoryForm.nombre_es) {
+        throw new Error("El nombre de la categoría es obligatorio");
       }
       
       if (isEditingCategory && selectedCategory) {
@@ -292,12 +292,12 @@ const AdminPanel = () => {
         const { data, error } = await supabase
           .from('categories')
           .update({
-            nombre: categoryForm.nombre,
+            nombre: categoryForm.nombre_es,
             nombre_es: categoryForm.nombre_es,
-            descripcion: categoryForm.descripcion,
+            descripcion: categoryForm.descripcion_es,
             descripcion_es: categoryForm.descripcion_es,
             imagen_url: categoryForm.imagen_url,
-            updated_at: new Date()
+            updated_at: new Date().toISOString()
           })
           .eq('id', selectedCategory.id);
         
@@ -310,9 +310,9 @@ const AdminPanel = () => {
       } else {
         // Crear nueva categoría - Asegurarse de que todos los campos requeridos existen
         const completeCategory = {
-          nombre: categoryForm.nombre || '',
+          nombre: categoryForm.nombre_es || '',
           nombre_es: categoryForm.nombre_es || '',
-          descripcion: categoryForm.descripcion || '',
+          descripcion: categoryForm.descripcion_es || '',
           descripcion_es: categoryForm.descripcion_es || '',
           imagen_url: categoryForm.imagen_url || ''
         };

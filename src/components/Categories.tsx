@@ -34,11 +34,11 @@ const Categories = () => {
   const categoriesToDisplay = dbCategories.length > 0 
     ? dbCategories.map(cat => ({
         id: cat.id,
-        name: cat.nombre,
-        nombre_es: cat.nombre_es || cat.nombre,
+        name: cat.nombre_es, // Use Spanish name
+        nombre_es: cat.nombre_es,
         icon: cat.icon || "laptop", // Fallback icon
-        description: cat.descripcion || "",
-        descripcion_es: cat.descripcion_es || cat.descripcion || ""
+        description: cat.descripcion_es || "", // Use Spanish description
+        descripcion_es: cat.descripcion_es || ""
       }))
     : defaultCategories;
 
