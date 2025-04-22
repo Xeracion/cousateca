@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,32 +17,58 @@ interface Category {
 }
 
 interface CategoriesPanelProps {
-  categories: Category[];
-  handleEditCategory: (category: Category) => void;
-  handleDeleteCategory: (id: string) => Promise<void>;
-  categoryForm: Partial<Category>;
-  setCategoryForm: React.Dispatch<React.SetStateAction<Partial<Category>>>;
-  isEditingCategory: boolean;
-  setIsEditingCategory: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<Category | null>>;
-  isCategoryDialogOpen: boolean;
-  setIsCategoryDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handleSaveCategory: () => Promise<void>;
+  categories: any[];
+  onCategoriesChange: () => void;
 }
 
-const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
+const CategoriesPanel: React.FC<CategoriesPanelProps> = ({ 
   categories,
-  handleEditCategory,
-  handleDeleteCategory,
-  categoryForm,
-  setCategoryForm,
-  isEditingCategory,
-  setIsEditingCategory,
-  setSelectedCategory,
-  isCategoryDialogOpen,
-  setIsCategoryDialogOpen,
-  handleSaveCategory
+  onCategoriesChange
 }) => {
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [isEditingCategory, setIsEditingCategory] = useState(false);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [categoryForm, setCategoryForm] = useState<Partial<Category>>({
+    nombre: '',
+    nombre_es: '',
+    descripcion: '',
+    descripcion_es: '',
+    imagen_url: ''
+  });
+
+  // Manejar editar categoría
+  const handleEditCategory = (category: Category) => {
+    setSelectedCategory(category);
+    setCategoryForm({
+      nombre: category.nombre,
+      nombre_es: category.nombre_es,
+      descripcion: category.descripcion,
+      descripcion_es: category.descripcion_es,
+      imagen_url: category.imagen_url
+    });
+    setIsEditingCategory(true);
+    setIsCategoryDialogOpen(true);
+  };
+
+  // Manejar eliminar categoría
+  const handleDeleteCategory = async (id: string) => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar esta categoría? Esto puede afectar a los productos asociados.")) {
+      // Lógica para eliminar la categoría
+      console.log(`Deleting category with id: ${id}`);
+      // Después de eliminar, recargar las categorías
+      onCategoriesChange();
+    }
+  };
+
+  // Manejar guardar categoría
+  const handleSaveCategory = async () => {
+    // Lógica para guardar la categoría
+    console.log('Saving category', categoryForm);
+    // Después de guardar, recargar las categorías
+    onCategoriesChange();
+    setIsCategoryDialogOpen(false);
+  };
+
   return (
     <>
       <div className="mb-6 flex justify-end">
@@ -85,7 +110,7 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
             </TableHeader>
             <TableBody>
               {categories.length > 0 ? (
-                categories.map(category => (
+                categories.map((category: Category) => (
                   <TableRow key={category.id}>
                     <TableCell className="font-medium">{category.nombre_es}</TableCell>
                     <TableCell>{category.descripcion_es || ''}</TableCell>

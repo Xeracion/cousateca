@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,39 +34,75 @@ interface Category {
 
 interface ProductsPanelProps {
   products: Product[];
-  filteredProducts: Product[];
-  searchQuery: string;
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   categories: Category[];
-  handleEditProduct: (product: Product) => void;
-  handleDeleteProduct: (id: string) => Promise<void>;
-  productForm: Partial<Product>;
-  setProductForm: React.Dispatch<React.SetStateAction<Partial<Product>>>;
-  isEditingProduct: boolean;
-  setIsEditingProduct: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedProduct: React.Dispatch<React.SetStateAction<Product | null>>;
-  isProductDialogOpen: boolean;
-  setIsProductDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handleSaveProduct: () => Promise<void>;
+  onProductsChange: () => void;
 }
 
-const ProductsPanel: React.FC<ProductsPanelProps> = ({
+const ProductsPanel: React.FC<ProductsPanelProps> = ({ 
   products,
-  filteredProducts,
-  searchQuery,
-  setSearchQuery,
   categories,
-  handleEditProduct,
-  handleDeleteProduct,
-  productForm,
-  setProductForm,
-  isEditingProduct,
-  setIsEditingProduct,
-  setSelectedProduct,
-  isProductDialogOpen,
-  setIsProductDialogOpen,
-  handleSaveProduct
+  onProductsChange
 }) => {
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
+  const [productForm, setProductForm] = useState<Partial<Product>>({
+    nombre: '',
+    categoria_id: '',
+    descripcion: '',
+    descripcion_corta: '',
+    precio_diario: 0,
+    precio_semanal: 0,
+    precio_mensual: 0,
+    deposito: 0,
+    imagenes: [''],
+    disponible: true,
+    destacado: false
+  });
+
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = products.filter(product => 
+        product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.descripcion.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts(products);
+    }
+  }, [searchQuery, products]);
+
+  const handleEditProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setProductForm({
+      nombre: product.nombre,
+      categoria_id: product.categoria_id,
+      descripcion: product.descripcion,
+      descripcion_corta: product.descripcion_corta,
+      precio_diario: product.precio_diario,
+      precio_semanal: product.precio_semanal,
+      precio_mensual: product.precio_mensual,
+      deposito: product.deposito,
+      imagenes: product.imagenes,
+      disponible: product.disponible,
+      destacado: product.destacado
+    });
+    setIsEditingProduct(true);
+    setIsProductDialogOpen(true);
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    // Implement your delete logic here
+    console.log('Delete product with id:', id);
+  };
+
+  const handleSaveProduct = async () => {
+    // Implement your save logic here
+    console.log('Save product:', productForm);
+  };
+
   return (
     <>
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -173,7 +208,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
         </CardContent>
       </Card>
       
-      {/* Diálogo para crear/editar producto */}
       <Dialog 
         open={isProductDialogOpen} 
         onOpenChange={setIsProductDialogOpen}
