@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
+import { products, Product } from "@/data/products";
 import { categories } from "@/data/categories";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,22 +73,22 @@ const CategoryDetail = () => {
   };
   
   // Helper function to map DB product to frontend product schema
-  const mapProductData = (product: any) => {
+  const mapProductData = (product: any): Product => {
     return {
       id: product.id,
-      nombre: product.nombre,
-      descripcion_corta: product.descripcion_corta,
-      precio_diario: product.precio_diario,
-      imagenes: product.imagenes,
-      destacado: product.destacado,
-      categoria_id: product.categoria_id,
-      // Also include legacy format for compatibility
-      name: product.nombre,
-      shortDescription: product.descripcion_corta,
-      dailyPrice: product.precio_diario,
-      images: product.imagenes,
-      featured: product.destacado,
-      category: product.categoria_id
+      name: product.nombre || product.name || "",
+      category: product.categoria?.nombre || product.category || "",
+      description: product.descripcion || "",
+      shortDescription: product.descripcion_corta || "",
+      dailyPrice: product.precio_diario || 0,
+      weeklyPrice: product.precio_semanal || 0,
+      monthlyPrice: product.precio_mensual || 0,
+      deposit: product.deposito || 0,
+      images: product.imagenes || product.images || [],
+      availability: product.disponible !== false,
+      featured: product.destacado === true,
+      rating: product.valoracion || 0,
+      reviewCount: product.num_valoraciones || 0
     };
   };
 
