@@ -80,6 +80,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
         },
         (payload) => {
           // Cuando ocurre un cambio (inserción, update, delete), refrescamos la lista
+          console.log("Cambio detectado en admin:", payload);
           onProductsChange();
         }
       )
@@ -89,8 +90,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       supabase.removeChannel(channel);
     };
     // deps vacío: solo al montar
-    // eslint-disable-next-line
-  }, []);
+  }, [onProductsChange]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -155,10 +155,15 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
         throw new Error("Por favor, completa los campos obligatorios");
       }
       
-      // Prevenir undefined en array de imágenes
-      const imagenes = productForm.imagenes && productForm.imagenes.length > 0
-        ? productForm.imagenes
+      // Asegurarnos de que imagenes es un array válido
+      const imagenes = Array.isArray(productForm.imagenes) && productForm.imagenes.length > 0
+        ? productForm.imagenes.filter(img => img.trim() !== '')
         : [''];
+      
+      // Si no hay imágenes después del filtrado, usar una imagen por defecto
+      if (imagenes.length === 0 || (imagenes.length === 1 && imagenes[0] === '')) {
+        imagenes[0] = 'https://via.placeholder.com/300x300?text=Sin+imagen';
+      }
 
       if (isEditingProduct && selectedProduct) {
         // Update existing product
@@ -167,19 +172,22 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           .update({
             nombre: productForm.nombre,
             categoria_id: productForm.categoria_id,
-            descripcion: productForm.descripcion,
-            descripcion_corta: productForm.descripcion_corta,
-            precio_diario: productForm.precio_diario,
-            precio_semanal: productForm.precio_semanal,
-            precio_mensual: productForm.precio_mensual,
-            deposito: productForm.deposito,
+            descripcion: productForm.descripcion || '',
+            descripcion_corta: productForm.descripcion_corta || '',
+            precio_diario: productForm.precio_diario || 0,
+            precio_semanal: productForm.precio_semanal || 0,
+            precio_mensual: productForm.precio_mensual || 0,
+            deposito: productForm.deposito || 0,
             imagenes,
-            disponible: productForm.disponible,
-            destacado: productForm.destacado
+            disponible: productForm.disponible !== undefined ? productForm.disponible : true,
+            destacado: productForm.destacado || false
           })
           .eq('id', selectedProduct.id);
         
-        if (error) throw error;
+        if (error) {
+          console.error("Error al actualizar:", error);
+          throw error;
+        }
         
         toast({
           title: "Producto actualizado",
@@ -192,18 +200,21 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           .insert({
             nombre: productForm.nombre,
             categoria_id: productForm.categoria_id,
-            descripcion: productForm.descripcion,
-            descripcion_corta: productForm.descripcion_corta,
-            precio_diario: productForm.precio_diario,
-            precio_semanal: productForm.precio_semanal,
-            precio_mensual: productForm.precio_mensual,
-            deposito: productForm.deposito,
+            descripcion: productForm.descripcion || '',
+            descripcion_corta: productForm.descripcion_corta || '',
+            precio_diario: productForm.precio_diario || 0,
+            precio_semanal: productForm.precio_semanal || 0,
+            precio_mensual: productForm.precio_mensual || 0,
+            deposito: productForm.deposito || 0,
             imagenes,
-            disponible: productForm.disponible,
-            destacado: productForm.destacado
+            disponible: productForm.disponible !== undefined ? productForm.disponible : true,
+            destacado: productForm.destacado || false
           });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Error al crear:", error);
+          throw error;
+        }
         
         toast({
           title: "Producto creado",
@@ -214,6 +225,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       setIsProductDialogOpen(false);
       onProductsChange(); // Refresca datos tras crear/editar
     } catch (error: any) {
+      console.error("Error completo:", error);
       toast({
         title: "Error al guardar el producto",
         description: error.message,

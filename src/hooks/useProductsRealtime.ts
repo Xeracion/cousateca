@@ -55,6 +55,7 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       let query = supabase
         .from('productos')
         .select(`
@@ -63,8 +64,7 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
             id,
             nombre
           )
-        `)
-        .eq('disponible', true);
+        `);
       
       // Aplicar filtros si existen
       if (filterOptions?.featured) {
@@ -73,6 +73,11 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
       
       if (filterOptions?.categoryId) {
         query = query.eq('categoria_id', filterOptions.categoryId);
+      }
+      
+      // Siempre mostrar solo productos disponibles en la web pública
+      if (!window.location.pathname.includes('/admin')) {
+        query = query.eq('disponible', true);
       }
       
       const { data: productsData, error: productsError } = await query;
