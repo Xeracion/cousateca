@@ -22,13 +22,13 @@ const ProductsPage = () => {
   // Filtrar productos basado en búsqueda y categoría
   const filteredProducts = products.filter((product) => {
     const matchesSearch = 
-      product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.descripcion?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.descripcion_corta?.toLowerCase().includes(searchQuery.toLowerCase());
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCategory = 
       selectedCategory === "all" || 
-      (product.categoria && product.categoria.id === selectedCategory);
+      product.category === selectedCategory;
     
     return matchesSearch && matchesCategory;
   });
@@ -37,14 +37,14 @@ const ProductsPage = () => {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortOption) {
       case "price-low":
-        return a.precio_diario - b.precio_diario;
+        return a.dailyPrice - b.dailyPrice;
       case "price-high":
-        return b.precio_diario - a.precio_diario;
+        return b.dailyPrice - a.dailyPrice;
       case "rating":
-        return b.valoracion - a.valoracion;
+        return b.rating - a.rating;
       case "featured":
       default:
-        return b.destacado ? 1 : -1;
+        return b.featured ? 1 : -1;
     }
   });
 
@@ -88,7 +88,7 @@ const ProductsPage = () => {
                       <SelectItem value="all">Todas las Categorías</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
-                          {category.nombre}
+                          {category.nombre_es}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -120,7 +120,7 @@ const ProductsPage = () => {
                     <SelectItem value="all">Todas las Categorías</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
-                        {category.nombre}
+                        {category.nombre_es}
                       </SelectItem>
                     ))}
                   </SelectContent>
