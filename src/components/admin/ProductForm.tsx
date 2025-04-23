@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +8,6 @@ import { Switch } from "@/components/ui/switch";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Trash2, Image, Plus } from "lucide-react";
 
-// Interfaces
 interface Category {
   id: string;
   nombre: string;
@@ -49,7 +47,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
   categories,
   setIsProductDialogOpen
 }) => {
-  // Handlers for form updates
   const handleAddImage = () => {
     setProductForm(prev => ({
       ...prev,
@@ -88,7 +85,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
             required
           />
         </div>
-        
         <div className="space-y-2">
           <Label htmlFor="categoria">Categoría *</Label>
           <Select
@@ -108,7 +104,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </Select>
         </div>
       </div>
-      
       <div className="space-y-2">
         <Label htmlFor="descripcion_corta">Descripción Corta *</Label>
         <Input
@@ -119,7 +114,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           required
         />
       </div>
-      
       <div className="space-y-2">
         <Label htmlFor="descripcion">Descripción Completa</Label>
         <Textarea
@@ -130,10 +124,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
           rows={4}
         />
       </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="precio_diario">Precio Diario ($) *</Label>
+          <Label htmlFor="precio_diario">Precio Diario (€) *</Label>
           <Input
             id="precio_diario"
             type="number"
@@ -145,9 +138,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             required
           />
         </div>
-        
         <div className="space-y-2">
-          <Label htmlFor="precio_semanal">Precio Semanal ($)</Label>
+          <Label htmlFor="precio_semanal">Precio Semanal (€)</Label>
           <Input
             id="precio_semanal"
             type="number"
@@ -159,10 +151,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
         </div>
       </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="precio_mensual">Precio Mensual ($)</Label>
+          <Label htmlFor="precio_mensual">Precio Mensual (€)</Label>
           <Input
             id="precio_mensual"
             type="number"
@@ -173,9 +164,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             placeholder="0.00"
           />
         </div>
-        
         <div className="space-y-2">
-          <Label htmlFor="deposito">Depósito ($)</Label>
+          <Label htmlFor="deposito">Depósito (€)</Label>
           <Input
             id="deposito"
             type="number"
@@ -187,7 +177,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
         </div>
       </div>
-      
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <Label>Imágenes *</Label>
@@ -200,7 +189,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <Plus className="h-4 w-4 mr-1" /> Añadir Imagen
           </Button>
         </div>
-        
         {productForm.imagenes && productForm.imagenes.map((url, index) => (
           <div key={index} className="flex gap-2">
             <div className="relative flex-grow">
@@ -226,7 +214,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
         ))}
       </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
         <div className="flex items-center space-x-2">
           <Switch
@@ -236,7 +223,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
           <Label htmlFor="disponible">Disponible para alquilar</Label>
         </div>
-        
         <div className="flex items-center space-x-2">
           <Switch
             id="destacado"
@@ -246,7 +232,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <Label htmlFor="destacado">Producto destacado</Label>
         </div>
       </div>
-
       <DialogFooter>
         <Button 
           variant="outline" 

@@ -66,6 +66,32 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     destacado: false
   });
 
+  // --- NUEVA SUSCRIPCIÓN EN TIEMPO REAL ---
+  useEffect(() => {
+    // Sólo suscribimos una vez, después de montar el componente
+    const channel = supabase
+      .channel('realtime:productos-admin')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'productos'
+        },
+        (payload) => {
+          // Cuando ocurre un cambio (inserción, update, delete), refrescamos la lista
+          onProductsChange();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // deps vacío: solo al montar
+    // eslint-disable-next-line
+  }, []);
+
   useEffect(() => {
     if (searchQuery) {
       const filtered = products.filter(product => 
@@ -89,7 +115,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       precio_semanal: product.precio_semanal,
       precio_mensual: product.precio_mensual,
       deposito: product.deposito,
-      imagenes: product.imagenes,
+      imagenes: product.imagenes && product.imagenes.length > 0 ? product.imagenes : [''],
       disponible: product.disponible,
       destacado: product.destacado
     });
@@ -112,7 +138,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           description: "El producto ha sido eliminado correctamente"
         });
         
-        onProductsChange();
+        onProductsChange(); // Refresca datos tras borrar
       } catch (error: any) {
         toast({
           title: "Error al eliminar el producto",
@@ -129,6 +155,11 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
         throw new Error("Por favor, completa los campos obligatorios");
       }
       
+      // Prevenir undefined en array de imágenes
+      const imagenes = productForm.imagenes && productForm.imagenes.length > 0
+        ? productForm.imagenes
+        : [''];
+
       if (isEditingProduct && selectedProduct) {
         // Update existing product
         const { error } = await supabase
@@ -142,7 +173,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
             precio_semanal: productForm.precio_semanal,
             precio_mensual: productForm.precio_mensual,
             deposito: productForm.deposito,
-            imagenes: productForm.imagenes,
+            imagenes,
             disponible: productForm.disponible,
             destacado: productForm.destacado
           })
@@ -167,7 +198,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
             precio_semanal: productForm.precio_semanal,
             precio_mensual: productForm.precio_mensual,
             deposito: productForm.deposito,
-            imagenes: productForm.imagenes,
+            imagenes,
             disponible: productForm.disponible,
             destacado: productForm.destacado
           });
@@ -181,7 +212,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       }
       
       setIsProductDialogOpen(false);
-      onProductsChange();
+      onProductsChange(); // Refresca datos tras crear/editar
     } catch (error: any) {
       toast({
         title: "Error al guardar el producto",
@@ -228,7 +259,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           Nuevo Producto
         </Button>
       </div>
-      
       <Card>
         <CardHeader>
           <CardTitle>Gestión de Productos</CardTitle>
@@ -256,7 +286,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                       <TableCell>
                         {categories.find(c => c.id === product.categoria_id)?.nombre || '-'}
                       </TableCell>
-                      <TableCell className="text-right">${product.precio_diario}</TableCell>
+                      <TableCell className="text-right">€{product.precio_diario}</TableCell>
                       <TableCell>
                         <Badge variant={product.disponible ? "outline" : "secondary"}>
                           {product.disponible ? "Disponible" : "No disponible"}
@@ -295,7 +325,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           </ScrollArea>
         </CardContent>
       </Card>
-      
       <Dialog 
         open={isProductDialogOpen} 
         onOpenChange={setIsProductDialogOpen}
