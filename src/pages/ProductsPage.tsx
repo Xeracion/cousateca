@@ -80,6 +80,27 @@ const ProductsPage = () => {
     };
     
     fetchData();
+
+    // Suscripción realtime
+    const channel = supabase
+      .channel('realtime:productos')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'productos'
+        },
+        (payload) => {
+          // Recargar productos en cualquier cambio relevante
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [toast]);
 
   // Filtrar productos basado en búsqueda y categoría
