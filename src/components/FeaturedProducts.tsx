@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
 import { useToast } from "@/components/ui/use-toast";
+import { Product } from "@/data/products";
 
 const FeaturedProducts = () => {
   const { toast } = useToast();
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -28,7 +29,26 @@ const FeaturedProducts = () => {
           .limit(6);
         
         if (error) throw error;
-        setFeaturedProducts(data || []);
+        
+        // Map the data to the Product interface format
+        const mappedProducts = data?.map(product => ({
+          id: product.id,
+          name: product.nombre || "",
+          category: product.categoria?.nombre || "",
+          description: product.descripcion || "",
+          shortDescription: product.descripcion_corta || "",
+          dailyPrice: product.precio_diario || 0,
+          weeklyPrice: product.precio_semanal || 0,
+          monthlyPrice: product.precio_mensual || 0,
+          deposit: product.deposito || 0,
+          images: product.imagenes || [],
+          availability: product.disponible !== false,
+          featured: product.destacado === true,
+          rating: product.valoracion || 0,
+          reviewCount: product.num_valoraciones || 0
+        })) || [];
+        
+        setFeaturedProducts(mappedProducts);
       } catch (error: any) {
         console.error("Error al cargar productos destacados:", error);
         toast({

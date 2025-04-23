@@ -12,11 +12,14 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const hasImages = product.images && product.images.length > 0;
+  const defaultImage = "https://via.placeholder.com/300x300?text=Sin+imagen";
+  
   return (
     <Card className="overflow-hidden product-card h-full flex flex-col">
       <div className="relative aspect-square overflow-hidden">
         <img
-          src={product.images[0]}
+          src={hasImages ? product.images[0] : defaultImage}
           alt={product.name}
           className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
         />
