@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,27 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { categories } from "@/data/categories";
 import { Sliders, Search } from "lucide-react";
-
-interface Product {
-  id: string;
-  nombre: string;
-  categoria_id: string;
-  descripcion: string;
-  descripcion_corta: string;
-  precio_diario: number;
-  precio_semanal: number;
-  precio_mensual: number;
-  deposito: number;
-  imagenes: string[];
-  disponible: boolean;
-  destacado: boolean;
-  valoracion: number;
-  num_valoraciones: number;
-  categoria?: {
-    id: string;
-    nombre: string;
-  };
-}
+import { useProductsRealtime } from "@/hooks/useProductsRealtime";
 
 const ProductsPage = () => {
   const { toast } = useToast();
@@ -38,77 +17,14 @@ const ProductsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortOption, setSortOption] = useState<string>("featured");
   const [showFilters, setShowFilters] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [dbCategories, setDbCategories] = useState<any[]>([]);
-
-  // Cargar productos y categorías de Supabase
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Cargar categorías
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('categories')
-          .select('id, nombre');
-        
-        if (categoriesError) throw categoriesError;
-        setDbCategories(categoriesData || []);
-        
-        // Cargar productos con categorías
-        const { data: productsData, error: productsError } = await supabase
-          .from('productos')
-          .select(`
-            *,
-            categoria:categoria_id (
-              id,
-              nombre
-            )
-          `)
-          .eq('disponible', true);
-        
-        if (productsError) throw productsError;
-        setProducts(productsData || []);
-      } catch (error: any) {
-        toast({
-          title: "Error al cargar datos",
-          description: error.message,
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchData();
-
-    // Suscripción realtime
-    const channel = supabase
-      .channel('realtime:productos')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'productos'
-        },
-        (payload) => {
-          // Recargar productos en cualquier cambio relevante
-          fetchData();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [toast]);
+  const { products, loading } = useProductsRealtime();
 
   // Filtrar productos basado en búsqueda y categoría
   const filteredProducts = products.filter((product) => {
     const matchesSearch = 
       product.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.descripcion.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.descripcion_corta.toLowerCase().includes(searchQuery.toLowerCase());
+      product.descripcion?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.descripcion_corta?.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCategory = 
       selectedCategory === "all" || 
@@ -170,7 +86,7 @@ const ProductsPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todas las Categorías</SelectItem>
-                      {dbCategories.map((category) => (
+                      {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.nombre}
                         </SelectItem>
@@ -202,7 +118,7 @@ const ProductsPage = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas las Categorías</SelectItem>
-                    {dbCategories.map((category) => (
+                    {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.nombre}
                       </SelectItem>
