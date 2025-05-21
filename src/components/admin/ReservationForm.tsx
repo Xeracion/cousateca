@@ -6,11 +6,16 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 
 interface ReservationFormProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (values: any) => void;
+  open?: boolean;
+  onClose?: () => void;
+  onSubmit?: (values: any) => void;
   defaultValues?: any;
   isEdit?: boolean;
+  // Props for use in ReservationsPanel
+  reserva?: any;
+  products?: any[];
+  onSave?: () => void;
+  onCancel?: () => void;
 }
 
 const ReservationForm: React.FC<ReservationFormProps> = ({
@@ -18,10 +23,15 @@ const ReservationForm: React.FC<ReservationFormProps> = ({
   onClose,
   onSubmit,
   defaultValues,
-  isEdit = false
+  isEdit = false,
+  // New props
+  reserva,
+  products,
+  onSave,
+  onCancel
 }) => {
   const { register, handleSubmit, reset } = useForm({
-    defaultValues: defaultValues || {
+    defaultValues: reserva || defaultValues || {
       usuario_id: "",
       producto_id: "",
       fecha_inicio: "",
@@ -31,20 +41,36 @@ const ReservationForm: React.FC<ReservationFormProps> = ({
   });
 
   useEffect(() => {
-    reset(defaultValues || {
+    reset(reserva || defaultValues || {
       usuario_id: "",
       producto_id: "",
       fecha_inicio: "",
       fecha_fin: "",
       precio_total: ""
     });
-  }, [defaultValues, open, reset]);
+  }, [reserva, defaultValues, open, reset]);
+
+  const handleFormSubmit = (data: any) => {
+    if (onSubmit) {
+      onSubmit(data);
+    } else if (onSave) {
+      onSave();
+    }
+  };
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else if (onCancel) {
+      onCancel();
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent>
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(handleFormSubmit)}
           className="space-y-4"
         >
           <DialogHeader>
@@ -57,7 +83,7 @@ const ReservationForm: React.FC<ReservationFormProps> = ({
           <Input {...register("precio_total")} placeholder="Precio Total" required type="number" />
           <DialogFooter>
             <Button type="submit">{isEdit ? "Actualizar" : "Crear"}</Button>
-            <Button variant="outline" type="button" onClick={onClose}>
+            <Button variant="outline" type="button" onClick={handleClose}>
               Cancelar
             </Button>
           </DialogFooter>
