@@ -88,10 +88,7 @@ const Testimonials = () => {
             recentReviews.map((review) => (
               <ReviewCard 
                 key={review.id}
-                name={review.name}
-                role={review.role}
-                content={review.content}
-                rating={review.rating}
+                review={review}
               />
             ))
           ) : (
