@@ -9,7 +9,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const ReservationsPanel = () => {
   const { toast } = useToast();
-  const [reservations, setReservations] = useState<any[]>([]);
+  const [reservas, setReservas] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isReservationDialogOpen, setIsReservationDialogOpen] = useState(false);
@@ -28,7 +28,7 @@ const ReservationsPanel = () => {
       setProducts(productsData || []);
       
       // Cargar reservas con información de productos
-      const { data: reservationsData, error: reservationsError } = await supabase
+      const { data: reservasData, error: reservasError } = await supabase
         .from('reservas')
         .select(`
           *,
@@ -36,8 +36,8 @@ const ReservationsPanel = () => {
         `)
         .order('fecha_inicio', { ascending: false });
       
-      if (reservationsError) throw reservationsError;
-      setReservations(reservationsData || []);
+      if (reservasError) throw reservasError;
+      setReservas(reservasData || []);
     } catch (error: any) {
       console.error('Error cargando datos:', error);
       toast({
@@ -140,7 +140,7 @@ const ReservationsPanel = () => {
         </CardHeader>
         <CardContent>
           <ReservationTable 
-            reservations={reservations} 
+            reservas={reservas} 
             loading={loading} 
             onUpdateStatus={handleUpdateStatus}
             onDelete={handleDeleteReservation}
@@ -158,7 +158,7 @@ const ReservationsPanel = () => {
       >
         <DialogContent className="sm:max-w-lg">
           <ReservationForm 
-            reservation={selectedReservation}
+            reserva={selectedReservation}
             products={products}
             onSave={() => {
               setIsReservationDialogOpen(false);
