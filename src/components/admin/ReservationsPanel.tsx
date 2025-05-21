@@ -1,139 +1,174 @@
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import ReservationForm from "./ReservationForm";
-import ReservationTable from "./ReservationTable";
+import { useToast } from "@/components/ui/use-toast";
+import ReservationTable from './ReservationTable';
+import ReservationForm from './ReservationForm';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-type ReservaRow = {
-  id: string;
-  usuario_id: string;
-  producto_id: string;
-  fecha_inicio: string;
-  fecha_fin?: string;
-  fecha_fin_prevista?: string;
-  precio_total?: number;
-  estado: string;
-};
-
-const ReservationsPanel: React.FC = () => {
+const ReservationsPanel = () => {
   const { toast } = useToast();
-  const [reservas, setReservas] = useState<ReservaRow[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [reservations, setReservations] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isReservationDialogOpen, setIsReservationDialogOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<any>(null);
 
-  // Modal states
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editReserva, setEditReserva] = useState<ReservaRow | null>(null);
-
-  const fetchReservas = async () => {
+  // Cargar reservas y productos
+  const loadData = async () => {
     setLoading(true);
-    // Se busca tanto de 'reservas' como de 'reservations'
-    const { data: data1 } = await supabase.from("reservas").select("*").order("created_at", { ascending: false });
-    const { data: data2 } = await supabase.from("reservations").select("*").order("created_at", { ascending: false });
-    // Unifica ambas si existen ambas tablas
-    let all = [];
-    if (Array.isArray(data1)) all = all.concat(data1);
-    if (Array.isArray(data2)) all = all.concat(data2);
-    setReservas(all);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchReservas();
-  }, []);
-
-  // Crear o editar reserva
-  const handleFormSubmit = async (values: any) => {
-    let result;
-    const table = editReserva
-      ? reservas.some((r) => r.id === editReserva.id && r.fecha_inicio && r.fecha_fin)
-        ? "reservas"
-        : "reservations"
-      : values.fecha_fin
-        ? "reservas"
-        : "reservations";
-
-    if (editReserva) {
-      // Actualización
-      const { error } = await supabase.from(table).update(values).eq("id", editReserva.id);
-      if (error) {
-        toast({
-          title: "Error",
-          description: "No se pudo actualizar la reserva",
-          variant: "destructive"
-        });
-      } else {
-        toast({ title: "Reserva actualizada" });
-        setModalOpen(false);
-        setEditReserva(null);
-        fetchReservas();
-      }
-    } else {
-      // Creación
-      const { error } = await supabase.from(table).insert([values]);
-      if (error) {
-        toast({
-          title: "Error",
-          description: "No se pudo crear la reserva",
-          variant: "destructive"
-        });
-      } else {
-        toast({ title: "Reserva creada" });
-        setModalOpen(false);
-        fetchReservas();
-      }
-    }
-  };
-
-  // Eliminar reserva
-  const handleDelete = async (reserva: ReservaRow) => {
-    const table = reserva.fecha_fin ? "reservas" : "reservations";
-    const { error } = await supabase.from(table).delete().eq("id", reserva.id);
-    if (error) {
+    try {
+      // Cargar productos
+      const { data: productsData, error: productsError } = await supabase
+        .from('productos')
+        .select('id, nombre');
+      
+      if (productsError) throw productsError;
+      setProducts(productsData || []);
+      
+      // Cargar reservas con información de productos
+      const { data: reservationsData, error: reservationsError } = await supabase
+        .from('reservas')
+        .select(`
+          *,
+          producto:producto_id (id, nombre)
+        `)
+        .order('fecha_inicio', { ascending: false });
+      
+      if (reservationsError) throw reservationsError;
+      setReservations(reservationsData || []);
+    } catch (error: any) {
+      console.error('Error cargando datos:', error);
       toast({
         title: "Error",
-        description: "No se pudo eliminar la reserva",
+        description: `No se pudieron cargar los datos: ${error.message}`,
         variant: "destructive"
       });
-    } else {
-      toast({ title: "Reserva eliminada" });
-      fetchReservas();
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Gestión de Reservas</CardTitle>
-        <CardDescription>Administra todas las reservas de los clientes</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 flex justify-end">
-          <Button onClick={() => { setEditReserva(null); setModalOpen(true); }}>
-            Añadir Reserva
-          </Button>
-        </div>
-        {loading ? (
-          <p className="text-center py-6 text-gray-500">Cargando reservas...</p>
-        ) : (
-          <ReservationTable
-            reservas={reservas}
-            onEdit={(r) => { setEditReserva(r); setModalOpen(true); }}
-            onDelete={handleDelete}
-          />
-        )}
+  // Manejar la actualización de estado de reserva
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('reservas')
+        .update({ estado: newStatus })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Estado actualizado",
+        description: `La reserva ha sido actualizada a: ${newStatus}`
+      });
+      
+      // Recargar datos
+      loadData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: `No se pudo actualizar el estado: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  };
 
-        <ReservationForm
-          open={modalOpen}
-          onClose={() => { setModalOpen(false); setEditReserva(null); }}
-          onSubmit={handleFormSubmit}
-          defaultValues={editReserva || undefined}
-          isEdit={Boolean(editReserva)}
-        />
-      </CardContent>
-    </Card>
+  // Manejar la eliminación de reserva
+  const handleDeleteReservation = async (id: string) => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar esta reserva?")) {
+      try {
+        const { error } = await supabase
+          .from('reservas')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Reserva eliminada",
+          description: "La reserva ha sido eliminada correctamente"
+        });
+        
+        loadData();
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: `No se pudo eliminar la reserva: ${error.message}`,
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  // Efecto para cargar datos iniciales
+  useEffect(() => {
+    loadData();
+    
+    // Configurar suscripción en tiempo real
+    const channel = supabase
+      .channel('realtime-reservas')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'reservas' 
+        },
+        (payload) => {
+          console.log('Cambio en reservas detectado:', payload);
+          loadData();
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Gestión de Reservas</CardTitle>
+          <CardDescription>
+            Visualiza y gestiona todas las reservas de productos
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ReservationTable 
+            reservations={reservations} 
+            loading={loading} 
+            onUpdateStatus={handleUpdateStatus}
+            onDelete={handleDeleteReservation}
+            onEdit={(reservation) => {
+              setSelectedReservation(reservation);
+              setIsReservationDialogOpen(true);
+            }}
+          />
+        </CardContent>
+      </Card>
+      
+      <Dialog 
+        open={isReservationDialogOpen} 
+        onOpenChange={setIsReservationDialogOpen}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <ReservationForm 
+            reservation={selectedReservation}
+            products={products}
+            onSave={() => {
+              setIsReservationDialogOpen(false);
+              loadData();
+            }}
+            onCancel={() => setIsReservationDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

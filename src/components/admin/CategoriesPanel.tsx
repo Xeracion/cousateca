@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -39,6 +39,29 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
     descripcion_es: '',
     imagen_url: ''
   });
+
+  // Configurar suscripción en tiempo real
+  useEffect(() => {
+    const channel = supabase
+      .channel('realtime-categories')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'categories' 
+        },
+        (payload) => {
+          console.log('Cambio en categorías detectado:', payload);
+          onCategoriesChange();
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [onCategoriesChange]);
 
   // Manejar editar categoría
   const handleEditCategory = (category: Category) => {
@@ -88,17 +111,20 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
         throw new Error("El nombre de la categoría es obligatorio");
       }
       
+      // Asegurarnos de que los valores nunca sean undefined
+      const formData = {
+        nombre: categoryForm.nombre_es || '', // Keep both fields in sync
+        nombre_es: categoryForm.nombre_es || '',
+        descripcion: categoryForm.descripcion_es || '', // Keep both fields in sync
+        descripcion_es: categoryForm.descripcion_es || '',
+        imagen_url: categoryForm.imagen_url || ''
+      };
+      
       if (isEditingCategory && selectedCategory) {
         // Update existing category
         const { error } = await supabase
           .from('categories')
-          .update({
-            nombre: categoryForm.nombre_es, // Keep both fields in sync
-            nombre_es: categoryForm.nombre_es,
-            descripcion: categoryForm.descripcion_es, // Keep both fields in sync
-            descripcion_es: categoryForm.descripcion_es,
-            imagen_url: categoryForm.imagen_url
-          })
+          .update(formData)
           .eq('id', selectedCategory.id);
         
         if (error) throw error;
@@ -111,13 +137,7 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
         // Create new category
         const { error } = await supabase
           .from('categories')
-          .insert({
-            nombre: categoryForm.nombre_es, // Keep both fields in sync
-            nombre_es: categoryForm.nombre_es,
-            descripcion: categoryForm.descripcion_es, // Keep both fields in sync
-            descripcion_es: categoryForm.descripcion_es,
-            imagen_url: categoryForm.imagen_url
-          });
+          .insert(formData);
         
         if (error) throw error;
         
@@ -128,6 +148,13 @@ const CategoriesPanel: React.FC<CategoriesPanelProps> = ({
       }
       
       setIsCategoryDialogOpen(false);
+      setCategoryForm({
+        nombre: '',
+        nombre_es: '',
+        descripcion: '',
+        descripcion_es: '',
+        imagen_url: ''
+      });
       onCategoriesChange();
     } catch (error: any) {
       toast({

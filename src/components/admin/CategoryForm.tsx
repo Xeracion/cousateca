@@ -66,15 +66,31 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       
       <div className="space-y-2">
         <Label htmlFor="cat_imagen">URL de Imagen</Label>
-        <div className="relative">
-          <Image className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          <Input
-            id="cat_imagen"
-            value={categoryForm.imagen_url || ''}
-            onChange={(e) => setCategoryForm({...categoryForm, imagen_url: e.target.value})}
-            placeholder="URL de la imagen (opcional)"
-            className="pl-9"
-          />
+        <div className="space-y-2">
+          <div className="relative">
+            <Image className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              id="cat_imagen"
+              value={categoryForm.imagen_url || ''}
+              onChange={(e) => setCategoryForm({...categoryForm, imagen_url: e.target.value})}
+              placeholder="URL de la imagen (opcional)"
+              className="pl-9"
+            />
+          </div>
+          {categoryForm.imagen_url && (
+            <div className="mt-2 rounded border p-2">
+              <p className="text-xs text-gray-500 mb-1">Vista previa:</p>
+              <img 
+                src={categoryForm.imagen_url} 
+                alt="Vista previa" 
+                className="max-h-32 max-w-full object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://placehold.co/600x400?text=Imagen+no+disponible';
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
