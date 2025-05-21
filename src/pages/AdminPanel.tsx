@@ -23,17 +23,23 @@ const AdminPanel = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (username === 'admin' && password === 'cousateca2024') {
-      toast({
-        title: "Inicio de sesión exitoso",
-        description: "Bienvenido al panel de administración"
-      });
-      setLocalLogin(true);
-      setLocalAdmin(true);
-      setError('');
-      loadData();
+    if (username === 'admin' || username === 'info@xeracion.org') {
+      if (password === 'cousateca2024') {
+        toast({
+          title: "Inicio de sesión exitoso",
+          description: "Bienvenido al panel de administración"
+        });
+        setLocalLogin(true);
+        setLocalAdmin(true);
+        // Guardar el estado de administrador en localStorage
+        localStorage.setItem('localAdminStatus', 'true');
+        setError('');
+        loadData();
+      } else {
+        setError('Contraseña incorrecta');
+      }
     } else {
-      setError('Credenciales incorrectas');
+      setError('Usuario no reconocido');
     }
   };
 

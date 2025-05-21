@@ -10,9 +10,11 @@ export const useAdminAuth = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
+        // Primero verificamos si hay un usuario de autenticación
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
+          // Si hay un usuario autenticado en Supabase
           const { data: perfil } = await supabase
             .from('perfiles')
             .select('role')
@@ -26,6 +28,13 @@ export const useAdminAuth = () => {
             setIsLoggedIn(true);
             setIsAdmin(false);
           }
+        } else {
+          // Verificación alternativa para el usuario local
+          const storedAdminStatus = localStorage.getItem('localAdminStatus');
+          if (storedAdminStatus === 'true') {
+            setIsLoggedIn(true);
+            setIsAdmin(true);
+          }
         }
       } catch (error) {
         console.error("Error verificando usuario:", error);
@@ -36,6 +45,7 @@ export const useAdminAuth = () => {
     
     checkUser();
     
+    // Listener para cambios de estado de autenticación
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const { data: perfil } = await supabase
@@ -51,6 +61,8 @@ export const useAdminAuth = () => {
       } else if (event === 'SIGNED_OUT') {
         setIsLoggedIn(false);
         setIsAdmin(false);
+        // Limpiar también el estado local
+        localStorage.removeItem('localAdminStatus');
       }
     });
     

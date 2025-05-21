@@ -158,11 +158,11 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       // Asegurarnos de que imagenes es un array válido
       const imagenes = Array.isArray(productForm.imagenes) && productForm.imagenes.length > 0
         ? productForm.imagenes.filter(img => img.trim() !== '')
-        : [''];
+        : [];
       
       // Si no hay imágenes después del filtrado, usar una imagen por defecto
-      if (imagenes.length === 0 || (imagenes.length === 1 && imagenes[0] === '')) {
-        imagenes[0] = 'https://via.placeholder.com/300x300?text=Sin+imagen';
+      if (imagenes.length === 0) {
+        imagenes.push('https://via.placeholder.com/300x300?text=Sin+imagen');
       }
 
       if (isEditingProduct && selectedProduct) {
