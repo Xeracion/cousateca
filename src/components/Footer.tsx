@@ -1,11 +1,8 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Instagram, MapPin, Phone, Mail } from "lucide-react";
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white pt-12 pb-8">
+  return <footer className="bg-gray-900 text-white pt-12 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -81,13 +78,9 @@ const Footer = () => {
 
           {/* EU Flag Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Financiado por</h3>
+            <h3 className="text-lg font-semibold mb-4">Con el apoyo de</h3>
             <div className="flex flex-col items-center">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png" 
-                alt="Bandera de la Unión Europea" 
-                className="w-20 h-auto mb-2"
-              />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png" alt="Bandera de la Unión Europea" className="w-20 h-auto mb-2" />
               <p className="text-gray-400 text-sm text-center">
                 Proyecto financiado por la Unión Europea
               </p>
@@ -111,8 +104,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
