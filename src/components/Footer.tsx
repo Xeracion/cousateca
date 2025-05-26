@@ -2,8 +2,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Instagram, MapPin, Phone, Mail } from "lucide-react";
+
 const Footer = () => {
-  return <footer className="bg-gray-900 text-white pt-12 pb-8">
+  return (
+    <footer className="bg-gray-900 text-white pt-12 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -77,18 +79,19 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* EU Flag Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Boletín</h3>
-            <p className="text-gray-400 mb-4">
-              Suscríbete para recibir ofertas especiales, sorteos gratuitos y actualizaciones.
-            </p>
-            <form className="flex flex-col space-y-2">
-              <input type="email" placeholder="Tu dirección de email" className="bg-gray-800 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-rental-500" />
-              <button type="submit" className="bg-rental-500 hover:bg-rental-600 text-white py-2 px-4 rounded-md transition duration-200">
-                Suscribirse
-              </button>
-            </form>
+            <h3 className="text-lg font-semibold mb-4">Financiado por</h3>
+            <div className="flex flex-col items-center">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png" 
+                alt="Bandera de la Unión Europea" 
+                className="w-20 h-auto mb-2"
+              />
+              <p className="text-gray-400 text-sm text-center">
+                Proyecto financiado por la Unión Europea
+              </p>
+            </div>
           </div>
         </div>
 
@@ -108,6 +111,8 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };
+
 export default Footer;
