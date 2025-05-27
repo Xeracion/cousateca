@@ -5,30 +5,53 @@ import { Button } from "@/components/ui/button";
 import CategoryCard from "@/components/CategoryCard";
 import { categories as defaultCategories } from "@/data/categories";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Categories = () => {
+  const { toast } = useToast();
   const [dbCategories, setDbCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoading(true);
+        setError(null);
+        
+        console.log("Cargando categorías...");
+        
         const { data, error } = await supabase
           .from('categories')
           .select('*')
           .order('nombre');
           
-        if (error) throw error;
-        if (data) setDbCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+        if (error) {
+          console.error("Error al cargar categorías:", error);
+          throw error;
+        }
+        
+        console.log("Categorías cargadas:", data);
+        setDbCategories(data || []);
+        
+      } catch (error: any) {
+        console.error("Error detallado al cargar categorías:", error);
+        setError(error.message);
+        toast({
+          title: "Error al cargar categorías",
+          description: "Usando categorías por defecto. " + error.message,
+          variant: "destructive"
+        });
+        // En caso de error, usar categorías por defecto
+        setDbCategories([]);
       } finally {
         setLoading(false);
       }
     };
     
     fetchCategories();
-  }, []);
+  }, [toast]);
 
   // Use database categories if available, otherwise fallback to static data
   const categoriesToDisplay = dbCategories.length > 0 
@@ -41,6 +64,22 @@ const Categories = () => {
         descripcion_es: cat.descripcion_es || ""
       }))
     : defaultCategories;
+
+  if (error && dbCategories.length === 0 && defaultCategories.length === 0) {
+    return (
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Error al cargar categorías</h2>
+            <p className="text-gray-600 mb-4">No se pudieron cargar las categorías. Por favor, inténtalo de nuevo.</p>
+            <Button onClick={() => window.location.reload()}>
+              Recargar página
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 bg-white">
@@ -60,7 +99,7 @@ const Categories = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {loading ? (
             Array(6).fill(0).map((_, i) => (
-              <div key={i} className="h-32 bg-gray-100 animate-pulse rounded-lg"></div>
+              <Skeleton key={i} className="h-32 w-full rounded-lg" />
             ))
           ) : (
             categoriesToDisplay.map((category) => (
@@ -68,6 +107,14 @@ const Categories = () => {
             ))
           )}
         </div>
+        
+        {error && dbCategories.length === 0 && (
+          <div className="mt-4 text-center">
+            <p className="text-sm text-orange-600">
+              Mostrando categorías por defecto debido a un error de conexión
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

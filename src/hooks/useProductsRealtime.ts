@@ -48,10 +48,15 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
   const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      console.log("Iniciando carga de productos...", filterOptions);
+      
       let query = supabase
         .from('productos')
         .select(`
@@ -65,32 +70,53 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
       // Aplicar filtros si existen
       if (filterOptions?.featured) {
         query = query.eq('destacado', true);
+        console.log("Aplicando filtro de productos destacados");
       }
       
       if (filterOptions?.categoryId) {
         query = query.eq('categoria_id', filterOptions.categoryId);
+        console.log("Aplicando filtro de categoría:", filterOptions.categoryId);
       }
       
       // Siempre mostrar solo productos disponibles en la web pública
       if (!window.location.pathname.includes('/admin')) {
         query = query.eq('disponible', true);
+        console.log("Aplicando filtro de productos disponibles");
       }
       
       const { data: productsData, error: productsError } = await query;
       
-      if (productsError) throw productsError;
+      if (productsError) {
+        console.error("Error en consulta de productos:", productsError);
+        throw productsError;
+      }
+      
+      console.log("Datos recibidos de Supabase:", productsData);
+      
+      // Verificar que tengamos datos válidos
+      if (!productsData) {
+        console.warn("No se recibieron datos de productos");
+        setProducts([]);
+        return;
+      }
       
       // Convertimos los datos de Supabase al formato Product
-      const mappedProducts = productsData?.map(mapSupabaseProductToProduct) || [];
+      const mappedProducts = productsData.map(mapSupabaseProductToProduct);
       setProducts(mappedProducts);
-      console.log("Productos actualizados:", mappedProducts.length);
+      console.log("Productos procesados correctamente:", mappedProducts.length);
+      
     } catch (error: any) {
-      console.error("Error fetching products:", error);
+      console.error("Error detallado al cargar productos:", error);
+      setError(error.message || "Error desconocido");
       toast({
-        title: "Error",
-        description: "No se pudieron cargar los productos",
+        title: "Error al cargar productos",
+        description: error.message || "No se pudieron cargar los productos. Inténtalo de nuevo.",
         variant: "destructive"
       });
+      // En caso de error, mantener productos existentes si los hay
+      if (products.length === 0) {
+        setProducts([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -115,12 +141,21 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
           fetchData();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Estado de suscripción realtime:", status);
+      });
 
     return () => {
+      console.log("Limpiando suscripción realtime");
       supabase.removeChannel(channel);
     };
   }, [filterOptions?.featured, filterOptions?.categoryId]);
 
-  return { products, loading, setProducts, refreshProducts: fetchData };
+  return { 
+    products, 
+    loading, 
+    error,
+    setProducts, 
+    refreshProducts: fetchData 
+  };
 };
