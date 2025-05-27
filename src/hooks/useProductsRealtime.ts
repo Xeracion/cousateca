@@ -11,8 +11,6 @@ interface SupabaseProduct {
   descripcion?: string;
   descripcion_corta?: string;
   precio_diario: number;
-  precio_semanal: number;
-  precio_mensual: number;
   deposito: number;
   imagenes: string[];
   disponible?: boolean;
@@ -37,8 +35,6 @@ const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
     description: product.descripcion || "",
     shortDescription: product.descripcion_corta || "",
     dailyPrice: product.precio_diario,
-    weeklyPrice: product.precio_semanal,
-    monthlyPrice: product.precio_mensual,
     deposit: product.deposito,
     images: product.imagenes || [],
     availability: product.disponible !== false, // true por defecto si es undefined

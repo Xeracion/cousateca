@@ -70,8 +70,6 @@ const CategoriesPage = () => {
       description: product.descripcion || "",
       shortDescription: product.descripcion_corta || "",
       dailyPrice: product.precio_diario || 0,
-      weeklyPrice: product.precio_semanal || 0,
-      monthlyPrice: product.precio_mensual || 0,
       deposit: product.deposito || 0,
       images: product.imagenes || product.images || [],
       availability: product.disponible !== false,
