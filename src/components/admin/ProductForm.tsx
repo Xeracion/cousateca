@@ -23,8 +23,6 @@ interface Product {
   descripcion: string;
   descripcion_corta: string;
   precio_diario: number;
-  precio_semanal: number;
-  precio_mensual: number;
   deposito: number;
   imagenes: string[];
   disponible: boolean;
@@ -137,32 +135,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={(e) => setProductForm({...productForm, precio_diario: parseFloat(e.target.value)})}
             placeholder="0.00"
             required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="precio_semanal">Precio Semanal (€)</Label>
-          <Input
-            id="precio_semanal"
-            type="number"
-            min="0"
-            step="0.01"
-            value={productForm.precio_semanal || ''}
-            onChange={(e) => setProductForm({...productForm, precio_semanal: parseFloat(e.target.value)})}
-            placeholder="0.00"
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="precio_mensual">Precio Mensual (€)</Label>
-          <Input
-            id="precio_mensual"
-            type="number"
-            min="0"
-            step="0.01"
-            value={productForm.precio_mensual || ''}
-            onChange={(e) => setProductForm({...productForm, precio_mensual: parseFloat(e.target.value)})}
-            placeholder="0.00"
           />
         </div>
         <div className="space-y-2">

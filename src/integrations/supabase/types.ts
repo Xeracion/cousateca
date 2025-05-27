@@ -86,8 +86,6 @@ export type Database = {
           nombre: string
           num_valoraciones: number | null
           precio_diario: number
-          precio_mensual: number
-          precio_semanal: number
           updated_at: string | null
           valoracion: number | null
         }
@@ -104,8 +102,6 @@ export type Database = {
           nombre: string
           num_valoraciones?: number | null
           precio_diario: number
-          precio_mensual: number
-          precio_semanal: number
           updated_at?: string | null
           valoracion?: number | null
         }
@@ -122,8 +118,6 @@ export type Database = {
           nombre?: string
           num_valoraciones?: number | null
           precio_diario?: number
-          precio_mensual?: number
-          precio_semanal?: number
           updated_at?: string | null
           valoracion?: number | null
         }

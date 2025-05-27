@@ -20,8 +20,6 @@ interface Product {
   descripcion: string;
   descripcion_corta: string;
   precio_diario: number;
-  precio_semanal: number;
-  precio_mensual: number;
   deposito: number;
   imagenes: string[];
   disponible: boolean;
@@ -58,17 +56,14 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     descripcion: '',
     descripcion_corta: '',
     precio_diario: 0,
-    precio_semanal: 0,
-    precio_mensual: 0,
     deposito: 0,
     imagenes: [''],
     disponible: true,
     destacado: false
   });
 
-  // --- NUEVA SUSCRIPCIÓN EN TIEMPO REAL ---
+  // Real-time subscription
   useEffect(() => {
-    // Sólo suscribimos una vez, después de montar el componente
     const channel = supabase
       .channel('realtime:productos-admin')
       .on(
@@ -79,7 +74,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           table: 'productos'
         },
         (payload) => {
-          // Cuando ocurre un cambio (inserción, update, delete), refrescamos la lista
           console.log("Cambio detectado en admin:", payload);
           onProductsChange();
         }
@@ -89,7 +83,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     return () => {
       supabase.removeChannel(channel);
     };
-    // deps vacío: solo al montar
   }, [onProductsChange]);
 
   useEffect(() => {
@@ -112,8 +105,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       descripcion: product.descripcion,
       descripcion_corta: product.descripcion_corta,
       precio_diario: product.precio_diario,
-      precio_semanal: product.precio_semanal,
-      precio_mensual: product.precio_mensual,
       deposito: product.deposito,
       imagenes: product.imagenes && product.imagenes.length > 0 ? product.imagenes : [''],
       disponible: product.disponible,
@@ -138,7 +129,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           description: "El producto ha sido eliminado correctamente"
         });
         
-        onProductsChange(); // Refresca datos tras borrar
+        onProductsChange();
       } catch (error: any) {
         toast({
           title: "Error al eliminar el producto",
@@ -155,12 +146,11 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
         throw new Error("Por favor, completa los campos obligatorios");
       }
       
-      // Asegurarnos de que imagenes es un array válido
+      // Ensure imagenes is a valid array
       const imagenes = Array.isArray(productForm.imagenes) && productForm.imagenes.length > 0
         ? productForm.imagenes.filter(img => img.trim() !== '')
         : [];
       
-      // Si no hay imágenes después del filtrado, usar una imagen por defecto
       if (imagenes.length === 0) {
         imagenes.push('https://via.placeholder.com/300x300?text=Sin+imagen');
       }
@@ -175,8 +165,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
             descripcion: productForm.descripcion || '',
             descripcion_corta: productForm.descripcion_corta || '',
             precio_diario: productForm.precio_diario || 0,
-            precio_semanal: productForm.precio_semanal || 0,
-            precio_mensual: productForm.precio_mensual || 0,
             deposito: productForm.deposito || 0,
             imagenes,
             disponible: productForm.disponible !== undefined ? productForm.disponible : true,
@@ -203,8 +191,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
             descripcion: productForm.descripcion || '',
             descripcion_corta: productForm.descripcion_corta || '',
             precio_diario: productForm.precio_diario || 0,
-            precio_semanal: productForm.precio_semanal || 0,
-            precio_mensual: productForm.precio_mensual || 0,
             deposito: productForm.deposito || 0,
             imagenes,
             disponible: productForm.disponible !== undefined ? productForm.disponible : true,
@@ -223,7 +209,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       }
       
       setIsProductDialogOpen(false);
-      onProductsChange(); // Refresca datos tras crear/editar
+      onProductsChange();
     } catch (error: any) {
       console.error("Error completo:", error);
       toast({
@@ -255,8 +241,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
               descripcion: '',
               descripcion_corta: '',
               precio_diario: 0,
-              precio_semanal: 0,
-              precio_mensual: 0,
               deposito: 0,
               imagenes: [''],
               disponible: true,

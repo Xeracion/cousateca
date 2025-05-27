@@ -6,8 +6,6 @@ export interface Product {
   description: string;
   shortDescription: string;
   dailyPrice: number;
-  weeklyPrice: number;
-  monthlyPrice: number;
   deposit: number;
   images: string[];
   availability: boolean;
@@ -24,8 +22,6 @@ export const products: Product[] = [
     description: "Cámara DSLR de alta gama con capacidades de video 4K, perfecta para proyectos profesionales de fotografía y videografía. Incluye múltiples lentes, trípode y estuche de transporte.",
     shortDescription: "Cámara profesional para fotos y videos impresionantes",
     dailyPrice: 65,
-    weeklyPrice: 350,
-    monthlyPrice: 1050,
     deposit: 450,
     images: [
       "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1738&auto=format&fit=crop",
@@ -44,8 +40,6 @@ export const products: Product[] = [
     description: "Bicicleta de montaña premium con cuadro de carbono, suspensión delantera y trasera, frenos de disco hidráulicos y ruedas de 29 pulgadas. Perfecta para rutas de montaña y aventuras.",
     shortDescription: "Bicicleta de alto rendimiento para todo tipo de terrenos",
     dailyPrice: 40,
-    weeklyPrice: 180,
-    monthlyPrice: 525,
     deposit: 260,
     images: [
       "https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=1740&auto=format&fit=crop",
@@ -64,8 +58,6 @@ export const products: Product[] = [
     description: "Equipo completo de camping que incluye una tienda para 4 personas, sacos de dormir, estufa portátil, linternas y utensilios de cocina. Todo lo que necesitas para tu próxima aventura al aire libre.",
     shortDescription: "Kit completo de camping para tus aventuras al aire libre",
     dailyPrice: 55,
-    weeklyPrice: 260,
-    monthlyPrice: 790,
     deposit: 175,
     images: [
       "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?q=80&w=1740&auto=format&fit=crop",
@@ -84,8 +76,6 @@ export const products: Product[] = [
     description: "Configuración profesional de DJ que incluye controlador, altavoces, auriculares y efectos de iluminación. Perfecto para fiestas, eventos y DJs aspirantes.",
     shortDescription: "Equipo profesional de DJ para fiestas y eventos",
     dailyPrice: 105,
-    weeklyPrice: 440,
-    monthlyPrice: 1320,
     deposit: 525,
     images: [
       "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1740&auto=format&fit=crop",
@@ -104,8 +94,6 @@ export const products: Product[] = [
     description: "Dron de alto rendimiento con cámara 4K, 30 minutos de tiempo de vuelo, evitación de obstáculos y funciones de seguimiento. Ideal para fotografía y videografía aérea.",
     shortDescription: "Captura imágenes aéreas impresionantes con este dron de alta tecnología",
     dailyPrice: 75,
-    weeklyPrice: 395,
-    monthlyPrice: 1140,
     deposit: 440,
     images: [
       "https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=1740&auto=format&fit=crop",
@@ -124,8 +112,6 @@ export const products: Product[] = [
     description: "Sistema completo de iluminación para fiestas con controlador DMX, cabezales móviles, efectos láser y modos activados por sonido. Transforma cualquier lugar en una discoteca profesional.",
     shortDescription: "Transforma cualquier espacio con efectos de iluminación profesionales",
     dailyPrice: 80,
-    weeklyPrice: 350,
-    monthlyPrice: 965,
     deposit: 260,
     images: [
       "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=1887&auto=format&fit=crop",

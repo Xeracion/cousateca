@@ -54,24 +54,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [items]);
 
-  // Calculate the correct price based on rental duration
+  // Calculate the price based on daily rate only
   const calculateItemPrice = (item: CartItem): number => {
     const { product, rentalDays } = item;
-    
-    // Use monthly rate if 30+ days
-    if (rentalDays >= 30) {
-      const months = Math.ceil(rentalDays / 30);
-      return product.monthlyPrice * months;
-    }
-    // Use weekly rate if 7+ days
-    else if (rentalDays >= 7) {
-      const weeks = Math.ceil(rentalDays / 7);
-      return product.weeklyPrice * weeks;
-    }
-    // Use daily rate for less than 7 days
-    else {
-      return product.dailyPrice * rentalDays;
-    }
+    return product.dailyPrice * rentalDays;
   };
 
   // Update total price and item count whenever items change

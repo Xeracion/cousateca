@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { Calendar as CalendarIcon, ChevronRight, Truck, Shield, DollarSign, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronRight, Truck, Shield, Clock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { formatCurrency, formatDate, getDefaultEndDate } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
@@ -96,7 +95,7 @@ const ProductDetail = () => {
   // Calcular la duración del alquiler en días
   const rentalDays = dateRange?.from && dateRange?.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 1;
 
-  // Calcular el precio total
+  // Calcular el precio total (solo precio diario)
   const totalPrice = dateRange?.from && dateRange?.to ? product.precio_diario * rentalDays : product.precio_diario;
 
   const handleAddToCart = () => {
@@ -170,45 +169,16 @@ const ProductDetail = () => {
                 
                 <p className="text-gray-700 mb-6">{product.descripcion}</p>
                 
-                <Tabs defaultValue="daily">
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="daily">Diario</TabsTrigger>
-                    <TabsTrigger value="weekly">Semanal</TabsTrigger>
-                    <TabsTrigger value="monthly">Mensual</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="daily" className="space-y-4">
-                    <div className="flex items-center">
-                      <span className="text-2xl font-bold">
-                        {formatCurrency(product.precio_diario)} / día
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Perfecto para necesidades a corto plazo o para probar antes de comprar.
-                    </p>
-                  </TabsContent>
-                  <TabsContent value="weekly" className="space-y-4">
-                    <div className="flex items-center">
-                      <DollarSign className="h-5 w-5 text-rental-500 mr-1" />
-                      <span className="text-2xl font-bold">
-                        {formatCurrency(product.precio_semanal)} / semana
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Ahorra {Math.round((1 - product.precio_semanal / (product.precio_diario * 7)) * 100)}% en comparación con las tarifas diarias.
-                    </p>
-                  </TabsContent>
-                  <TabsContent value="monthly" className="space-y-4">
-                    <div className="flex items-center">
-                      <DollarSign className="h-5 w-5 text-rental-500 mr-1" />
-                      <span className="text-2xl font-bold">
-                        {formatCurrency(product.precio_mensual)} / mes
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Ahorra {Math.round((1 - product.precio_mensual / (product.precio_diario * 30)) * 100)}% en comparación con las tarifas diarias.
-                    </p>
-                  </TabsContent>
-                </Tabs>
+                <div className="mb-6">
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold">
+                      {formatCurrency(product.precio_diario)} / día
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Precio fijo por día de alquiler.
+                  </p>
+                </div>
                 
                 <Separator className="my-6" />
                 
@@ -264,7 +234,7 @@ const ProductDetail = () => {
                     </span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-700">Tarifa Diaria:</span>
+                    <span className="text-gray-700">Precio por día:</span>
                     <span className="font-medium">{formatCurrency(product.precio_diario)}</span>
                   </div>
                   <div className="flex justify-between mb-2">
