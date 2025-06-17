@@ -4,477 +4,428 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Trash2, Image, Plus, Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-
-interface Category {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  imagen_url?: string;
-}
-
-interface Product {
-  id: string;
-  nombre: string;
-  categoria_id: string;
-  descripcion: string;
-  descripcion_corta: string;
-  precio_diario: number;
-  deposito: number;
-  imagenes: string[];
-  disponible: boolean;
-  destacado: boolean;
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Plus, X, Eye, AlertCircle, CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ProductFormProps {
-  productForm: Partial<Product>;
-  setProductForm: React.Dispatch<React.SetStateAction<Partial<Product>>>;
-  isEditingProduct: boolean;
-  handleSaveProduct: () => Promise<void>;
-  categories: Category[];
-  setIsProductDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  isLoading?: boolean;
+  product?: any;
+  categories: any[];
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ 
-  productForm, 
-  setProductForm, 
-  isEditingProduct, 
-  handleSaveProduct, 
-  categories,
-  setIsProductDialogOpen,
-  isLoading = false
-}) => {
-  const [imageValidation, setImageValidation] = useState<{[key: number]: 'valid' | 'invalid' | 'loading' | 'unknown'}>({});
-  const [showImagePreviews, setShowImagePreviews] = useState(false);
-  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+// Función para validar URLs de imágenes
+const isValidImageUrl = (url: string): boolean => {
+  if (!url || url.trim() === '') return false;
+  
+  try {
+    new URL(url);
+    return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+  } catch {
+    return false;
+  }
+};
 
-  // Validar campos requeridos
-  const validateForm = (): boolean => {
-    const errors: {[key: string]: string} = {};
-    
-    if (!productForm.nombre?.trim()) {
-      errors.nombre = 'El nombre es obligatorio';
-    }
-    
-    if (!productForm.categoria_id) {
-      errors.categoria_id = 'La categoría es obligatoria';
-    }
-    
-    if (!productForm.precio_diario || productForm.precio_diario <= 0) {
-      errors.precio_diario = 'El precio diario debe ser mayor que 0';
-    }
-    
-    if (!productForm.descripcion_corta?.trim()) {
-      errors.descripcion_corta = 'La descripción corta es obligatoria';
-    }
+// Función para generar URL de placeholder
+const getPlaceholderImage = (name: string) => {
+  const encodedName = encodeURIComponent(name || 'Producto');
+  return `https://via.placeholder.com/300x300?text=${encodedName}`;
+};
 
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormProps) => {
+  const [loading, setLoading] = useState(false);
+  const [imageUrls, setImageUrls] = useState<string[]>(['']);
+  const [imageLoadStates, setImageLoadStates] = useState<{ [key: string]: 'loading' | 'success' | 'error' }>({});
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    nombre: product?.nombre || '',
+    descripcion: product?.descripcion || '',
+    descripcion_corta: product?.descripcion_corta || '',
+    precio_diario: product?.precio_diario || 0,
+    deposito: product?.deposito || 0,
+    disponible: product?.disponible !== false,
+    destacado: product?.destacado === true,
+    valoracion: product?.valoracion || 0,
+    num_valoraciones: product?.num_valoraciones || 0,
+    categoria_id: product?.categoria_id || ''
+  });
 
-  // Validar URL de imagen
-  const validateImageUrl = async (url: string, index: number) => {
-    if (!url.trim()) {
-      setImageValidation(prev => ({ ...prev, [index]: 'unknown' }));
+  useEffect(() => {
+    if (product?.imagenes && Array.isArray(product.imagenes)) {
+      const validImages = product.imagenes.filter(isValidImageUrl);
+      if (validImages.length > 0) {
+        setImageUrls([...validImages, '']);
+      } else {
+        setImageUrls([getPlaceholderImage(product.nombre)]);
+      }
+    }
+  }, [product]);
+
+  // Validar imagen cuando se actualiza la URL
+  const validateImage = (url: string, index: number) => {
+    if (!url || url.trim() === '') {
+      setImageLoadStates(prev => {
+        const newState = { ...prev };
+        delete newState[`${index}-${url}`];
+        return newState;
+      });
       return;
     }
 
-    setImageValidation(prev => ({ ...prev, [index]: 'loading' }));
-    
-    try {
-      // Validar formato de URL
-      const urlObj = new URL(url);
-      const isValidImageExtension = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(urlObj.pathname);
-      
-      if (!isValidImageExtension) {
-        setImageValidation(prev => ({ ...prev, [index]: 'invalid' }));
-        return;
-      }
+    const key = `${index}-${url}`;
+    setImageLoadStates(prev => ({ ...prev, [key]: 'loading' }));
 
-      // Intentar cargar la imagen
-      const img = new Image();
-      img.onload = () => {
-        setImageValidation(prev => ({ ...prev, [index]: 'valid' }));
-      };
-      img.onerror = () => {
-        setImageValidation(prev => ({ ...prev, [index]: 'invalid' }));
-      };
-      img.src = url;
-      
-    } catch {
-      setImageValidation(prev => ({ ...prev, [index]: 'invalid' }));
-    }
-  };
-
-  // Debounce para validación de imágenes
-  useEffect(() => {
-    const timeouts: NodeJS.Timeout[] = [];
-    
-    productForm.imagenes?.forEach((url, index) => {
-      const timeout = setTimeout(() => {
-        validateImageUrl(url, index);
-      }, 1000);
-      timeouts.push(timeout);
-    });
-
-    return () => {
-      timeouts.forEach(timeout => clearTimeout(timeout));
+    const img = new Image();
+    img.onload = () => {
+      setImageLoadStates(prev => ({ ...prev, [key]: 'success' }));
     };
-  }, [productForm.imagenes]);
-
-  const handleAddImage = () => {
-    setProductForm(prev => ({
-      ...prev,
-      imagenes: [...(prev.imagenes || []), '']
-    }));
+    img.onerror = () => {
+      setImageLoadStates(prev => ({ ...prev, [key]: 'error' }));
+    };
+    img.src = url;
   };
 
   const handleImageUrlChange = (index: number, value: string) => {
-    const newImages = [...(productForm.imagenes || [])];
-    newImages[index] = value;
-    setProductForm(prev => ({
-      ...prev,
-      imagenes: newImages
-    }));
-  };
-
-  const handleRemoveImage = (index: number) => {
-    const newImages = [...(productForm.imagenes || [])];
-    newImages.splice(index, 1);
-    setProductForm(prev => ({
-      ...prev,
-      imagenes: newImages.length ? newImages : ['']
-    }));
+    const newUrls = [...imageUrls];
+    newUrls[index] = value;
     
-    // Limpiar validación de la imagen eliminada
-    setImageValidation(prev => {
-      const newValidation = { ...prev };
-      delete newValidation[index];
-      return newValidation;
-    });
-  };
-
-  const getImageValidationIcon = (index: number) => {
-    const status = imageValidation[index];
-    switch (status) {
-      case 'loading':
-        return <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />;
-      case 'valid':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'invalid':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return null;
+    // Si es la última URL y no está vacía, añadir una nueva
+    if (index === newUrls.length - 1 && value.trim() !== '') {
+      newUrls.push('');
+    }
+    
+    // Si no es la última URL y está vacía, eliminarla (excepto si es la única)
+    if (index < newUrls.length - 1 && value.trim() === '' && newUrls.length > 1) {
+      newUrls.splice(index, 1);
+    }
+    
+    setImageUrls(newUrls);
+    
+    // Validar la imagen
+    if (value.trim() !== '') {
+      validateImage(value, index);
     }
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) {
+  const removeImageUrl = (index: number) => {
+    if (imageUrls.length > 1) {
+      const newUrls = imageUrls.filter((_, i) => i !== index);
+      setImageUrls(newUrls);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.nombre.trim()) {
+      toast.error('El nombre del producto es obligatorio');
       return;
     }
-    
-    await handleSaveProduct();
+
+    if (formData.precio_diario <= 0) {
+      toast.error('El precio diario debe ser mayor que 0');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Filtrar URLs vacías y generar placeholder si es necesario
+      const validImageUrls = imageUrls
+        .filter(url => url.trim() !== '')
+        .filter(isValidImageUrl);
+      
+      const finalImageUrls = validImageUrls.length > 0 
+        ? validImageUrls 
+        : [getPlaceholderImage(formData.nombre)];
+
+      const productData = {
+        ...formData,
+        imagenes: finalImageUrls,
+        updated_at: new Date().toISOString()
+      };
+
+      let result;
+      if (product?.id) {
+        console.log('🔄 Actualizando producto:', product.id, productData);
+        result = await supabase
+          .from('productos')
+          .update(productData)
+          .eq('id', product.id)
+          .select();
+      } else {
+        console.log('➕ Creando nuevo producto:', productData);
+        result = await supabase
+          .from('productos')
+          .insert(productData)
+          .select();
+      }
+
+      if (result.error) {
+        console.error('❌ Error en operación:', result.error);
+        throw result.error;
+      }
+
+      console.log('✅ Operación exitosa:', result.data);
+      toast.success(product?.id ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
+      onSuccess();
+    } catch (error: any) {
+      console.error('💥 Error al guardar producto:', error);
+      toast.error(`Error al ${product?.id ? 'actualizar' : 'crear'} producto: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const validImageUrls = productForm.imagenes?.filter(url => 
-    url.trim() !== '' && imageValidation[productForm.imagenes.indexOf(url)] === 'valid'
-  ) || [];
+  const getImageStatus = (url: string, index: number) => {
+    if (!url || url.trim() === '') return null;
+    
+    const key = `${index}-${url}`;
+    const state = imageLoadStates[key];
+    
+    if (state === 'loading') return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
+    if (state === 'success') return <CheckCircle className="h-4 w-4 text-green-500" />;
+    if (state === 'error') return <AlertCircle className="h-4 w-4 text-red-500" />;
+    
+    return null;
+  };
 
   return (
-    <div className="grid gap-4 py-4">
-      {/* Campos básicos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="nombre">Nombre *</Label>
-          <Input
-            id="nombre"
-            value={productForm.nombre || ''}
-            onChange={(e) => {
-              setProductForm({...productForm, nombre: e.target.value});
-              if (formErrors.nombre) {
-                setFormErrors(prev => ({ ...prev, nombre: '' }));
-              }
-            }}
-            placeholder="Nombre del producto"
-            className={formErrors.nombre ? 'border-red-500' : ''}
-            disabled={isLoading}
-          />
-          {formErrors.nombre && (
-            <p className="text-sm text-red-500">{formErrors.nombre}</p>
-          )}
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="categoria">Categoría *</Label>
-          <Select
-            value={productForm.categoria_id || ''}
-            onValueChange={(value) => {
-              setProductForm({...productForm, categoria_id: value});
-              if (formErrors.categoria_id) {
-                setFormErrors(prev => ({ ...prev, categoria_id: '' }));
-              }
-            }}
-            disabled={isLoading}
-          >
-            <SelectTrigger className={formErrors.categoria_id ? 'border-red-500' : ''}>
-              <SelectValue placeholder="Selecciona una categoría" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(category => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {formErrors.categoria_id && (
-            <p className="text-sm text-red-500">{formErrors.categoria_id}</p>
-          )}
-        </div>
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Información básica */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Información Básica</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="nombre">Nombre del Producto *</Label>
+              <Input
+                id="nombre"
+                value={formData.nombre}
+                onChange={(e) => setFormData(prev => ({ ...prev, nombre: e.target.value }))}
+                placeholder="Ej: Cámara DSLR Canon"
+                required
+              />
+            </div>
 
-      {/* Descripción corta */}
-      <div className="space-y-2">
-        <Label htmlFor="descripcion_corta">Descripción Corta *</Label>
-        <Input
-          id="descripcion_corta"
-          value={productForm.descripcion_corta || ''}
-          onChange={(e) => {
-            setProductForm({...productForm, descripcion_corta: e.target.value});
-            if (formErrors.descripcion_corta) {
-              setFormErrors(prev => ({ ...prev, descripcion_corta: '' }));
-            }
-          }}
-          placeholder="Breve descripción para tarjetas de producto"
-          className={formErrors.descripcion_corta ? 'border-red-500' : ''}
-          disabled={isLoading}
-        />
-        {formErrors.descripcion_corta && (
-          <p className="text-sm text-red-500">{formErrors.descripcion_corta}</p>
-        )}
-        <p className="text-xs text-gray-500">
-          Aparece en las tarjetas de producto. Máximo recomendado: 100 caracteres.
-        </p>
-      </div>
+            <div>
+              <Label htmlFor="descripcion_corta">Descripción Corta</Label>
+              <Textarea
+                id="descripcion_corta"
+                value={formData.descripcion_corta}
+                onChange={(e) => setFormData(prev => ({ ...prev, descripcion_corta: e.target.value }))}
+                placeholder="Breve descripción del producto..."
+                rows={2}
+              />
+            </div>
 
-      {/* Descripción completa */}
-      <div className="space-y-2">
-        <Label htmlFor="descripcion">Descripción Completa</Label>
-        <Textarea
-          id="descripcion"
-          value={productForm.descripcion || ''}
-          onChange={(e) => setProductForm({...productForm, descripcion: e.target.value})}
-          placeholder="Descripción detallada del producto"
-          rows={4}
-          disabled={isLoading}
-        />
-        <p className="text-xs text-gray-500">
-          Descripción detallada que aparece en la página del producto.
-        </p>
-      </div>
+            <div>
+              <Label htmlFor="descripcion">Descripción Completa</Label>
+              <Textarea
+                id="descripcion"
+                value={formData.descripcion}
+                onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
+                placeholder="Descripción detallada del producto..."
+                rows={4}
+              />
+            </div>
 
-      {/* Precios */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="precio_diario">Precio Diario (€) *</Label>
-          <Input
-            id="precio_diario"
-            type="number"
-            min="0"
-            step="0.01"
-            value={productForm.precio_diario || ''}
-            onChange={(e) => {
-              setProductForm({...productForm, precio_diario: parseFloat(e.target.value) || 0});
-              if (formErrors.precio_diario) {
-                setFormErrors(prev => ({ ...prev, precio_diario: '' }));
-              }
-            }}
-            placeholder="0.00"
-            className={formErrors.precio_diario ? 'border-red-500' : ''}
-            disabled={isLoading}
-          />
-          {formErrors.precio_diario && (
-            <p className="text-sm text-red-500">{formErrors.precio_diario}</p>
-          )}
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="deposito">Depósito (€)</Label>
-          <Input
-            id="deposito"
-            type="number"
-            min="0"
-            step="0.01"
-            value={productForm.deposito || ''}
-            onChange={(e) => setProductForm({...productForm, deposito: parseFloat(e.target.value) || 0})}
-            placeholder="0.00"
-            disabled={isLoading}
-          />
-          <p className="text-xs text-gray-500">
-            Cantidad retenida como garantía durante el alquiler.
-          </p>
-        </div>
-      </div>
+            <div>
+              <Label htmlFor="categoria">Categoría</Label>
+              <Select
+                value={formData.categoria_id}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, categoria_id: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Gestión de imágenes */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Label>Imágenes del Producto *</Label>
-          <div className="flex gap-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowImagePreviews(!showImagePreviews)}
-              disabled={isLoading}
-            >
-              {showImagePreviews ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              {showImagePreviews ? 'Ocultar' : 'Ver'} Previsualizaciones
-            </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="sm"
-              onClick={handleAddImage}
-              disabled={isLoading}
-            >
-              <Plus className="h-4 w-4 mr-1" /> Añadir Imagen
-            </Button>
-          </div>
-        </div>
-
-        {productForm.imagenes && productForm.imagenes.map((url, index) => (
-          <div key={index} className="space-y-2">
-            <div className="flex gap-2">
-              <div className="relative flex-grow">
-                <Image className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        {/* Precios y estado */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Precios y Estado</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="precio_diario">Precio Diario (€) *</Label>
                 <Input
-                  value={url}
-                  onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  className="pl-9 pr-10"
-                  disabled={isLoading}
+                  id="precio_diario"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.precio_diario}
+                  onChange={(e) => setFormData(prev => ({ ...prev, precio_diario: parseFloat(e.target.value) || 0 }))}
+                  required
                 />
-                <div className="absolute right-3 top-3">
-                  {getImageValidationIcon(index)}
+              </div>
+
+              <div>
+                <Label htmlFor="deposito">Fianza (€)</Label>
+                <Input
+                  id="deposito"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.deposito}
+                  onChange={(e) => setFormData(prev => ({ ...prev, deposito: parseFloat(e.target.value) || 0 }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="valoracion">Valoración (0-5)</Label>
+                <Input
+                  id="valoracion"
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={formData.valoracion}
+                  onChange={(e) => setFormData(prev => ({ ...prev, valoracion: parseFloat(e.target.value) || 0 }))}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="num_valoraciones">Número de Valoraciones</Label>
+                <Input
+                  id="num_valoraciones"
+                  type="number"
+                  min="0"
+                  value={formData.num_valoraciones}
+                  onChange={(e) => setFormData(prev => ({ ...prev, num_valoraciones: parseInt(e.target.value) || 0 }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="disponible"
+                  checked={formData.disponible}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, disponible: checked }))}
+                />
+                <Label htmlFor="disponible">Producto Disponible</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="destacado"
+                  checked={formData.destacado}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, destacado: checked }))}
+                />
+                <Label htmlFor="destacado">Producto Destacado</Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Imágenes */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Imágenes del Producto</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {imageUrls.map((url, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div className="flex-1">
+                  <Input
+                    value={url}
+                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                    placeholder="URL de la imagen"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  {getImageStatus(url, index)}
+                  {url && isValidImageUrl(url) && (
+                    <Eye 
+                      className="h-4 w-4 text-blue-500 cursor-pointer hover:text-blue-700" 
+                      onClick={() => window.open(url, '_blank')}
+                      title="Ver imagen"
+                    />
+                  )}
+                  {imageUrls.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeImageUrl(index)}
+                      className="h-8 w-8"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
-              {(productForm.imagenes?.length || 0) > 1 && (
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleRemoveImage(index)}
-                  className="flex-shrink-0"
-                  disabled={isLoading}
-                >
-                  <Trash2 className="h-4 w-4 text-red-500" />
-                </Button>
-              )}
+            ))}
+            
+            {/* Vista previa de imágenes válidas */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+              {imageUrls
+                .filter(url => url && isValidImageUrl(url))
+                .slice(0, 4)
+                .map((url, index) => (
+                  <div key={index} className="relative">
+                    <img 
+                      src={url} 
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-20 object-cover rounded border"
+                      onError={(e) => {
+                        e.currentTarget.src = getPlaceholderImage(formData.nombre);
+                      }}
+                    />
+                    <Badge 
+                      variant="secondary" 
+                      className="absolute top-1 right-1 text-xs"
+                    >
+                      {index + 1}
+                    </Badge>
+                  </div>
+                ))}
             </div>
-            
-            {/* Previsualización de imagen */}
-            {showImagePreviews && url && imageValidation[index] === 'valid' && (
-              <div className="mt-2">
-                <img 
-                  src={url} 
-                  alt={`Preview ${index + 1}`}
-                  className="w-32 h-32 object-cover rounded-lg border"
-                  onError={() => setImageValidation(prev => ({ ...prev, [index]: 'invalid' }))}
-                />
-              </div>
-            )}
-            
-            {/* Mensaje de error para imagen inválida */}
-            {imageValidation[index] === 'invalid' && url.trim() !== '' && (
-              <Alert className="border-red-200 bg-red-50">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-800">
-                  URL de imagen inválida. Verifica que la URL sea correcta y termine en .jpg, .png, .gif, .webp o .svg
-                </AlertDescription>
-              </Alert>
-            )}
           </div>
-        ))}
+        </CardContent>
+      </Card>
 
-        {/* Resumen de imágenes válidas */}
-        {validImageUrls.length > 0 && (
-          <Alert className="border-green-200 bg-green-50">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              ✅ {validImageUrls.length} imagen(es) válida(s) encontrada(s)
-            </AlertDescription>
-          </Alert>
-        )}
-      </div>
-
-      {/* Configuraciones adicionales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="disponible"
-            checked={productForm.disponible}
-            onCheckedChange={(checked) => setProductForm({...productForm, disponible: checked})}
-            disabled={isLoading}
-          />
-          <Label htmlFor="disponible">Disponible para alquilar</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="destacado"
-            checked={productForm.destacado}
-            onCheckedChange={(checked) => setProductForm({...productForm, destacado: checked})}
-            disabled={isLoading}
-          />
-          <Label htmlFor="destacado">Producto destacado</Label>
-        </div>
-      </div>
-
-      {/* Información adicional */}
-      <Alert className="border-blue-200 bg-blue-50">
-        <AlertCircle className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-800">
-          <strong>💡 Consejos:</strong>
-          <ul className="mt-2 space-y-1 text-sm">
-            <li>• Usa imágenes de alta calidad (mínimo 300x300px)</li>
-            <li>• La primera imagen será la principal en las tarjetas</li>
-            <li>• Los productos destacados aparecen en la página de inicio</li>
-            <li>• El depósito es opcional pero recomendado para productos de alto valor</li>
-          </ul>
-        </AlertDescription>
-      </Alert>
-
-      <DialogFooter>
-        <Button 
-          variant="outline" 
-          onClick={() => setIsProductDialogOpen(false)}
-          disabled={isLoading}
-        >
+      {/* Botones de acción */}
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
           Cancelar
         </Button>
-        <Button 
-          className="bg-rental-500 hover:bg-rental-600" 
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? (
+        <Button type="submit" disabled={loading}>
+          {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isEditingProduct ? 'Guardando...' : 'Creando...'}
+              {product?.id ? 'Actualizando...' : 'Creando...'}
             </>
           ) : (
-            <>
-              {isEditingProduct ? '💾 Guardar Cambios' : '➕ Crear Producto'}
-            </>
+            product?.id ? 'Actualizar Producto' : 'Crear Producto'
           )}
         </Button>
-      </DialogFooter>
-    </div>
+      </div>
+    </form>
   );
 };
 
