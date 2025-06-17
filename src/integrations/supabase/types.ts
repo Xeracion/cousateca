@@ -187,6 +187,10 @@ export type Database = {
         Args: { p_item_id: string; p_fecha_inicio: string; p_fecha_fin: string }
         Returns: boolean
       }
+      is_admin_user: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

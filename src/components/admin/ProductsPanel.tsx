@@ -7,7 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Plus, Search, Edit, Trash2, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import ProductForm from './ProductForm';
@@ -50,6 +51,8 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [operationStatus, setOperationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [productForm, setProductForm] = useState<Partial<Product>>({
     nombre: '',
     categoria_id: '',
@@ -74,16 +77,37 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           table: 'productos'
         },
         (payload) => {
-          console.log("Cambio detectado en admin:", payload);
+          console.log("🔄 [ADMIN] Cambio detectado:", payload.eventType, payload.new || payload.old);
+          
+          // Show success notification for operations
+          if (payload.eventType === 'INSERT') {
+            toast({
+              title: "✅ Producto creado",
+              description: `${payload.new?.nombre || 'Nuevo producto'} ha sido añadido al catálogo`,
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            toast({
+              title: "✅ Producto actualizado",
+              description: `${payload.new?.nombre || 'Producto'} ha sido modificado`,
+            });
+          } else if (payload.eventType === 'DELETE') {
+            toast({
+              title: "🗑️ Producto eliminado",
+              description: "El producto ha sido eliminado del catálogo",
+            });
+          }
+          
           onProductsChange();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("📡 [ADMIN] Estado realtime:", status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [onProductsChange]);
+  }, [onProductsChange, toast]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -97,7 +121,52 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     }
   }, [searchQuery, products]);
 
+  // Función para validar URLs de imágenes
+  const validateImageUrls = (urls: string[]): { valid: string[], invalid: string[] } => {
+    const valid: string[] = [];
+    const invalid: string[] = [];
+    
+    urls.forEach(url => {
+      if (url.trim() === '') return;
+      
+      try {
+        new URL(url);
+        if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url)) {
+          valid.push(url);
+        } else {
+          invalid.push(url);
+        }
+      } catch {
+        invalid.push(url);
+      }
+    });
+    
+    return { valid, invalid };
+  };
+
+  // Función para verificar permisos de administrador
+  const checkAdminPermissions = async (): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('perfiles')
+        .select('role')
+        .eq('id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+      
+      if (error) {
+        console.error("❌ Error verificando permisos:", error);
+        return false;
+      }
+      
+      return data?.role === 'admin';
+    } catch (error) {
+      console.error("❌ Error en verificación de admin:", error);
+      return false;
+    }
+  };
+
   const handleEditProduct = (product: Product) => {
+    console.log("✏️ Editando producto:", product.nombre);
     setSelectedProduct(product);
     setProductForm({
       nombre: product.nombre,
@@ -112,112 +181,171 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     });
     setIsEditingProduct(true);
     setIsProductDialogOpen(true);
+    setOperationStatus('idle');
   };
 
-  const handleDeleteProduct = async (id: string) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este producto?")) {
-      try {
-        const { error } = await supabase
-          .from('productos')
-          .delete()
-          .eq('id', id);
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Producto eliminado",
-          description: "El producto ha sido eliminado correctamente"
-        });
-        
-        onProductsChange();
-      } catch (error: any) {
-        toast({
-          title: "Error al eliminar el producto",
-          description: error.message,
-          variant: "destructive"
-        });
+  const handleDeleteProduct = async (id: string, nombre: string) => {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar "${nombre}"?`)) {
+      return;
+    }
+
+    console.log("🗑️ Eliminando producto:", nombre);
+    setIsLoading(true);
+    setOperationStatus('idle');
+    
+    try {
+      // Verificar permisos
+      const isAdmin = await checkAdminPermissions();
+      if (!isAdmin) {
+        throw new Error("No tienes permisos de administrador");
       }
+
+      const { error } = await supabase
+        .from('productos')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        console.error("❌ Error al eliminar:", error);
+        throw error;
+      }
+      
+      console.log("✅ Producto eliminado exitosamente");
+      setOperationStatus('success');
+      
+      // No need to call onProductsChange here as realtime will handle it
+      
+    } catch (error: any) {
+      console.error("💥 Error completo al eliminar:", error);
+      setOperationStatus('error');
+      toast({
+        title: "❌ Error al eliminar el producto",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSaveProduct = async () => {
+    console.log("💾 Guardando producto:", productForm.nombre);
+    setIsLoading(true);
+    setOperationStatus('idle');
+    
     try {
+      // Validaciones
       if (!productForm.nombre || !productForm.categoria_id || !productForm.precio_diario) {
-        throw new Error("Por favor, completa los campos obligatorios");
+        throw new Error("Por favor, completa los campos obligatorios: nombre, categoría y precio diario");
+      }
+
+      if (productForm.precio_diario <= 0) {
+        throw new Error("El precio diario debe ser mayor que 0");
+      }
+
+      // Verificar permisos
+      const isAdmin = await checkAdminPermissions();
+      if (!isAdmin) {
+        throw new Error("No tienes permisos de administrador para esta operación");
       }
       
-      // Ensure imagenes is a valid array
-      const imagenes = Array.isArray(productForm.imagenes) && productForm.imagenes.length > 0
-        ? productForm.imagenes.filter(img => img.trim() !== '')
-        : [];
+      // Validar y limpiar URLs de imágenes
+      const imageUrls = productForm.imagenes?.filter(img => img.trim() !== '') || [];
+      const { valid: validUrls, invalid: invalidUrls } = validateImageUrls(imageUrls);
       
-      if (imagenes.length === 0) {
-        imagenes.push('https://via.placeholder.com/300x300?text=Sin+imagen');
+      if (invalidUrls.length > 0) {
+        console.warn("⚠️ URLs de imágenes inválidas detectadas:", invalidUrls);
+        toast({
+          title: "⚠️ URLs de imágenes inválidas",
+          description: `Se encontraron ${invalidUrls.length} URLs inválidas que serán omitidas`,
+          variant: "destructive"
+        });
       }
+      
+      const finalImages = validUrls.length > 0 
+        ? validUrls 
+        : ['https://via.placeholder.com/300x300?text=Sin+imagen'];
+
+      const productData = {
+        nombre: productForm.nombre.trim(),
+        categoria_id: productForm.categoria_id,
+        descripcion: productForm.descripcion?.trim() || '',
+        descripcion_corta: productForm.descripcion_corta?.trim() || '',
+        precio_diario: Number(productForm.precio_diario) || 0,
+        deposito: Number(productForm.deposito) || 0,
+        imagenes: finalImages,
+        disponible: productForm.disponible !== undefined ? productForm.disponible : true,
+        destacado: productForm.destacado || false
+      };
+
+      console.log("📦 Datos del producto a guardar:", productData);
 
       if (isEditingProduct && selectedProduct) {
         // Update existing product
         const { error } = await supabase
           .from('productos')
-          .update({
-            nombre: productForm.nombre,
-            categoria_id: productForm.categoria_id,
-            descripcion: productForm.descripcion || '',
-            descripcion_corta: productForm.descripcion_corta || '',
-            precio_diario: productForm.precio_diario || 0,
-            deposito: productForm.deposito || 0,
-            imagenes,
-            disponible: productForm.disponible !== undefined ? productForm.disponible : true,
-            destacado: productForm.destacado || false
-          })
+          .update(productData)
           .eq('id', selectedProduct.id);
         
         if (error) {
-          console.error("Error al actualizar:", error);
+          console.error("❌ Error al actualizar:", error);
           throw error;
         }
         
-        toast({
-          title: "Producto actualizado",
-          description: "El producto ha sido actualizado correctamente"
-        });
+        console.log("✅ Producto actualizado exitosamente");
+        
       } else {
         // Create new product
         const { error } = await supabase
           .from('productos')
-          .insert({
-            nombre: productForm.nombre,
-            categoria_id: productForm.categoria_id,
-            descripcion: productForm.descripcion || '',
-            descripcion_corta: productForm.descripcion_corta || '',
-            precio_diario: productForm.precio_diario || 0,
-            deposito: productForm.deposito || 0,
-            imagenes,
-            disponible: productForm.disponible !== undefined ? productForm.disponible : true,
-            destacado: productForm.destacado || false
-          });
+          .insert(productData);
         
         if (error) {
-          console.error("Error al crear:", error);
+          console.error("❌ Error al crear:", error);
           throw error;
         }
         
-        toast({
-          title: "Producto creado",
-          description: "El producto ha sido creado correctamente"
-        });
+        console.log("✅ Producto creado exitosamente");
       }
       
+      setOperationStatus('success');
       setIsProductDialogOpen(false);
-      onProductsChange();
+      
+      // Reset form
+      setProductForm({
+        nombre: '',
+        categoria_id: '',
+        descripcion: '',
+        descripcion_corta: '',
+        precio_diario: 0,
+        deposito: 0,
+        imagenes: [''],
+        disponible: true,
+        destacado: false
+      });
+      
+      // No need to call onProductsChange here as realtime will handle it
+      
     } catch (error: any) {
-      console.error("Error completo:", error);
+      console.error("💥 Error completo al guardar:", error);
+      setOperationStatus('error');
       toast({
-        title: "Error al guardar el producto",
+        title: "❌ Error al guardar el producto",
         description: error.message,
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleRefresh = () => {
+    console.log("🔄 Refrescando datos manualmente");
+    onProductsChange();
+    toast({
+      title: "🔄 Actualizando",
+      description: "Refrescando el catálogo de productos..."
+    });
   };
 
   return (
@@ -232,34 +360,65 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
             className="pl-9"
           />
         </div>
-        <Button 
-          className="bg-rental-500 hover:bg-rental-600"
-          onClick={() => {
-            setProductForm({
-              nombre: '',
-              categoria_id: '',
-              descripcion: '',
-              descripcion_corta: '',
-              precio_diario: 0,
-              deposito: 0,
-              imagenes: [''],
-              disponible: true,
-              destacado: false
-            });
-            setIsEditingProduct(false);
-            setSelectedProduct(null);
-            setIsProductDialogOpen(true);
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Nuevo Producto
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={isLoading}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Actualizar
+          </Button>
+          <Button 
+            className="bg-rental-500 hover:bg-rental-600"
+            onClick={() => {
+              setProductForm({
+                nombre: '',
+                categoria_id: '',
+                descripcion: '',
+                descripcion_corta: '',
+                precio_diario: 0,
+                deposito: 0,
+                imagenes: [''],
+                disponible: true,
+                destacado: false
+              });
+              setIsEditingProduct(false);
+              setSelectedProduct(null);
+              setIsProductDialogOpen(true);
+              setOperationStatus('idle');
+            }}
+            disabled={isLoading}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Nuevo Producto
+          </Button>
+        </div>
       </div>
+
+      {operationStatus === 'success' && (
+        <Alert className="mb-4 border-green-200 bg-green-50">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            Operación completada exitosamente. Los cambios se reflejarán automáticamente.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {operationStatus === 'error' && (
+        <Alert className="mb-4 border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            Hubo un error en la operación. Revisa los logs de la consola para más detalles.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card>
         <CardHeader>
-          <CardTitle>Gestión de Productos</CardTitle>
+          <CardTitle>Gestión de Productos ({filteredProducts.length})</CardTitle>
           <CardDescription>
-            Administra todos los productos disponibles para alquiler
+            Administra todos los productos disponibles para alquiler. Los cambios se sincronizan en tiempo real.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -278,14 +437,24 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map(product => (
                     <TableRow key={product.id}>
-                      <TableCell className="font-medium">{product.nombre}</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {product.nombre}
+                          {product.destacado && (
+                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                              ⭐ Destacado
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
-                        {categories.find(c => c.id === product.categoria_id)?.nombre || '-'}
+                        {categories.find(c => c.id === product.categoria_id)?.nombre || 
+                         <span className="text-red-500">Sin categoría</span>}
                       </TableCell>
                       <TableCell className="text-right">€{product.precio_diario}</TableCell>
                       <TableCell>
                         <Badge variant={product.disponible ? "outline" : "secondary"}>
-                          {product.disponible ? "Disponible" : "No disponible"}
+                          {product.disponible ? "✅ Disponible" : "❌ No disponible"}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -294,6 +463,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                             variant="outline" 
                             size="sm"
                             onClick={() => handleEditProduct(product)}
+                            disabled={isLoading}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -301,7 +471,8 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                             variant="outline" 
                             size="sm"
                             className="text-red-500 hover:text-red-600"
-                            onClick={() => handleDeleteProduct(product.id)}
+                            onClick={() => handleDeleteProduct(product.id, product.nombre)}
+                            disabled={isLoading}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -311,8 +482,19 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-4">
-                      No se encontraron productos
+                    <TableCell colSpan={5} className="text-center py-8">
+                      {searchQuery ? (
+                        <>
+                          <Search className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-gray-500">No se encontraron productos que coincidan con "{searchQuery}"</p>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-gray-500">No hay productos en el catálogo</p>
+                          <p className="text-sm text-gray-400">Haz clic en "Nuevo Producto" para comenzar</p>
+                        </>
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
@@ -321,6 +503,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           </ScrollArea>
         </CardContent>
       </Card>
+
       <Dialog 
         open={isProductDialogOpen} 
         onOpenChange={setIsProductDialogOpen}
@@ -328,10 +511,15 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {isEditingProduct ? 'Editar Producto' : 'Crear Nuevo Producto'}
+              {isEditingProduct ? '✏️ Editar Producto' : '➕ Crear Nuevo Producto'}
             </DialogTitle>
             <DialogDescription>
               Completa los detalles del producto. Los campos con * son obligatorios.
+              {isEditingProduct && selectedProduct && (
+                <span className="block mt-1 text-sm text-blue-600">
+                  Editando: {selectedProduct.nombre}
+                </span>
+              )}
             </DialogDescription>
           </DialogHeader>
           
@@ -342,6 +530,7 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
             handleSaveProduct={handleSaveProduct}
             categories={categories}
             setIsProductDialogOpen={setIsProductDialogOpen}
+            isLoading={isLoading}
           />
         </DialogContent>
       </Dialog>

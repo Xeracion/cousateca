@@ -1,10 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ProductsPanel from './ProductsPanel';
 import CategoriesPanel from './CategoriesPanel';
 import ReservationsPanel from './ReservationsPanel';
-import { supabase } from "@/integrations/supabase/client";
+import AdminDebugPanel from './AdminDebugPanel';
 
 interface AdminContentProps {
   loadData: () => Promise<void>;
@@ -14,48 +15,56 @@ interface AdminContentProps {
   setDbCategories: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-const AdminContent: React.FC<AdminContentProps> = ({ 
-  loadData, 
-  products, 
-  dbCategories, 
-  setProducts, 
-  setDbCategories 
+const AdminContent: React.FC<AdminContentProps> = ({
+  loadData,
+  products,
+  dbCategories,
+  setProducts,
+  setDbCategories
 }) => {
-  useEffect(() => {
+  const [activeTab, setActiveTab] = useState("products");
+
+  React.useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-6">Panel de Administrador</h1>
-      
-      <Tabs defaultValue="productos" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="productos">Productos</TabsTrigger>
-          <TabsTrigger value="categorias">Categorías</TabsTrigger>
-          <TabsTrigger value="reservas">Reservas</TabsTrigger>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Panel de Administración</h1>
+        <p className="text-gray-600">Gestiona productos, categorías y reservas de tu plataforma</p>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="products">Productos ({products.length})</TabsTrigger>
+          <TabsTrigger value="categories">Categorías ({dbCategories.length})</TabsTrigger>
+          <TabsTrigger value="reservations">Reservas</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="productos">
+
+        <TabsContent value="products">
           <ProductsPanel 
             products={products}
             categories={dbCategories}
-            onProductsChange={() => loadData()}
+            onProductsChange={loadData}
           />
         </TabsContent>
-        
-        <TabsContent value="categorias">
+
+        <TabsContent value="categories">
           <CategoriesPanel 
             categories={dbCategories}
-            onCategoriesChange={() => loadData()}
+            onCategoriesChange={loadData}
           />
         </TabsContent>
-        
-        <TabsContent value="reservas">
+
+        <TabsContent value="reservations">
           <ReservationsPanel />
         </TabsContent>
       </Tabs>
-    </>
+
+      {/* Panel de diagnóstico siempre visible */}
+      <AdminDebugPanel />
+    </div>
   );
 };
 
