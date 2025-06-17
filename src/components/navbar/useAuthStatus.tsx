@@ -8,26 +8,30 @@ export const useAuthStatus = () => {
   
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
-      if (user) {
-        // Verificar si el usuario es administrador
-        const { data: perfil } = await supabase
-          .from('perfiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        
-        if (perfil && perfil.role === 'admin') {
-          setIsAdmin(true);
-        }
-      } else {
-        // Verificar si hay un admin local (para la funcionalidad existente)
+      try {
+        // Verificar admin local primero
         const storedAdminStatus = localStorage.getItem('localAdminStatus');
         if (storedAdminStatus === 'true') {
           setIsAdmin(true);
         }
+
+        // Verificar usuario de Supabase
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        
+        if (user) {
+          const { data: perfil } = await supabase
+            .from('perfiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          if (perfil?.role === 'admin') {
+            setIsAdmin(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error verificando estado de auth:", error);
       }
     };
     
@@ -45,7 +49,8 @@ export const useAuthStatus = () => {
         
         setIsAdmin(perfil?.role === 'admin' || false);
       } else {
-        setIsAdmin(localStorage.getItem('localAdminStatus') === 'true');
+        const storedAdminStatus = localStorage.getItem('localAdminStatus');
+        setIsAdmin(storedAdminStatus === 'true');
       }
     });
     

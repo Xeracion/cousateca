@@ -16,25 +16,21 @@ const AdminPanel = () => {
   const [error, setError] = useState('');
   const [products, setProducts] = useState<any[]>([]);
   const [dbCategories, setDbCategories] = useState<any[]>([]);
-  const [localLogin, setLocalLogin] = useState(false);
-  const [localAdmin, setLocalAdmin] = useState(false);
 
-  // Manejar inicio de sesión manual
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (username === 'admin' || username === 'info@xeracion.org') {
       if (password === 'cousateca2024') {
+        localStorage.setItem('localAdminStatus', 'true');
         toast({
           title: "Inicio de sesión exitoso",
           description: "Bienvenido al panel de administración"
         });
-        setLocalLogin(true);
-        setLocalAdmin(true);
-        // Guardar el estado de administrador en localStorage
-        localStorage.setItem('localAdminStatus', 'true');
         setError('');
         loadData();
+        // Forzar actualización del estado
+        window.location.reload();
       } else {
         setError('Contraseña incorrecta');
       }
@@ -47,7 +43,6 @@ const AdminPanel = () => {
     alert("Para recuperar tu contraseña, contacta al administrador del sistema.");
   };
 
-  // Cargar datos de productos y categorías
   const loadData = async () => {
     try {
       const { data: productsData, error: productsError } = await supabase
@@ -66,6 +61,7 @@ const AdminPanel = () => {
       if (categoriesError) throw categoriesError;
       setDbCategories(categoriesData || []);
     } catch (error: any) {
+      console.error("Error cargando datos:", error);
       toast({
         title: "Error al cargar datos",
         description: error.message,
@@ -77,24 +73,24 @@ const AdminPanel = () => {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center">
-          <p>Cargando...</p>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rental-500 mx-auto mb-4"></div>
+            <p>Verificando permisos...</p>
+          </div>
         </div>
       </AdminLayout>
     );
   }
 
-  // User is either logged in via Supabase or local admin credentials
-  const isUserAdmin = isAdmin || localAdmin;
-  const isUserLoggedIn = isLoggedIn || localLogin;
-
-  if (isUserLoggedIn && !isUserAdmin) {
-    return <Navigate to="/" />;
+  // Si el usuario está logueado pero no es admin, redirigir al inicio
+  if (isLoggedIn && !isAdmin) {
+    return <Navigate to="/" replace />;
   }
 
   return (
     <AdminLayout>
-      {isUserAdmin ? (
+      {isAdmin ? (
         <AdminContent 
           loadData={loadData}
           products={products}
@@ -103,7 +99,7 @@ const AdminPanel = () => {
           setDbCategories={setDbCategories}
         />
       ) : (
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center min-h-[60vh]">
           <LoginForm 
             username={username}
             setUsername={setUsername}

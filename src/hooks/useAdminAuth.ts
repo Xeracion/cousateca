@@ -10,34 +10,34 @@ export const useAdminAuth = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        // Primero verificamos si hay un usuario de autenticación
+        // Verificar estado local primero
+        const localAdminStatus = localStorage.getItem('localAdminStatus');
+        if (localAdminStatus === 'true') {
+          setIsLoggedIn(true);
+          setIsAdmin(true);
+          setLoading(false);
+          return;
+        }
+
+        // Verificar usuario de Supabase
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Si hay un usuario autenticado en Supabase
+          setIsLoggedIn(true);
+          
+          // Verificar rol de administrador
           const { data: perfil } = await supabase
             .from('perfiles')
             .select('role')
             .eq('id', user.id)
             .single();
           
-          if (perfil && perfil.role === 'admin') {
-            setIsAdmin(true);
-            setIsLoggedIn(true);
-          } else {
-            setIsLoggedIn(true);
-            setIsAdmin(false);
-          }
-        } else {
-          // Verificación alternativa para el usuario local
-          const storedAdminStatus = localStorage.getItem('localAdminStatus');
-          if (storedAdminStatus === 'true') {
-            setIsLoggedIn(true);
-            setIsAdmin(true);
-          }
+          setIsAdmin(perfil?.role === 'admin' || false);
         }
       } catch (error) {
         console.error("Error verificando usuario:", error);
+        setIsLoggedIn(false);
+        setIsAdmin(false);
       } finally {
         setLoading(false);
       }
@@ -48,20 +48,18 @@ export const useAdminAuth = () => {
     // Listener para cambios de estado de autenticación
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        setIsLoggedIn(true);
+        
         const { data: perfil } = await supabase
           .from('perfiles')
           .select('role')
           .eq('id', session.user.id)
           .single();
         
-        if (perfil && perfil.role === 'admin') {
-          setIsAdmin(true);
-        }
-        setIsLoggedIn(true);
+        setIsAdmin(perfil?.role === 'admin' || false);
       } else if (event === 'SIGNED_OUT') {
         setIsLoggedIn(false);
         setIsAdmin(false);
-        // Limpiar también el estado local
         localStorage.removeItem('localAdminStatus');
       }
     });
