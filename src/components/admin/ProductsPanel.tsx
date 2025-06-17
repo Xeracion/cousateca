@@ -53,17 +53,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [operationStatus, setOperationStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [productForm, setProductForm] = useState<Partial<Product>>({
-    nombre: '',
-    categoria_id: '',
-    descripcion: '',
-    descripcion_corta: '',
-    precio_diario: 0,
-    deposito: 0,
-    imagenes: [''],
-    disponible: true,
-    destacado: false
-  });
 
   // Real-time subscription
   useEffect(() => {
@@ -121,29 +110,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     }
   }, [searchQuery, products]);
 
-  // Función para validar URLs de imágenes
-  const validateImageUrls = (urls: string[]): { valid: string[], invalid: string[] } => {
-    const valid: string[] = [];
-    const invalid: string[] = [];
-    
-    urls.forEach(url => {
-      if (url.trim() === '') return;
-      
-      try {
-        new URL(url);
-        if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url)) {
-          valid.push(url);
-        } else {
-          invalid.push(url);
-        }
-      } catch {
-        invalid.push(url);
-      }
-    });
-    
-    return { valid, invalid };
-  };
-
   // Función para verificar permisos de administrador
   const checkAdminPermissions = async (): Promise<boolean> => {
     try {
@@ -168,17 +134,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
   const handleEditProduct = (product: Product) => {
     console.log("✏️ Editando producto:", product.nombre);
     setSelectedProduct(product);
-    setProductForm({
-      nombre: product.nombre,
-      categoria_id: product.categoria_id,
-      descripcion: product.descripcion,
-      descripcion_corta: product.descripcion_corta,
-      precio_diario: product.precio_diario,
-      deposito: product.deposito,
-      imagenes: product.imagenes && product.imagenes.length > 0 ? product.imagenes : [''],
-      disponible: product.disponible,
-      destacado: product.destacado
-    });
     setIsEditingProduct(true);
     setIsProductDialogOpen(true);
     setOperationStatus('idle');
@@ -228,115 +183,17 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     }
   };
 
-  const handleSaveProduct = async () => {
-    console.log("💾 Guardando producto:", productForm.nombre);
-    setIsLoading(true);
-    setOperationStatus('idle');
-    
-    try {
-      // Validaciones
-      if (!productForm.nombre || !productForm.categoria_id || !productForm.precio_diario) {
-        throw new Error("Por favor, completa los campos obligatorios: nombre, categoría y precio diario");
-      }
+  const handleProductFormSuccess = () => {
+    setIsProductDialogOpen(false);
+    setSelectedProduct(null);
+    setIsEditingProduct(false);
+    setOperationStatus('success');
+  };
 
-      if (productForm.precio_diario <= 0) {
-        throw new Error("El precio diario debe ser mayor que 0");
-      }
-
-      // Verificar permisos
-      const isAdmin = await checkAdminPermissions();
-      if (!isAdmin) {
-        throw new Error("No tienes permisos de administrador para esta operación");
-      }
-      
-      // Validar y limpiar URLs de imágenes
-      const imageUrls = productForm.imagenes?.filter(img => img.trim() !== '') || [];
-      const { valid: validUrls, invalid: invalidUrls } = validateImageUrls(imageUrls);
-      
-      if (invalidUrls.length > 0) {
-        console.warn("⚠️ URLs de imágenes inválidas detectadas:", invalidUrls);
-        toast({
-          title: "⚠️ URLs de imágenes inválidas",
-          description: `Se encontraron ${invalidUrls.length} URLs inválidas que serán omitidas`,
-          variant: "destructive"
-        });
-      }
-      
-      const finalImages = validUrls.length > 0 
-        ? validUrls 
-        : ['https://via.placeholder.com/300x300?text=Sin+imagen'];
-
-      const productData = {
-        nombre: productForm.nombre.trim(),
-        categoria_id: productForm.categoria_id,
-        descripcion: productForm.descripcion?.trim() || '',
-        descripcion_corta: productForm.descripcion_corta?.trim() || '',
-        precio_diario: Number(productForm.precio_diario) || 0,
-        deposito: Number(productForm.deposito) || 0,
-        imagenes: finalImages,
-        disponible: productForm.disponible !== undefined ? productForm.disponible : true,
-        destacado: productForm.destacado || false
-      };
-
-      console.log("📦 Datos del producto a guardar:", productData);
-
-      if (isEditingProduct && selectedProduct) {
-        // Update existing product
-        const { error } = await supabase
-          .from('productos')
-          .update(productData)
-          .eq('id', selectedProduct.id);
-        
-        if (error) {
-          console.error("❌ Error al actualizar:", error);
-          throw error;
-        }
-        
-        console.log("✅ Producto actualizado exitosamente");
-        
-      } else {
-        // Create new product
-        const { error } = await supabase
-          .from('productos')
-          .insert(productData);
-        
-        if (error) {
-          console.error("❌ Error al crear:", error);
-          throw error;
-        }
-        
-        console.log("✅ Producto creado exitosamente");
-      }
-      
-      setOperationStatus('success');
-      setIsProductDialogOpen(false);
-      
-      // Reset form
-      setProductForm({
-        nombre: '',
-        categoria_id: '',
-        descripcion: '',
-        descripcion_corta: '',
-        precio_diario: 0,
-        deposito: 0,
-        imagenes: [''],
-        disponible: true,
-        destacado: false
-      });
-      
-      // No need to call onProductsChange here as realtime will handle it
-      
-    } catch (error: any) {
-      console.error("💥 Error completo al guardar:", error);
-      setOperationStatus('error');
-      toast({
-        title: "❌ Error al guardar el producto",
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleProductFormCancel = () => {
+    setIsProductDialogOpen(false);
+    setSelectedProduct(null);
+    setIsEditingProduct(false);
   };
 
   const handleRefresh = () => {
@@ -372,17 +229,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           <Button 
             className="bg-rental-500 hover:bg-rental-600"
             onClick={() => {
-              setProductForm({
-                nombre: '',
-                categoria_id: '',
-                descripcion: '',
-                descripcion_corta: '',
-                precio_diario: 0,
-                deposito: 0,
-                imagenes: [''],
-                disponible: true,
-                destacado: false
-              });
               setIsEditingProduct(false);
               setSelectedProduct(null);
               setIsProductDialogOpen(true);
@@ -524,13 +370,10 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
           </DialogHeader>
           
           <ProductForm 
-            productForm={productForm}
-            setProductForm={setProductForm}
-            isEditingProduct={isEditingProduct}
-            handleSaveProduct={handleSaveProduct}
+            product={selectedProduct}
             categories={categories}
-            setIsProductDialogOpen={setIsProductDialogOpen}
-            isLoading={isLoading}
+            onSuccess={handleProductFormSuccess}
+            onCancel={handleProductFormCancel}
           />
         </DialogContent>
       </Dialog>
