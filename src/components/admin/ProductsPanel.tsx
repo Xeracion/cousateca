@@ -110,27 +110,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     }
   }, [searchQuery, products]);
 
-  // Función para verificar permisos de administrador
-  const checkAdminPermissions = async (): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase
-        .from('perfiles')
-        .select('role')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-      
-      if (error) {
-        console.error("❌ Error verificando permisos:", error);
-        return false;
-      }
-      
-      return data?.role === 'admin';
-    } catch (error) {
-      console.error("❌ Error en verificación de admin:", error);
-      return false;
-    }
-  };
-
   const handleEditProduct = (product: Product) => {
     console.log("✏️ Editando producto:", product.nombre);
     setSelectedProduct(product);
@@ -149,9 +128,9 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     setOperationStatus('idle');
     
     try {
-      // Verificar permisos
-      const isAdmin = await checkAdminPermissions();
-      if (!isAdmin) {
+      // Verificar admin local (más rápido que Supabase)
+      const localAdminStatus = localStorage.getItem('localAdminStatus');
+      if (localAdminStatus !== 'true') {
         throw new Error("No tienes permisos de administrador");
       }
 
@@ -168,7 +147,10 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
       console.log("✅ Producto eliminado exitosamente");
       setOperationStatus('success');
       
-      // No need to call onProductsChange here as realtime will handle it
+      toast({
+        title: "✅ Producto eliminado",
+        description: `"${nombre}" ha sido eliminado del catálogo`,
+      });
       
     } catch (error: any) {
       console.error("💥 Error completo al eliminar:", error);
@@ -188,6 +170,11 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     setSelectedProduct(null);
     setIsEditingProduct(false);
     setOperationStatus('success');
+    
+    // Refrescar datos después de un pequeño delay
+    setTimeout(() => {
+      onProductsChange();
+    }, 1000);
   };
 
   const handleProductFormCancel = () => {

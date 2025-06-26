@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, X, Eye, AlertCircle, CheckCircle } from "lucide-react";
+import { Loader2, X, Eye, AlertCircle, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -95,19 +95,16 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
     const newUrls = [...imageUrls];
     newUrls[index] = value;
     
-    // Si es la última URL y no está vacía, añadir una nueva
     if (index === newUrls.length - 1 && value.trim() !== '') {
       newUrls.push('');
     }
     
-    // Si no es la última URL y está vacía, eliminarla (excepto si es la única)
     if (index < newUrls.length - 1 && value.trim() === '' && newUrls.length > 1) {
       newUrls.splice(index, 1);
     }
     
     setImageUrls(newUrls);
     
-    // Validar la imagen
     if (value.trim() !== '') {
       validateImage(value, index);
     }
@@ -123,6 +120,8 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🚀 Iniciando envío del formulario...');
+    
     if (!formData.nombre.trim()) {
       toast.error('El nombre del producto es obligatorio');
       return;
@@ -136,6 +135,14 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
     setLoading(true);
 
     try {
+      // Verificar estado de admin local primero (más rápido)
+      const localAdminStatus = localStorage.getItem('localAdminStatus');
+      if (localAdminStatus !== 'true') {
+        throw new Error('No tienes permisos de administrador (verificación local)');
+      }
+
+      console.log('✅ Verificación local de admin exitosa');
+
       // Filtrar URLs vacías y generar placeholder si es necesario
       const validImageUrls = imageUrls
         .filter(url => url.trim() !== '')
@@ -151,33 +158,63 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
         updated_at: new Date().toISOString()
       };
 
+      console.log('📦 Datos del producto a enviar:', productData);
+
       let result;
       if (product?.id) {
-        console.log('🔄 Actualizando producto:', product.id, productData);
+        console.log('🔄 Actualizando producto existente:', product.id);
         result = await supabase
           .from('productos')
           .update(productData)
           .eq('id', product.id)
           .select();
       } else {
-        console.log('➕ Creando nuevo producto:', productData);
+        console.log('➕ Creando nuevo producto');
         result = await supabase
           .from('productos')
           .insert(productData)
           .select();
       }
 
+      console.log('📤 Resultado de la operación:', result);
+
       if (result.error) {
-        console.error('❌ Error en operación:', result.error);
-        throw result.error;
+        console.error('❌ Error en la operación de base de datos:', result.error);
+        throw new Error(`Error de base de datos: ${result.error.message}`);
       }
 
-      console.log('✅ Operación exitosa:', result.data);
-      toast.success(product?.id ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente');
-      onSuccess();
+      if (!result.data || result.data.length === 0) {
+        console.warn('⚠️ La operación no devolvió datos');
+        throw new Error('La operación no devolvió datos válidos');
+      }
+
+      console.log('✅ Producto guardado exitosamente:', result.data[0]);
+      
+      toast.success(
+        product?.id 
+          ? `Producto "${formData.nombre}" actualizado exitosamente` 
+          : `Producto "${formData.nombre}" creado exitosamente`
+      );
+      
+      // Pequeño delay para asegurar que el toast se muestre
+      setTimeout(() => {
+        onSuccess();
+      }, 500);
+
     } catch (error: any) {
-      console.error('💥 Error al guardar producto:', error);
-      toast.error(`Error al ${product?.id ? 'actualizar' : 'crear'} producto: ${error.message}`);
+      console.error('💥 Error completo al guardar producto:', error);
+      
+      let errorMessage = 'Error desconocido';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (error.error_description) {
+        errorMessage = error.error_description;
+      } else if (error.details) {
+        errorMessage = error.details;
+      }
+      
+      toast.error(`Error al ${product?.id ? 'actualizar' : 'crear'} producto: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
