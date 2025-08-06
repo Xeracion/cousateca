@@ -119,10 +119,13 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
       }
       
       // Validar y limpiar imágenes
-      const cleanedData = productsData.map(product => ({
-        ...product,
-        imagenes: product.imagenes?.filter(isValidImageUrl) || ['https://via.placeholder.com/300x300?text=Sin+imagen']
-      }));
+      const cleanedData = productsData.map(product => {
+        const filteredImages = product.imagenes?.filter(isValidImageUrl);
+        return {
+          ...product,
+          imagenes: filteredImages && filteredImages.length > 0 ? filteredImages : ['https://via.placeholder.com/300x300?text=Sin+imagen']
+        };
+      });
       
       // Convertimos los datos de Supabase al formato Product
       const mappedProducts = cleanedData.map(mapSupabaseProductToProduct);
