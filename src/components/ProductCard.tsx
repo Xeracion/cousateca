@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Product } from "@/data/products";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductCardProps {
   product: Product;
@@ -14,14 +15,27 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const hasImages = product.images && product.images.length > 0;
   const defaultImage = "https://via.placeholder.com/300x300?text=Sin+imagen";
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   
   return (
     <Card className="overflow-hidden product-card h-full flex flex-col">
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
+        {!imageLoaded && !imageError && (
+          <Skeleton className="absolute inset-0 w-full h-full" />
+        )}
         <img
-          src={hasImages ? product.images[0] : defaultImage}
+          src={imageError ? defaultImage : (hasImages ? product.images[0] : defaultImage)}
           alt={product.name}
-          className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+          loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          onError={() => {
+            setImageError(true);
+            setImageLoaded(true);
+          }}
+          className={`object-cover w-full h-full transition-all duration-300 hover:scale-105 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
         />
         {product.featured && (
           <div className="absolute top-2 left-2 bg-rental-500 text-white text-xs font-semibold px-2 py-1 rounded">
