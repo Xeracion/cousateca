@@ -30,7 +30,7 @@ const FeaturedProducts = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Productos destacados</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Los básicos</h2>
             <p className="text-gray-600">Artículos de alta calidad disponibles para alquilar</p>
           </div>
           <Link to="/products">
