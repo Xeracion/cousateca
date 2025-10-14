@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from '@/data/products';
 import { useToast } from "@/components/ui/use-toast";
+import taladroImg from "@/assets/products/taladro.jpg";
 
 // Definimos la interfaz para los datos que vienen de Supabase
 interface SupabaseProduct {
@@ -28,13 +29,16 @@ interface SupabaseProduct {
 
 // Función auxiliar para convertir productos de Supabase al formato Product
 const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
-  // Map placeholder URLs to actual images
+  // Map placeholder URLs to actual images (Taladro specific fix)
   const mapImageUrl = (url: string): string => {
-    if (url.includes('placeholder.com') && url.includes('Taladro')) {
-      return '/src/assets/products/taladro.jpg';
+    const lower = url.toLowerCase();
+    if (lower.includes('placeholder.com') && lower.includes('taladro')) {
+      return taladroImg;
     }
     return url;
   };
+
+  const mappedImages = (product.imagenes || []).map(mapImageUrl);
 
   return {
     id: product.id,
@@ -44,7 +48,7 @@ const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
     shortDescription: product.descripcion_corta || "",
     dailyPrice: product.precio_diario,
     deposit: product.deposito,
-    images: (product.imagenes || []).map(mapImageUrl),
+    images: mappedImages,
     availability: product.disponible !== false, // true por defecto si es undefined
     featured: product.destacado === true,
     rating: product.valoracion || 0,
