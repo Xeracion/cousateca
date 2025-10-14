@@ -28,6 +28,14 @@ interface SupabaseProduct {
 
 // Función auxiliar para convertir productos de Supabase al formato Product
 const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
+  // Map placeholder URLs to actual images
+  const mapImageUrl = (url: string): string => {
+    if (url.includes('placeholder.com') && url.includes('Taladro')) {
+      return '/src/assets/products/taladro.jpg';
+    }
+    return url;
+  };
+
   return {
     id: product.id,
     name: product.nombre,
@@ -36,7 +44,7 @@ const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
     shortDescription: product.descripcion_corta || "",
     dailyPrice: product.precio_diario,
     deposit: product.deposito,
-    images: product.imagenes || [],
+    images: (product.imagenes || []).map(mapImageUrl),
     availability: product.disponible !== false, // true por defecto si es undefined
     featured: product.destacado === true,
     rating: product.valoracion || 0,
