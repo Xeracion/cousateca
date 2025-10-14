@@ -91,6 +91,15 @@ const CategoriesPage = () => {
     );
   }
 
+  const categoriesToDisplay = (dbCategories.length > 0 && dbProducts.length > 0)
+    ? dbCategories.map(cat => ({
+        id: cat.id,
+        nombre_es: cat.nombre_es || cat.nombre,
+        descripcion_es: cat.descripcion_es || cat.descripcion || "",
+        icon: 'laptop'
+      }))
+    : categories;
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -103,11 +112,14 @@ const CategoriesPage = () => {
             Desde electrónica hasta equipamiento para exteriores, tenemos artículos de alta calidad que se adaptan a tus necesidades.
           </p>
           
-          {categories.map((category) => {
+          {categoriesToDisplay.map((category) => {
             // Get products for this category from database or fallback to static data
             const categoryProducts = dbProducts.length > 0 
               ? dbProducts.filter(product => product.categoria_id === category.id)
-              : staticProducts.filter(product => product.category.toLowerCase() === category.name.toLowerCase());
+              : staticProducts.filter(product => {
+                  const staticCat = categories.find(c => c.id === category.id);
+                  return staticCat ? product.category.toLowerCase() === staticCat.name.toLowerCase() : false;
+                });
             
             return (
               <section key={category.id} className="mb-16 last:mb-0">
