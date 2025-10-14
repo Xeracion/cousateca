@@ -5,8 +5,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
-import { products, Product } from "@/data/products";
+import { Product } from "@/data/products";
 import { categories } from "@/data/categories";
+import { useProductsRealtime } from "@/hooks/useProductsRealtime";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
@@ -31,16 +32,16 @@ const CategoryDetail = () => {
   const [priceRange, setPriceRange] = useState<{min: number, max: number}>({min: 0, max: 1000});
   const [sortOrder, setSortOrder] = useState("featured");
   const [maxPrice, setMaxPrice] = useState(1000);
-  const [loading, setLoading] = useState(true);
-  const [dbProducts, setDbProducts] = useState<any[]>([]);
   const [dbCategories, setDbCategories] = useState<any[]>([]);
 
   const category = categories.find(c => c.id === id);
   
+  // Get products from database filtered by category
+  const { products: dbProducts, loading } = useProductsRealtime([], { categoryId: id });
+  
   // Function to get filtered and sorted products
   const getFilteredProducts = () => {
-    return products
-      .filter(product => product.category.toLowerCase() === category?.name.toLowerCase())
+    return dbProducts
       .filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
       .filter(product => product.dailyPrice >= priceRange.min && product.dailyPrice <= priceRange.max)
       .sort((a, b) => {
@@ -99,29 +100,21 @@ const CategoryDetail = () => {
           .select('*')
           .order('nombre');
           
-        // Fetch products
-        const { data: productsData } = await supabase
-          .from('productos')
-          .select('*');
-          
         if (categoriesData) setDbCategories(categoriesData);
-        if (productsData) setDbProducts(productsData);
         
-        // Find maximum price for range slider
-        if (productsData && productsData.length > 0) {
-          const max = Math.max(...productsData.map((p: any) => p.precio_diario));
+        // Find maximum price for range slider from loaded products
+        if (dbProducts && dbProducts.length > 0) {
+          const max = Math.max(...dbProducts.map((p: any) => p.dailyPrice || 0));
           setMaxPrice(max);
           setPriceRange({min: 0, max});
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
       }
     };
     
     fetchData();
-  }, []);
+  }, [dbProducts]);
   
   if (!category) {
     return (
@@ -228,7 +221,7 @@ const CategoryDetail = () => {
           {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={mapProductData(product)} />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
