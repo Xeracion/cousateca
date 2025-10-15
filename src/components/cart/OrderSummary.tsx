@@ -60,25 +60,31 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
         
         <div className="space-y-4 mb-6">
           {items.map((item) => (
-            <div key={item.product.id} className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                {item.product.name} ({item.rentalDays} días)
-              </span>
-              <span className="font-medium">
-                {formatCurrency(item.product.dailyPrice * item.rentalDays)}
-              </span>
+            <div key={item.product.id} className="space-y-1 pb-3 border-b last:border-0">
+              <div className="flex justify-between">
+                <span className="font-medium">{item.product.name}</span>
+                <span className="font-semibold">
+                  {formatCurrency(item.product.dailyPrice * item.rentalDays)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>{formatCurrency(item.product.dailyPrice)} × {item.rentalDays} días</span>
+                <span>Fianza: {formatCurrency(item.product.deposit)}</span>
+              </div>
             </div>
           ))}
           
-          <Separator className="my-2" />
+          <Separator className="my-4" />
           
-          <div className="flex justify-between font-medium">
-            <span>Subtotal de alquileres</span>
-            <span>{formatCurrency(totalPrice)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Fianza total</span>
-            <span>{formatCurrency(totalDeposit)}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between font-medium">
+              <span>Subtotal alquileres</span>
+              <span>{formatCurrency(totalPrice)}</span>
+            </div>
+            <div className="flex justify-between font-medium">
+              <span>Total fianzas</span>
+              <span>{formatCurrency(totalDeposit)}</span>
+            </div>
           </div>
         </div>
         

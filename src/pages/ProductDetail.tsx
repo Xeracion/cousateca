@@ -107,8 +107,25 @@ const ProductDetail = () => {
       toast.error("Por favor selecciona fechas de inicio y fin");
       return;
     }
+    
+    // Map the Supabase product to the Product interface format
+    const mappedProduct = {
+      id: product.id,
+      name: product.nombre,
+      category: product.categoria?.nombre || '',
+      description: product.descripcion || '',
+      shortDescription: product.descripcion_corta || '',
+      dailyPrice: product.precio_diario,
+      deposit: product.deposito,
+      images: product.imagenes || [],
+      availability: product.disponible,
+      featured: product.destacado || false,
+      rating: product.valoracion || 0,
+      reviewCount: product.num_valoraciones || 0
+    };
+    
     addToCart({
-      product,
+      product: mappedProduct,
       rentalDays,
       startDate: dateRange.from,
       endDate: dateRange.to
