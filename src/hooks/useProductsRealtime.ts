@@ -56,17 +56,29 @@ const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
   };
 };
 
-// Función para validar URLs de imágenes
+// Función para validar URLs de imágenes (soporta rutas relativas a /public)
 const isValidImageUrl = (url: string): boolean => {
   if (!url || url.trim() === '') return false;
-  
+  const pattern = /(\.jpg|\.jpeg|\.png|\.gif|\.webp|\.svg)$/i;
+
+  // Rutas relativas servidas desde la carpeta public
+  if (url.startsWith('/')) {
+    return pattern.test(url);
+  }
+
+  // Data URLs
+  if (url.startsWith('data:image/')) {
+    return true;
+  }
+
   try {
     new URL(url);
-    return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+    return pattern.test(url);
   } catch {
     return false;
   }
 };
+
 
 export const useProductsRealtime = (initialProducts: Product[] = [], filterOptions?: { featured?: boolean, categoryId?: string }) => {
   const { toast } = useToast();
