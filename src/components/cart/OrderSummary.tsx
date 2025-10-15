@@ -58,13 +58,26 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
       <CardContent className="p-6">
         <h2 className="text-xl font-bold mb-4">Resumen del Pedido</h2>
         
-        <div className="space-y-3 mb-6">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Subtotal</span>
+        <div className="space-y-4 mb-6">
+          {items.map((item) => (
+            <div key={item.product.id} className="flex justify-between text-sm">
+              <span className="text-muted-foreground">
+                {item.product.name} ({item.rentalDays} días)
+              </span>
+              <span className="font-medium">
+                {formatCurrency(item.product.dailyPrice * item.rentalDays)}
+              </span>
+            </div>
+          ))}
+          
+          <Separator className="my-2" />
+          
+          <div className="flex justify-between font-medium">
+            <span>Subtotal de alquileres</span>
             <span>{formatCurrency(totalPrice)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Fianza</span>
+            <span className="text-muted-foreground">Fianza total</span>
             <span>{formatCurrency(totalDeposit)}</span>
           </div>
         </div>
