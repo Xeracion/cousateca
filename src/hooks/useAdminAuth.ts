@@ -10,29 +10,24 @@ export const useAdminAuth = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        // Verificar estado local primero
-        const localAdminStatus = localStorage.getItem('localAdminStatus');
-        if (localAdminStatus === 'true') {
-          setIsLoggedIn(true);
-          setIsAdmin(true);
-          setLoading(false);
-          return;
-        }
-
-        // Verificar usuario de Supabase
+        // Get authenticated user from Supabase
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
           setIsLoggedIn(true);
           
-          // Verificar rol de administrador
-          const { data: perfil } = await supabase
-            .from('perfiles')
+          // Check admin role from user_roles table (server-validated)
+          const { data: userRole } = await supabase
+            .from('user_roles')
             .select('role')
-            .eq('id', user.id)
-            .single();
+            .eq('user_id', user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
           
-          setIsAdmin(perfil?.role === 'admin' || false);
+          setIsAdmin(!!userRole);
+        } else {
+          setIsLoggedIn(false);
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error("Error verificando usuario:", error);
@@ -45,22 +40,23 @@ export const useAdminAuth = () => {
     
     checkUser();
     
-    // Listener para cambios de estado de autenticación
+    // Auth state change listener
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setIsLoggedIn(true);
         
-        const { data: perfil } = await supabase
-          .from('perfiles')
+        // Check admin role from user_roles table
+        const { data: userRole } = await supabase
+          .from('user_roles')
           .select('role')
-          .eq('id', session.user.id)
-          .single();
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
         
-        setIsAdmin(perfil?.role === 'admin' || false);
+        setIsAdmin(!!userRole);
       } else if (event === 'SIGNED_OUT') {
         setIsLoggedIn(false);
         setIsAdmin(false);
-        localStorage.removeItem('localAdminStatus');
       }
     });
     

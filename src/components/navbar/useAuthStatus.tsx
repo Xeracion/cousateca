@@ -9,29 +9,26 @@ export const useAuthStatus = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        // Verificar admin local primero
-        const storedAdminStatus = localStorage.getItem('localAdminStatus');
-        if (storedAdminStatus === 'true') {
-          setIsAdmin(true);
-        }
-
-        // Verificar usuario de Supabase
+        // Get authenticated user
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
         
+        // Check admin status from user_roles table (server-validated)
         if (user) {
-          const { data: perfil } = await supabase
-            .from('perfiles')
+          const { data: userRole } = await supabase
+            .from('user_roles')
             .select('role')
-            .eq('id', user.id)
-            .single();
+            .eq('user_id', user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
           
-          if (perfil?.role === 'admin') {
-            setIsAdmin(true);
-          }
+          setIsAdmin(!!userRole);
+        } else {
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error("Error verificando estado de auth:", error);
+        setIsAdmin(false);
       }
     };
     
@@ -41,16 +38,17 @@ export const useAuthStatus = () => {
       setUser(session?.user || null);
       
       if (session?.user) {
-        const { data: perfil } = await supabase
-          .from('perfiles')
+        // Check admin role from user_roles table
+        const { data: userRole } = await supabase
+          .from('user_roles')
           .select('role')
-          .eq('id', session.user.id)
-          .single();
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
         
-        setIsAdmin(perfil?.role === 'admin' || false);
+        setIsAdmin(!!userRole);
       } else {
-        const storedAdminStatus = localStorage.getItem('localAdminStatus');
-        setIsAdmin(storedAdminStatus === 'true');
+        setIsAdmin(false);
       }
     });
     

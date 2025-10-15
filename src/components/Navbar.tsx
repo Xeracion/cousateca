@@ -22,10 +22,7 @@ const Navbar = () => {
   
   const handleLogout = async () => {
     try {
-      // Limpiar el estado de autenticación local si existe
-      localStorage.removeItem('localAdminStatus');
-      
-      // Cerrar sesión en Supabase
+      // Sign out from Supabase
       await supabase.auth.signOut();
       
       toast({

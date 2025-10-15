@@ -14,6 +14,15 @@ serve(async (req) => {
   }
 
   try {
+    // AUTHENTICATION: Require service role key for cron-triggered functions
+    const authHeader = req.headers.get('Authorization');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!authHeader || !authHeader.includes(serviceRoleKey || '')) {
+      console.error('Unauthorized access attempt to send-feedback-request');
+      throw new Error('Unauthorized - Service role required');
+    }
+
     // Create a Supabase client with the service role key
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -24,20 +33,21 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    console.log('Processing feedback request notifications...');
+
     // Get today's date
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
     
     console.log(`Checking for rentals that ended on ${todayStr}`);
 
-    // Find reservations that ended today
+    // Find reservations that ended today (fixed query - removed invalid users join)
     const { data: completedReservations, error } = await supabase
       .from("reservas")
       .select(`
         id, 
         usuario_id, 
-        productos (nombre),
-        users!reservas_usuario_id_fkey (email, nombre)
+        productos (nombre)
       `)
       .eq("estado", "completada")
       .like("fecha_fin", `${todayStr}%`);
@@ -90,7 +100,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
+        status: error.message?.includes('Unauthorized') ? 401 : 500,
       }
     );
   }

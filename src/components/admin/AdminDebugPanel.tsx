@@ -42,9 +42,17 @@ const AdminDebugPanel: React.FC = () => {
             .eq('id', user.id)
             .single();
           
+          // Check admin role from user_roles table
+          const { data: userRole } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+          
           diagnostics.permissions = {
             profile,
-            isAdmin: profile?.role === 'admin',
+            isAdmin: !!userRole,
             error: profileError?.message
           };
         } catch (error: any) {

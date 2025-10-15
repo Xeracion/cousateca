@@ -40,7 +40,6 @@ interface Perfil {
   nombre: string | null;
   telefono: string | null;
   direccion: string | null;
-  role: string | null;
 }
 
 const UserProfilePage = () => {

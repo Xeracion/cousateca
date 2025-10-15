@@ -14,6 +14,15 @@ serve(async (req) => {
   }
 
   try {
+    // AUTHENTICATION: Require service role key for cron-triggered functions
+    const authHeader = req.headers.get('Authorization');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!authHeader || !authHeader.includes(serviceRoleKey || '')) {
+      console.error('Unauthorized access attempt to send-return-reminder');
+      throw new Error('Unauthorized - Service role required');
+    }
+
     // Create a Supabase client with the service role key
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -24,6 +33,8 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    console.log('Processing return reminder notifications...');
+
     // Get tomorrow's date (for returns due tomorrow)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -31,15 +42,14 @@ serve(async (req) => {
     
     console.log(`Checking for returns due on ${tomorrowStr}`);
 
-    // Find reservations that end tomorrow
+    // Find reservations that end tomorrow (fixed query - removed invalid users join)
     const { data: reservations, error } = await supabase
       .from("reservas")
       .select(`
         id, 
         fecha_fin, 
         usuario_id, 
-        productos (nombre),
-        users!reservas_usuario_id_fkey (email, nombre)
+        productos (nombre)
       `)
       .eq("estado", "activa")
       .like("fecha_fin", `${tomorrowStr}%`);
@@ -92,7 +102,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
+        status: error.message?.includes('Unauthorized') ? 401 : 500,
       }
     );
   }

@@ -20,23 +20,14 @@ const AdminPanel = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (username === 'admin' || username === 'info@xeracion.org') {
-      if (password === 'cousateca2024') {
-        localStorage.setItem('localAdminStatus', 'true');
-        toast({
-          title: "Inicio de sesión exitoso",
-          description: "Bienvenido al panel de administración"
-        });
-        setError('');
-        loadData();
-        // Forzar actualización del estado
-        window.location.reload();
-      } else {
-        setError('Contraseña incorrecta');
-      }
-    } else {
-      setError('Usuario no reconocido');
-    }
+    // Show message that hardcoded admin login is no longer supported
+    setError('El sistema de administración ha sido actualizado. Por favor, inicia sesión con una cuenta de administrador válida registrada en el sistema.');
+    
+    toast({
+      title: "Sistema actualizado",
+      description: "Utiliza el sistema de autenticación principal para acceder al panel de administración",
+      variant: "destructive"
+    });
   };
 
   const handleForgotPassword = () => {
