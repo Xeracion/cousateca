@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -22,9 +23,20 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [resetEmail, setResetEmail] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!acceptedTerms) {
+      toast({
+        title: "Error",
+        description: "Debes aceptar las Condiciones Generales de Alquiler",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -273,12 +285,26 @@ const AuthPage = () => {
                           </button>
                         </div>
                       </div>
+                      <div className="flex items-start space-x-2 pt-2">
+                        <Checkbox 
+                          id="terms" 
+                          checked={acceptedTerms}
+                          onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                          required
+                        />
+                        <Label 
+                          htmlFor="terms" 
+                          className="text-sm leading-tight cursor-pointer"
+                        >
+                          Declaro haber leído y aceptado las Condiciones Generales de Alquiler
+                        </Label>
+                      </div>
                     </CardContent>
                     <CardFooter>
                       <Button 
                         type="submit" 
                         className="w-full bg-rental-500 hover:bg-rental-600"
-                        disabled={loading}
+                        disabled={loading || !acceptedTerms}
                       >
                         {loading ? "Creando cuenta..." : "Registrarse"}
                       </Button>
