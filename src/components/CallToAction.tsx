@@ -14,9 +14,9 @@ const CallToAction = () => {
           Únete a miles de clientes satisfechos que ahorran dinero alquilando
           en lugar de comprar. ¡Explora nuestra selección hoy mismo!
         </p>
-        <Link to="/products">
+        <Link to="/auth">
           <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100">
-            Ver todos los productos
+            Únete y explora
           </Button>
         </Link>
       </div>
