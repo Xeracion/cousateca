@@ -12,6 +12,33 @@ import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { z } from "zod";
+
+// Validation schemas
+const signupSchema = z.object({
+  nombre: z.string()
+    .trim()
+    .min(2, { message: "El nombre debe tener al menos 2 caracteres" })
+    .max(100, { message: "El nombre no puede exceder 100 caracteres" })
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { 
+      message: "El nombre solo puede contener letras y espacios" 
+    }),
+  email: z.string()
+    .trim()
+    .email({ message: "Email inválido" })
+    .max(255, { message: "Email demasiado largo" })
+    .toLowerCase(),
+  password: z.string()
+    .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
+    .regex(/[A-Z]/, { message: "Debe incluir al menos una mayúscula" })
+    .regex(/[a-z]/, { message: "Debe incluir al menos una minúscula" })
+    .regex(/[0-9]/, { message: "Debe incluir al menos un número" })
+});
+
+const signinSchema = z.object({
+  email: z.string().trim().email({ message: "Email inválido" }),
+  password: z.string().min(1, { message: "La contraseña es requerida" })
+});
 
 const AuthPage = () => {
   const { toast } = useToast();
@@ -35,6 +62,20 @@ const AuthPage = () => {
         variant: "destructive",
       });
       return;
+    }
+
+    // Validate inputs
+    try {
+      signupSchema.parse({ nombre, email, password });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Error de validación",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+        return;
+      }
     }
     
     setLoading(true);
@@ -74,6 +115,21 @@ const AuthPage = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate inputs
+    try {
+      signinSchema.parse({ email, password });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Error de validación",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
