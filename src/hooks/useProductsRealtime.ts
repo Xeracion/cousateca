@@ -59,10 +59,10 @@ const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
 // Función para validar URLs de imágenes (soporta rutas relativas a /public)
 const isValidImageUrl = (url: string): boolean => {
   if (!url || url.trim() === '') return false;
-  const pattern = /(\.jpg|\.jpeg|\.png|\.gif|\.webp|\.svg)$/i;
-
+  
   // Rutas relativas servidas desde la carpeta public
   if (url.startsWith('/')) {
+    const pattern = /(\.jpg|\.jpeg|\.png|\.gif|\.webp|\.svg)$/i;
     return pattern.test(url);
   }
 
@@ -71,8 +71,27 @@ const isValidImageUrl = (url: string): boolean => {
     return true;
   }
 
+  // Domini fidati per immagini (Unsplash, CDN comuni, etc.)
+  const trustedDomains = [
+    'images.unsplash.com',
+    'unsplash.com',
+    'cdn.pixabay.com',
+    'images.pexels.com',
+    'via.placeholder.com',
+    'placehold.co',
+    'picsum.photos'
+  ];
+
   try {
-    new URL(url);
+    const urlObj = new URL(url);
+    
+    // Controlla se è un dominio fidato
+    if (trustedDomains.some(domain => urlObj.hostname.includes(domain))) {
+      return true;
+    }
+    
+    // Altrimenti verifica l'estensione del file
+    const pattern = /(\.jpg|\.jpeg|\.png|\.gif|\.webp|\.svg)($|\?)/i;
     return pattern.test(url);
   } catch {
     return false;
