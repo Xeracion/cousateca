@@ -16,17 +16,26 @@ export default defineConfig(({ mode }) => ({
     // Plugin to make CSS non-render-blocking
     {
       name: 'async-css-loading',
-      transformIndexHtml(html: string) {
-        // Only apply in production builds
-        if (mode === 'production') {
-          // Transform CSS links to load asynchronously using media query technique
-          // This prevents render blocking while maintaining all styles
-          return html.replace(
-            /<link([^>]*rel="stylesheet"[^>]*)>/gi,
-            '<link$1 media="print" onload="this.media=\'all\'; this.onload=null;"><noscript><link$1></noscript>'
-          );
+      transformIndexHtml: {
+        order: 'post' as const,
+        handler(html: string) {
+          // Only apply in production builds
+          if (mode === 'production') {
+            // Transform CSS links to load asynchronously using media query technique
+            // This prevents render blocking while maintaining all styles
+            return html.replace(
+              /<link\s+([^>]*?\s+)?rel=["']stylesheet["']([^>]*)>/gi,
+              (match, before = '', after = '') => {
+                // Don't transform if already has media="print" or onload
+                if (match.includes('media="print"') || match.includes('onload=')) {
+                  return match;
+                }
+                return `<link ${before}rel="stylesheet"${after} media="print" onload="this.media='all';this.onload=null;"><noscript>${match}</noscript>`;
+              }
+            );
+          }
+          return html;
         }
-        return html;
       }
     }
   ].filter(Boolean),
