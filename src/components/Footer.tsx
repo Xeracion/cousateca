@@ -8,10 +8,7 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <h3 className="text-xl font-bold mb-4 text-rental-300">Cousateca</h3>
-            <p className="text-gray-400 mb-4">
-              Alquila productos de alta calidad para cualquier ocasión. Ofrecemos una amplia 
-              selección de artículos a precios asequibles con opciones convenientes de entrega y recogida.
-            </p>
+            <p className="text-gray-400 mb-4">Una iniciativa de Xeración para un Ferrol más sostenible.</p>
             
           </div>
 
