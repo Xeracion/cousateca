@@ -145,7 +145,60 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
         console.log("⚙️ Vista de administrador - mostrando todos los productos");
       }
       
-      const { data: productsData, error: productsError } = await query;
+      const { data: productsData, error: productsError, status } = await query;
+      
+      // 🔁 Si hay sesión inválida (401/403), cerrar sesión y reintentar como visitante anónimo
+      if (status === 401 || status === 403) {
+        console.log('⚠️ Sesión inválida detectada (código ' + status + '), limpiando y reintentando...');
+        await supabase.auth.signOut();
+        
+        // Reintentar la consulta sin autenticación
+        let retryQuery = supabase
+          .from('productos')
+          .select(`
+            *,
+            categoria:categoria_id (
+              id,
+              nombre
+            )
+          `);
+        
+        if (filterOptions?.featured) {
+          retryQuery = retryQuery.eq('destacado', true);
+        }
+        
+        if (filterOptions?.categoryId) {
+          retryQuery = retryQuery.eq('categoria_id', filterOptions.categoryId);
+        }
+        
+        if (!window.location.pathname.includes('/admin')) {
+          retryQuery = retryQuery.eq('disponible', true);
+        }
+        
+        const { data: retryData, error: retryError } = await retryQuery;
+        
+        if (retryError) {
+          console.error("❌ Error al reintentar cargar productos:", retryError);
+          throw retryError;
+        }
+        
+        if (!retryData) {
+          console.warn("⚠️ No se recibieron datos tras reintentar");
+          setProducts([]);
+          return;
+        }
+        
+        const cleanedRetryData = retryData.map(product => ({
+          ...product,
+          imagenes: product.imagenes?.filter(isValidImageUrl) || ['https://via.placeholder.com/300x300?text=Sin+imagen']
+        }));
+        
+        const mappedRetryProducts = cleanedRetryData.map(mapSupabaseProductToProduct);
+        setProducts(mappedRetryProducts);
+        console.log("✅ Productos cargados correctamente tras limpiar sesión:", mappedRetryProducts.length);
+        setRetryCount(0);
+        return;
+      }
       
       if (productsError) {
         console.error("❌ Error en consulta de productos:", productsError);
