@@ -34,7 +34,18 @@ const CategoryDetail = () => {
   const [maxPrice, setMaxPrice] = useState(1000);
   const [dbCategories, setDbCategories] = useState<any[]>([]);
 
-  const category = categories.find(c => c.id === id);
+  // Find category in database categories first, then fallback to static categories
+  const category = dbCategories.find(c => c.id?.toString() === id) || categories.find(c => c.id === id);
+  
+  // Map database category to expected format if it exists
+  const displayCategory = category ? {
+    id: category.id,
+    name: category.nombre || category.name || category.nombre_es,
+    nombre_es: category.nombre_es || category.nombre || category.name,
+    icon: category.icon || "laptop",
+    description: category.descripcion_es || category.description || "",
+    descripcion_es: category.descripcion_es || category.description || ""
+  } : null;
   
   // Get products from database filtered by category
   const { products: dbProducts, loading } = useProductsRealtime([], { categoryId: id });
@@ -116,7 +127,7 @@ const CategoryDetail = () => {
     fetchData();
   }, [dbProducts]);
   
-  if (!category) {
+  if (!displayCategory) {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
@@ -153,11 +164,11 @@ const CategoryDetail = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center mb-8">
             <div className="bg-rental-50 p-4 rounded-full mr-5">
-              {getIcon(category.icon)}
+              {getIcon(displayCategory.icon)}
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">{category.nombre_es}</h1>
-              <p className="text-gray-600 max-w-3xl">{category.descripcion_es}</p>
+              <h1 className="text-3xl font-bold mb-2">{displayCategory.nombre_es}</h1>
+              <p className="text-gray-600 max-w-3xl">{displayCategory.descripcion_es}</p>
             </div>
           </div>
           
