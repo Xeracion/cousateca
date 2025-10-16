@@ -71,10 +71,10 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
                 </TableCell>
                 <TableCell>
                   <div className="font-semibold text-lg">
-                    {formatCurrency(item.product.dailyPrice * item.rentalDays)}
+                    {formatCurrency((item.product.dailyPrice || 0) * item.rentalDays)}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {formatCurrency(item.product.dailyPrice)} × {item.rentalDays} días
+                    {formatCurrency(item.product.dailyPrice || 0)} × {item.rentalDays} días
                   </p>
                 </TableCell>
                 <TableCell>
@@ -144,10 +144,10 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
               <div>
                 <p className="text-sm text-gray-500">Precio Total</p>
                 <div className="font-semibold text-lg mt-1">
-                  {formatCurrency(item.product.dailyPrice * item.rentalDays)}
+                  {formatCurrency((item.product.dailyPrice || 0) * item.rentalDays)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {formatCurrency(item.product.dailyPrice)} × {item.rentalDays} días
+                  {formatCurrency(item.product.dailyPrice || 0)} × {item.rentalDays} días
                 </p>
               </div>
             </div>

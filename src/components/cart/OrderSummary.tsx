@@ -20,7 +20,7 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
   
   // Calculate total deposit amount
   const totalDeposit = items.reduce((sum, item) => {
-    const deposit = item.product.deposit || 0;
+    const deposit = Number(item.product.deposit) || 0;
     return sum + deposit;
   }, 0);
   
@@ -68,8 +68,8 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
                 </span>
               </div>
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>{formatCurrency(item.product.dailyPrice)} × {item.rentalDays} días</span>
-                <span>Fianza: {formatCurrency(item.product.deposit)}</span>
+                <span>{formatCurrency(item.product.dailyPrice || 0)} × {item.rentalDays} días</span>
+                <span>Fianza: {formatCurrency(item.product.deposit || 0)}</span>
               </div>
             </div>
           ))}

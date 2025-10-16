@@ -46,8 +46,8 @@ const mapSupabaseProductToProduct = (product: SupabaseProduct): Product => {
     category: product.categoria?.nombre || "",
     description: product.descripcion || "",
     shortDescription: product.descripcion_corta || "",
-    dailyPrice: product.precio_diario,
-    deposit: product.deposito,
+    dailyPrice: product.precio_diario || 0,
+    deposit: product.deposito || 0,
     images: mappedImages,
     availability: product.disponible !== false, // true por defecto si es undefined
     featured: product.destacado === true,
