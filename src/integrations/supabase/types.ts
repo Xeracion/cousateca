@@ -178,6 +178,13 @@ export type Database = {
             referencedRelation: "productos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reservas_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "v_catalogo_productos"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -203,7 +210,59 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_catalogo_productos: {
+        Row: {
+          categoria_id: string | null
+          created_at: string | null
+          deposito: number | null
+          descripcion: string | null
+          descripcion_corta: string | null
+          destacado: boolean | null
+          id: string | null
+          imagenes: string[] | null
+          nombre: string | null
+          num_valoraciones: number | null
+          precio_diario: number | null
+          valoracion: number | null
+        }
+        Insert: {
+          categoria_id?: string | null
+          created_at?: string | null
+          deposito?: number | null
+          descripcion?: string | null
+          descripcion_corta?: string | null
+          destacado?: boolean | null
+          id?: string | null
+          imagenes?: string[] | null
+          nombre?: string | null
+          num_valoraciones?: number | null
+          precio_diario?: number | null
+          valoracion?: number | null
+        }
+        Update: {
+          categoria_id?: string | null
+          created_at?: string | null
+          deposito?: number | null
+          descripcion?: string | null
+          descripcion_corta?: string | null
+          destacado?: boolean | null
+          id?: string | null
+          imagenes?: string[] | null
+          nombre?: string | null
+          num_valoraciones?: number | null
+          precio_diario?: number | null
+          valoracion?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "productos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       check_item_availability: {
