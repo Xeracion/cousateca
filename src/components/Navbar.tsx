@@ -47,7 +47,11 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold text-rental-500">Cousateca</span>
+              <img 
+                src="https://tiyxvewddrkgsrsmgbvh.supabase.co/storage/v1/object/public/Imagenes/Cousateca.svg" 
+                alt="Cousateca" 
+                className="h-8 w-auto"
+              />
             </Link>
           </div>
 
