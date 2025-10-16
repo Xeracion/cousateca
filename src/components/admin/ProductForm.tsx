@@ -135,14 +135,6 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
     setLoading(true);
 
     try {
-      // Verificar estado de admin local primero (más rápido)
-      const localAdminStatus = localStorage.getItem('localAdminStatus');
-      if (localAdminStatus !== 'true') {
-        throw new Error('No tienes permisos de administrador (verificación local)');
-      }
-
-      console.log('✅ Verificación local de admin exitosa');
-
       // Filtrar URLs vacías y generar placeholder si es necesario
       const validImageUrls = imageUrls
         .filter(url => url.trim() !== '')

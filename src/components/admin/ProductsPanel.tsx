@@ -128,12 +128,6 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
     setOperationStatus('idle');
     
     try {
-      // Verificar admin local (más rápido que Supabase)
-      const localAdminStatus = localStorage.getItem('localAdminStatus');
-      if (localAdminStatus !== 'true') {
-        throw new Error("No tienes permisos de administrador");
-      }
-
       const { error } = await supabase
         .from('productos')
         .delete()
