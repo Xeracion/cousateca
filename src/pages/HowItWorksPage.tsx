@@ -136,7 +136,7 @@ const HowItWorksPage = () => {
                 </Button>
               </Link>
               <Link to="/categories">
-                <Button size="lg" variant="outline" className="border-white hover:bg-rental-600 w-full sm:w-auto text-gray-50">
+                <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100 w-full sm:w-auto">
                   Ver Categorías
                 </Button>
               </Link>
