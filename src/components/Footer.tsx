@@ -12,17 +12,7 @@ const Footer = () => {
               Alquila productos de alta calidad para cualquier ocasión. Ofrecemos una amplia 
               selección de artículos a precios asequibles con opciones convenientes de entrega y recogida.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-rental-300">
-                <Facebook size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-rental-300">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-rental-300">
-                <Instagram size={20} />
-              </a>
-            </div>
+            
           </div>
 
           {/* Quick Links */}
