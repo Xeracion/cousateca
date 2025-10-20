@@ -41,19 +41,26 @@ export const useAdminAuth = () => {
     checkUser();
     
     // Auth state change listener
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setIsLoggedIn(true);
         
-        // Check admin role from user_roles table
-        const { data: userRole } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
-        
-        setIsAdmin(!!userRole);
+        // Defer the admin role check to prevent deadlock
+        setTimeout(async () => {
+          try {
+            const { data: userRole } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id)
+              .eq('role', 'admin')
+              .maybeSingle();
+            
+            setIsAdmin(!!userRole);
+          } catch (error) {
+            console.error("Error checking admin role:", error);
+            setIsAdmin(false);
+          }
+        }, 0);
       } else if (event === 'SIGNED_OUT') {
         setIsLoggedIn(false);
         setIsAdmin(false);
