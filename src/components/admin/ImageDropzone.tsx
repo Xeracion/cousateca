@@ -6,14 +6,19 @@ interface ImageDropzoneProps {
   onFilesSelected: (files: File[]) => void;
   accept?: string;
   maxFiles?: number;
+  maxFileSize?: number; // in MB
+  currentFileCount?: number;
 }
 
 const ImageDropzone = ({ 
   onFilesSelected, 
   accept = "image/jpeg,image/png",
-  maxFiles = 10 
+  maxFiles = 10,
+  maxFileSize = 5, // 5MB default
+  currentFileCount = 0
 }: ImageDropzoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [error, setError] = useState<string>('');
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -32,34 +37,61 @@ const ImageDropzone = ({
     e.stopPropagation();
   }, []);
 
+  const validateAndSelectFiles = useCallback((files: File[]) => {
+    setError('');
+    
+    // Check remaining slots
+    const remainingSlots = maxFiles - currentFileCount;
+    if (remainingSlots <= 0) {
+      setError(`Ya has alcanzado el límite de ${maxFiles} imágenes`);
+      return;
+    }
+
+    // Filter valid file types
+    const validFiles = files.filter(file => 
+      file.type === 'image/jpeg' || file.type === 'image/png'
+    );
+
+    if (validFiles.length === 0) {
+      setError('Solo se permiten archivos JPG y PNG');
+      return;
+    }
+
+    // Check file sizes
+    const maxSizeBytes = maxFileSize * 1024 * 1024;
+    const oversizedFiles = validFiles.filter(file => file.size > maxSizeBytes);
+    
+    if (oversizedFiles.length > 0) {
+      setError(`Algunas imágenes superan el límite de ${maxFileSize}MB`);
+      return;
+    }
+
+    // Limit to available slots
+    const filesToUpload = validFiles.slice(0, remainingSlots);
+    
+    if (filesToUpload.length < validFiles.length) {
+      setError(`Solo puedes agregar ${remainingSlots} imagen(es) más`);
+    }
+
+    onFilesSelected(filesToUpload);
+  }, [onFilesSelected, maxFiles, maxFileSize, currentFileCount]);
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
 
     const files = Array.from(e.dataTransfer.files);
-    const validFiles = files.filter(file => 
-      file.type === 'image/jpeg' || file.type === 'image/png'
-    );
-
-    if (validFiles.length > 0) {
-      onFilesSelected(validFiles.slice(0, maxFiles));
-    }
-  }, [onFilesSelected, maxFiles]);
+    validateAndSelectFiles(files);
+  }, [validateAndSelectFiles]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const validFiles = files.filter(file => 
-      file.type === 'image/jpeg' || file.type === 'image/png'
-    );
-
-    if (validFiles.length > 0) {
-      onFilesSelected(validFiles.slice(0, maxFiles));
-    }
+    validateAndSelectFiles(files);
     
     // Reset input
     e.target.value = '';
-  }, [onFilesSelected, maxFiles]);
+  }, [validateAndSelectFiles]);
 
   return (
     <div
@@ -111,7 +143,20 @@ const ImageDropzone = ({
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="px-2 py-1 bg-accent rounded">JPG</span>
           <span className="px-2 py-1 bg-accent rounded">PNG</span>
+          <span className="px-2 py-1 bg-accent rounded">Max {maxFileSize}MB</span>
         </div>
+        
+        {currentFileCount > 0 && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {currentFileCount} de {maxFiles} imágenes agregadas
+          </p>
+        )}
+        
+        {error && (
+          <p className="text-xs text-destructive mt-2 font-medium">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );

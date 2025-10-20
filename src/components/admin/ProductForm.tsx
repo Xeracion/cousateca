@@ -8,10 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, X, Image as ImageIcon } from "lucide-react";
+import { Loader2, X, Image as ImageIcon, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ImageDropzone from "./ImageDropzone";
+import { useImageUpload } from "@/hooks/useImageUpload";
 
 interface ProductFormProps {
   product?: any;
@@ -28,10 +29,11 @@ const getPlaceholderImage = (name: string) => {
 
 const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormProps) => {
   const [loading, setLoading] = useState(false);
-  const [uploadingImages, setUploadingImages] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  
+  const { uploadStatus, uploadProgress, uploadImages: uploadImagesHook } = useImageUpload();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -89,39 +91,10 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
   const uploadImages = async (): Promise<string[]> => {
     if (imageFiles.length === 0) return imageUrls;
 
-    setUploadingImages(true);
-    const uploadedUrls: string[] = [];
-
-    try {
-      for (const file of imageFiles) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-        const filePath = `products/${fileName}`;
-
-        const { error: uploadError, data } = await supabase.storage
-          .from('Imagenes')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          toast.error(`Error al subir ${file.name}: ${uploadError.message}`);
-          continue;
-        }
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('Imagenes')
-          .getPublicUrl(filePath);
-
-        uploadedUrls.push(publicUrl);
-      }
-
-      return [...imageUrls.filter(url => !url.startsWith('blob:')), ...uploadedUrls];
-    } finally {
-      setUploadingImages(false);
-    }
+    const uploadedUrls = await uploadImagesHook(imageFiles);
+    
+    // Combine existing URLs with newly uploaded ones
+    return [...imageUrls.filter(url => !url.startsWith('blob:')), ...uploadedUrls];
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -378,9 +351,36 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
           <div className="space-y-4">
             <ImageDropzone 
               onFilesSelected={handleFilesSelected}
-              accept="image/jpeg,image/png"
               maxFiles={10}
+              maxFileSize={5}
+              currentFileCount={imagePreviews.length}
             />
+            
+            {/* Upload progress indicator */}
+            {uploadStatus === 'uploading' && uploadProgress.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <p className="text-sm font-medium">Subiendo imágenes...</p>
+                {uploadProgress.map((progress, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-sm">
+                    {progress.status === 'uploading' && (
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    )}
+                    {progress.status === 'success' && (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    )}
+                    {progress.status === 'error' && (
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                    )}
+                    <span className={progress.status === 'error' ? 'text-destructive' : ''}>
+                      {progress.fileName}
+                    </span>
+                    {progress.error && (
+                      <span className="text-xs text-destructive">({progress.error})</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Vista previa de imágenes */}
             {imagePreviews.length > 0 && (
@@ -428,11 +428,11 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
         <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={loading || uploadingImages}>
-          {loading || uploadingImages ? (
+        <Button type="submit" disabled={loading || uploadStatus === 'uploading'}>
+          {loading || uploadStatus === 'uploading' ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {uploadingImages ? 'Subiendo imágenes...' : (product?.id ? 'Actualizando...' : 'Creando...')}
+              {uploadStatus === 'uploading' ? 'Subiendo imágenes...' : (product?.id ? 'Actualizando...' : 'Creando...')}
             </>
           ) : (
             product?.id ? 'Actualizar Producto' : 'Crear Producto'
