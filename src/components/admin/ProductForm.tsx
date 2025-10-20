@@ -8,9 +8,10 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, X, Upload, Image as ImageIcon } from "lucide-react";
+import { Loader2, X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ImageDropzone from "./ImageDropzone";
 
 interface ProductFormProps {
   product?: any;
@@ -53,9 +54,7 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
     }
   }, [product]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    
+  const handleFilesSelected = (files: File[]) => {
     // Validar tipo de archivo
     const validFiles = files.filter(file => {
       const isValid = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -377,23 +376,11 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Label 
-                htmlFor="image-upload" 
-                className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-              >
-                <Upload className="h-4 w-4" />
-                Subir Imágenes (JPG/PNG)
-              </Label>
-              <Input
-                id="image-upload"
-                type="file"
-                accept="image/jpeg,image/png"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </div>
+            <ImageDropzone 
+              onFilesSelected={handleFilesSelected}
+              accept="image/jpeg,image/png"
+              maxFiles={10}
+            />
 
             {/* Vista previa de imágenes */}
             {imagePreviews.length > 0 && (
