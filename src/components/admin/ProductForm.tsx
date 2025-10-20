@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, X, Eye, AlertCircle, CheckCircle } from "lucide-react";
+import { Loader2, X, Upload, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -19,18 +19,6 @@ interface ProductFormProps {
   onCancel: () => void;
 }
 
-// Función para validar URLs de imágenes
-const isValidImageUrl = (url: string): boolean => {
-  if (!url || url.trim() === '') return false;
-  
-  try {
-    new URL(url);
-    return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
-  } catch {
-    return false;
-  }
-};
-
 // Función para generar URL de placeholder
 const getPlaceholderImage = (name: string) => {
   const encodedName = encodeURIComponent(name || 'Producto');
@@ -39,8 +27,10 @@ const getPlaceholderImage = (name: string) => {
 
 const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormProps) => {
   const [loading, setLoading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>(['']);
-  const [imageLoadStates, setImageLoadStates] = useState<{ [key: string]: 'loading' | 'success' | 'error' }>({});
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -58,62 +48,80 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
 
   useEffect(() => {
     if (product?.imagenes && Array.isArray(product.imagenes)) {
-      const validImages = product.imagenes.filter(isValidImageUrl);
-      if (validImages.length > 0) {
-        setImageUrls([...validImages, '']);
-      } else {
-        setImageUrls([getPlaceholderImage(product.nombre)]);
-      }
+      setImageUrls(product.imagenes);
+      setImagePreviews(product.imagenes);
     }
   }, [product]);
 
-  // Validar imagen cuando se actualiza la URL
-  const validateImage = (url: string, index: number) => {
-    if (!url || url.trim() === '') {
-      setImageLoadStates(prev => {
-        const newState = { ...prev };
-        delete newState[`${index}-${url}`];
-        return newState;
-      });
-      return;
-    }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    // Validar tipo de archivo
+    const validFiles = files.filter(file => {
+      const isValid = file.type === 'image/jpeg' || file.type === 'image/png';
+      if (!isValid) {
+        toast.error(`El archivo ${file.name} no es JPG o PNG`);
+      }
+      return isValid;
+    });
 
-    const key = `${index}-${url}`;
-    setImageLoadStates(prev => ({ ...prev, [key]: 'loading' }));
+    if (validFiles.length === 0) return;
 
-    const img = new Image();
-    img.onload = () => {
-      setImageLoadStates(prev => ({ ...prev, [key]: 'success' }));
-    };
-    img.onerror = () => {
-      setImageLoadStates(prev => ({ ...prev, [key]: 'error' }));
-    };
-    img.src = url;
+    // Crear previews
+    const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+    
+    setImageFiles(prev => [...prev, ...validFiles]);
+    setImagePreviews(prev => [...prev, ...newPreviews]);
   };
 
-  const handleImageUrlChange = (index: number, value: string) => {
-    const newUrls = [...imageUrls];
-    newUrls[index] = value;
-    
-    if (index === newUrls.length - 1 && value.trim() !== '') {
-      newUrls.push('');
-    }
-    
-    if (index < newUrls.length - 1 && value.trim() === '' && newUrls.length > 1) {
-      newUrls.splice(index, 1);
-    }
-    
-    setImageUrls(newUrls);
-    
-    if (value.trim() !== '') {
-      validateImage(value, index);
-    }
+  const removeImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => {
+      const newPreviews = prev.filter((_, i) => i !== index);
+      // Revocar la URL del preview para liberar memoria
+      if (prev[index] && prev[index].startsWith('blob:')) {
+        URL.revokeObjectURL(prev[index]);
+      }
+      return newPreviews;
+    });
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
-  const removeImageUrl = (index: number) => {
-    if (imageUrls.length > 1) {
-      const newUrls = imageUrls.filter((_, i) => i !== index);
-      setImageUrls(newUrls);
+  const uploadImages = async (): Promise<string[]> => {
+    if (imageFiles.length === 0) return imageUrls;
+
+    setUploadingImages(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (const file of imageFiles) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+        const filePath = `products/${fileName}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('Imagenes')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          toast.error(`Error al subir ${file.name}: ${uploadError.message}`);
+          continue;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('Imagenes')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      return [...imageUrls.filter(url => !url.startsWith('blob:')), ...uploadedUrls];
+    } finally {
+      setUploadingImages(false);
     }
   };
 
@@ -132,17 +140,22 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
       return;
     }
 
+    if (imagePreviews.length === 0) {
+      toast.error('Debes subir al menos una imagen del producto');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Filtrar URLs vacías y generar placeholder si es necesario
-      const validImageUrls = imageUrls
-        .filter(url => url.trim() !== '')
-        .filter(isValidImageUrl);
+      // Subir imágenes nuevas
+      const finalImageUrls = await uploadImages();
       
-      const finalImageUrls = validImageUrls.length > 0 
-        ? validImageUrls 
-        : [getPlaceholderImage(formData.nombre)];
+      if (finalImageUrls.length === 0) {
+        toast.error('No se pudo subir ninguna imagen');
+        setLoading(false);
+        return;
+      }
 
       const productData = {
         ...formData,
@@ -210,19 +223,6 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
     } finally {
       setLoading(false);
     }
-  };
-
-  const getImageStatus = (url: string, index: number) => {
-    if (!url || url.trim() === '') return null;
-    
-    const key = `${index}-${url}`;
-    const state = imageLoadStates[key];
-    
-    if (state === 'loading') return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
-    if (state === 'success') return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (state === 'error') return <AlertCircle className="h-4 w-4 text-red-500" />;
-    
-    return null;
   };
 
   return (
@@ -377,62 +377,61 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {imageUrls.map((url, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div className="flex-1">
-                  <Input
-                    value={url}
-                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                    placeholder="URL de la imagen"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  {getImageStatus(url, index)}
-                  {url && isValidImageUrl(url) && (
-                    <Eye 
-                      className="h-4 w-4 text-blue-500 cursor-pointer hover:text-blue-700" 
-                      onClick={() => window.open(url, '_blank')}
+            <div className="flex items-center gap-2">
+              <Label 
+                htmlFor="image-upload" 
+                className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              >
+                <Upload className="h-4 w-4" />
+                Subir Imágenes (JPG/PNG)
+              </Label>
+              <Input
+                id="image-upload"
+                type="file"
+                accept="image/jpeg,image/png"
+                multiple
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+
+            {/* Vista previa de imágenes */}
+            {imagePreviews.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative group">
+                    <img 
+                      src={preview} 
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-32 object-cover rounded border"
                     />
-                  )}
-                  {imageUrls.length > 1 && (
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="destructive"
                       size="icon"
-                      onClick={() => removeImageUrl(index)}
-                      className="h-8 w-8"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <X className="h-4 w-4" />
                     </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-            
-            {/* Vista previa de imágenes válidas */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
-              {imageUrls
-                .filter(url => url && isValidImageUrl(url))
-                .slice(0, 4)
-                .map((url, index) => (
-                  <div key={index} className="relative">
-                    <img 
-                      src={url} 
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-20 object-cover rounded border"
-                      onError={(e) => {
-                        e.currentTarget.src = getPlaceholderImage(formData.nombre);
-                      }}
-                    />
                     <Badge 
                       variant="secondary" 
-                      className="absolute top-1 right-1 text-xs"
+                      className="absolute bottom-2 left-2 text-xs"
                     >
                       {index + 1}
                     </Badge>
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
+
+            {imagePreviews.length === 0 && (
+              <div className="border-2 border-dashed rounded-lg p-8 text-center text-muted-foreground">
+                <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No hay imágenes cargadas</p>
+                <p className="text-sm">Sube al menos una imagen JPG o PNG</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -442,11 +441,11 @@ const ProductForm = ({ product, categories, onSuccess, onCancel }: ProductFormPr
         <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={loading}>
-          {loading ? (
+        <Button type="submit" disabled={loading || uploadingImages}>
+          {loading || uploadingImages ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {product?.id ? 'Actualizando...' : 'Creando...'}
+              {uploadingImages ? 'Subiendo imágenes...' : (product?.id ? 'Actualizando...' : 'Creando...')}
             </>
           ) : (
             product?.id ? 'Actualizar Producto' : 'Crear Producto'
