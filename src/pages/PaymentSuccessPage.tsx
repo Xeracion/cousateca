@@ -68,7 +68,9 @@ const PaymentSuccessPage = () => {
       }
       
       // If we get here, all retries failed but payment was successful
-      toast.info('Tu pago se completó correctamente. Las reservas pueden tardar unos minutos en aparecer.');
+      console.warn('Payment completed but reservations not found after all retries');
+      toast.warning('Tu pago se completó correctamente. Si no ves tus reservas en unos minutos, contacta con soporte.');
+      setError('no_reservations');
       setLoading(false);
     };
 
@@ -88,6 +90,49 @@ const PaymentSuccessPage = () => {
                 </div>
                 <h1 className="text-2xl font-bold mb-2">Verificando tu pago...</h1>
                 <p className="text-gray-600">Por favor espera mientras confirmamos tu reserva</p>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error === 'no_reservations') {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow bg-gray-50 py-10">
+          <div className="container mx-auto px-4">
+            <Card className="max-w-lg mx-auto">
+              <CardContent className="p-8 text-center">
+                <div className="flex justify-center mb-6">
+                  <CheckCircle2 className="h-16 w-16 text-yellow-500" />
+                </div>
+                <h1 className="text-2xl font-bold mb-2">Pago Completado</h1>
+                <p className="text-gray-600 mb-4">
+                  Tu pago se ha procesado correctamente. Tus reservas están siendo creadas y aparecerán en tu perfil en unos minutos.
+                </p>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-gray-700">
+                    Si las reservas no aparecen en 5 minutos, por favor contacta con soporte indicando este ID de sesión:
+                  </p>
+                  <p className="font-mono text-xs break-all mt-2 text-gray-600">{sessionId}</p>
+                </div>
+                <div className="space-y-3">
+                  <Link to="/profile">
+                    <Button className="w-full bg-rental-500 hover:bg-rental-600">
+                      Ver Mi Perfil
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link to="/">
+                    <Button variant="outline" className="w-full">
+                      Volver al Inicio
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           </div>

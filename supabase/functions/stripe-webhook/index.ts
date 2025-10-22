@@ -12,6 +12,7 @@ serve(async (req) => {
   const signature = req.headers.get('Stripe-Signature');
 
   if (!signature) {
+    console.error('No Stripe signature header found');
     return new Response('No signature', { status: 400 });
   }
 
@@ -20,9 +21,12 @@ serve(async (req) => {
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
     if (!webhookSecret) {
-      console.error('Webhook secret not configured');
+      console.error('STRIPE_WEBHOOK_SECRET not configured');
       return new Response('Webhook secret not configured', { status: 500 });
     }
+
+    console.log('Webhook secret configured:', webhookSecret.substring(0, 10) + '...');
+    console.log('Signature header:', signature.substring(0, 20) + '...');
 
     const event = await stripe.webhooks.constructEventAsync(
       body,
@@ -32,6 +36,7 @@ serve(async (req) => {
       cryptoProvider
     );
 
+    console.log('✅ Webhook signature verified successfully');
     console.log('Received webhook event:', event.type);
 
     if (event.type === 'checkout.session.completed') {
@@ -69,7 +74,7 @@ serve(async (req) => {
 
         const totalPrice = Number(product.precio_diario) * item.rentalDays + Number(product.deposito || 0);
 
-        const { error: reservationError } = await supabaseClient
+        const { data: reservationData, error: reservationError } = await supabaseClient
           .from('reservas')
           .insert({
             usuario_id: userId,
@@ -79,12 +84,18 @@ serve(async (req) => {
             precio_total: totalPrice,
             stripe_session_id: session.id,
             estado: 'pendiente'
-          });
+          })
+          .select();
 
         if (reservationError) {
-          console.error('Error creating reservation:', reservationError);
+          console.error('❌ Error creating reservation:', reservationError);
         } else {
-          console.log('Reservation created for product:', item.productId);
+          console.log('✅ Reservation created successfully:', {
+            reservationId: reservationData?.[0]?.id,
+            productId: item.productId,
+            userId: userId,
+            sessionId: session.id
+          });
         }
       }
     }
