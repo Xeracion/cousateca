@@ -32,27 +32,43 @@ const PaymentSuccessPage = () => {
       // Clear the cart
       clearCart();
       
-      // Give the webhook some time to process (2 seconds)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Retry logic: try to verify reservations multiple times
+      const maxRetries = 3;
+      const delayBetweenRetries = 3000; // 3 seconds
       
-      // Verify reservations were created
-      try {
-        const { data: reservations, error: reservationsError } = await supabase
-          .from('reservas')
-          .select('*')
-          .eq('stripe_session_id', session_id);
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        // Wait before checking (5 seconds on first attempt, 3 seconds on retries)
+        await new Promise(resolve => setTimeout(resolve, attempt === 1 ? 5000 : delayBetweenRetries));
+        
+        try {
+          const { data: reservations, error: reservationsError } = await supabase
+            .from('reservas')
+            .select('*')
+            .eq('stripe_session_id', session_id);
 
-        if (reservationsError) {
-          console.error('Error verifying reservations:', reservationsError);
-          toast.error('Hubo un problema al verificar tu reserva');
-        } else if (reservations && reservations.length > 0) {
-          setReservationCount(reservations.length);
-          toast.success(`${reservations.length} reserva(s) creada(s) exitosamente`);
+          if (reservationsError) {
+            console.error('Error verifying reservations:', reservationsError);
+            if (attempt === maxRetries) {
+              toast.error('Hubo un problema al verificar tu reserva. Por favor, contacta con soporte.');
+            }
+          } else if (reservations && reservations.length > 0) {
+            setReservationCount(reservations.length);
+            toast.success(`${reservations.length} reserva(s) creada(s) exitosamente`);
+            setLoading(false);
+            return; // Exit successfully
+          } else if (attempt < maxRetries) {
+            console.log(`Attempt ${attempt}: No reservations found yet, retrying...`);
+          }
+        } catch (err) {
+          console.error('Error:', err);
+          if (attempt === maxRetries) {
+            toast.error('Error al verificar tu reserva. Por favor, verifica tus reservas en tu perfil.');
+          }
         }
-      } catch (err) {
-        console.error('Error:', err);
       }
       
+      // If we get here, all retries failed but payment was successful
+      toast.info('Tu pago se completó correctamente. Las reservas pueden tardar unos minutos en aparecer.');
       setLoading(false);
     };
 
