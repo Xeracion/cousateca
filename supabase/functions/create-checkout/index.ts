@@ -1,147 +1,150 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@12.1.1?target=deno";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.21.0";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from 'https://esm.sh/stripe@14.21.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // 1. AUTHENTICATION: Require authenticated user
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Authentication required');
-    }
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    );
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
-    
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
+    // Verify user authentication
+    const {
+      data: { user },
+      error: userError
+    } = await supabaseClient.auth.getUser();
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
-      throw new Error('Invalid authentication');
+      console.error('Authentication error:', userError);
+      throw new Error('No autenticado');
     }
 
-    // 2. INPUT VALIDATION: Parse and validate request body
-    const requestBody = await req.json();
-    const { cartItems, customerEmail } = requestBody;
+    const { cartItems, customerEmail } = await req.json();
 
-    // Validate cartItems structure
+    console.log('Processing checkout for user:', user.id);
+    console.log('Cart items:', JSON.stringify(cartItems, null, 2));
+
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
-      throw new Error('Cart items must be a non-empty array');
+      throw new Error('El carrito está vacío');
     }
 
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!customerEmail || !emailRegex.test(customerEmail) || customerEmail.length > 255) {
-      throw new Error('Invalid email address');
-    }
-
-    // 3. FETCH PRICES FROM DATABASE (don't trust client)
-    const lineItems = [];
+    // Validate cart items structure
     for (const item of cartItems) {
-      // Validate item structure
-      if (!item.productId || typeof item.productId !== 'string') {
-        throw new Error('Invalid product ID format');
+      if (!item.productId || !item.rentalDays || !item.startDate || !item.endDate) {
+        console.error('Invalid item:', item);
+        throw new Error('Formato de items del carrito inválido');
       }
-      if (!item.rentalDays || typeof item.rentalDays !== 'number' || item.rentalDays < 1 || item.rentalDays > 365) {
-        throw new Error('Rental days must be between 1 and 365');
-      }
+    }
 
-      // Fetch product from database to get actual price
-      const { data: product, error: productError } = await supabase
-        .from('productos')
-        .select('id, nombre, precio_diario, imagenes, deposito')
-        .eq('id', item.productId)
-        .single();
+    // Fetch product prices from database
+    const productIds = cartItems.map((item: any) => item.productId);
+    const { data: products, error: productsError } = await supabaseClient
+      .from('productos')
+      .select('id, nombre, precio_diario, deposito')
+      .in('id', productIds);
 
-      if (productError || !product) {
-        throw new Error(`Product not found: ${item.productId}`);
+    if (productsError) {
+      console.error('Error fetching products:', productsError);
+      throw new Error('Error al obtener información de productos');
+    }
+
+    if (!products || products.length === 0) {
+      throw new Error('No se encontraron productos');
+    }
+
+    console.log('Products fetched:', products);
+
+    // Create line items for Stripe
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+
+    for (const item of cartItems) {
+      const product = products.find((p: any) => p.id === item.productId);
+      if (!product) {
+        throw new Error(`Producto no encontrado: ${item.productId}`);
       }
 
       // Add rental price line item
       const rentalAmount = Math.round(Number(product.precio_diario) * item.rentalDays * 100);
+      console.log(`Adding rental for ${product.nombre}: ${rentalAmount} cents`);
+      
       lineItems.push({
         price_data: {
-          currency: "eur",
+          currency: 'eur',
           product_data: {
             name: `${product.nombre} - Alquiler`,
             description: `${item.rentalDays} días de alquiler`,
-            images: product.imagenes ? [product.imagenes[0]] : []
           },
           unit_amount: rentalAmount,
-          tax_behavior: "exclusive",
         },
-        quantity: 1
+        quantity: 1,
       });
 
       // Add deposit line item if deposit exists
       if (product.deposito && Number(product.deposito) > 0) {
         const depositAmount = Math.round(Number(product.deposito) * 100);
+        console.log(`Adding deposit for ${product.nombre}: ${depositAmount} cents`);
+        
         lineItems.push({
           price_data: {
-            currency: "eur",
+            currency: 'eur',
             product_data: {
               name: `${product.nombre} - Fianza`,
               description: 'Depósito de seguridad (reembolsable)',
             },
             unit_amount: depositAmount,
-            tax_behavior: "exclusive",
           },
-          quantity: 1
+          quantity: 1,
         });
       }
     }
 
-    // 4. Initialize Stripe and create checkout session
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2022-11-15",
+    console.log('Total line items:', lineItems.length);
+
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
     });
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ['card'],
       line_items: lineItems,
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/cart`,
+      mode: 'payment',
+      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get('origin')}/cart`,
       customer_email: customerEmail,
       metadata: {
-        user_id: user.id,
-        cart_items: JSON.stringify(cartItems.map(item => ({
-          productId: item.productId,
-          rentalDays: item.rentalDays,
-          startDate: item.startDate,
-          endDate: item.endDate
-        })))
-      }
+        userId: user.id,
+        cartItems: JSON.stringify(cartItems),
+      },
     });
 
-    console.log(`Checkout session created for user ${user.id}: ${session.id}`);
+    console.log('Stripe session created:', session.id);
 
-    return new Response(
-      JSON.stringify({ url: session.url }),
-      { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200 
-      }
-    );
+    return new Response(JSON.stringify({ url: session.url }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   } catch (error) {
-    console.error('Create checkout error:', error);
+    console.error('Error in create-checkout function:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Internal server error' }),
-      { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: error.message?.includes('Authentication') || error.message?.includes('Invalid') ? 401 : 400
+      JSON.stringify({ error: error.message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
       }
     );
   }
