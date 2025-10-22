@@ -1,29 +1,110 @@
-
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/context/CartContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const { clearCart } = useCart();
-  const [orderNumber, setOrderNumber] = useState("");
+  const [sessionId, setSessionId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reservationCount, setReservationCount] = useState(0);
   
   useEffect(() => {
-    // Clear the cart after successful payment
-    clearCart();
-    
-    // Generate a random order number for display
-    const randomOrderNumber = Math.floor(10000000 + Math.random() * 90000000).toString();
-    setOrderNumber(randomOrderNumber);
-    
-    // In a real implementation, you would verify the session with Stripe
-    // and retrieve the order details from your database
-  }, [clearCart]);
+    const verifyPayment = async () => {
+      const session_id = searchParams.get("session_id");
+      
+      if (!session_id) {
+        setError("No se encontró información de la sesión de pago");
+        setLoading(false);
+        return;
+      }
+
+      setSessionId(session_id);
+      
+      // Clear the cart
+      clearCart();
+      
+      // Give the webhook some time to process (2 seconds)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Verify reservations were created
+      try {
+        const { data: reservations, error: reservationsError } = await supabase
+          .from('reservas')
+          .select('*')
+          .eq('stripe_session_id', session_id);
+
+        if (reservationsError) {
+          console.error('Error verifying reservations:', reservationsError);
+          toast.error('Hubo un problema al verificar tu reserva');
+        } else if (reservations && reservations.length > 0) {
+          setReservationCount(reservations.length);
+          toast.success(`${reservations.length} reserva(s) creada(s) exitosamente`);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+      }
+      
+      setLoading(false);
+    };
+
+    verifyPayment();
+  }, [clearCart, searchParams]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow bg-gray-50 py-10">
+          <div className="container mx-auto px-4">
+            <Card className="max-w-lg mx-auto">
+              <CardContent className="p-8 text-center">
+                <div className="flex justify-center mb-6">
+                  <Loader2 className="h-16 w-16 text-rental-500 animate-spin" />
+                </div>
+                <h1 className="text-2xl font-bold mb-2">Verificando tu pago...</h1>
+                <p className="text-gray-600">Por favor espera mientras confirmamos tu reserva</p>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow bg-gray-50 py-10">
+          <div className="container mx-auto px-4">
+            <Card className="max-w-lg mx-auto">
+              <CardContent className="p-8 text-center">
+                <div className="flex justify-center mb-6">
+                  <AlertCircle className="h-16 w-16 text-red-500" />
+                </div>
+                <h1 className="text-2xl font-bold mb-2">Error</h1>
+                <p className="text-gray-600 mb-6">{error}</p>
+                <Link to="/">
+                  <Button className="w-full bg-rental-500 hover:bg-rental-600">Volver al Inicio</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -38,12 +119,12 @@ const PaymentSuccessPage = () => {
               
               <h1 className="text-2xl font-bold mb-2">¡Pago Completado!</h1>
               <p className="text-gray-600 mb-6">
-                Tu reserva ha sido procesada correctamente. Te hemos enviado un correo electrónico con los detalles.
+                Tu pago ha sido procesado correctamente. {reservationCount > 0 ? `Se han creado ${reservationCount} reserva(s).` : ''} Te hemos enviado un correo electrónico con los detalles.
               </p>
               
               <div className="bg-gray-50 p-4 rounded-md mb-6">
-                <p className="text-sm text-gray-500 mb-1">Número de Orden</p>
-                <p className="font-mono text-lg font-medium">{orderNumber}</p>
+                <p className="text-sm text-gray-500 mb-1">ID de Sesión</p>
+                <p className="font-mono text-sm break-all">{sessionId}</p>
               </div>
               
               <div className="space-y-4">

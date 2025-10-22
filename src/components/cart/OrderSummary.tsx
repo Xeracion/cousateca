@@ -28,22 +28,35 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      let email = user?.email;
       
-      if (!email) {
-        email = "guest@example.com";
+      if (!user) {
+        toast.error('Debes iniciar sesión para proceder con el pago');
+        setLoading(false);
+        return;
       }
+      
+      // Transform cart items to the format expected by the edge function
+      const cartItems = items.map(item => ({
+        productId: item.product.id,
+        rentalDays: item.rentalDays,
+        startDate: item.startDate.toISOString(),
+        endDate: item.endDate.toISOString()
+      }));
       
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
-          cartItems: items,
-          customerEmail: email
+          cartItems,
+          customerEmail: user.email
         }
       });
       
       if (error) throw error;
       
-      window.location.href = data.url;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No se recibió URL de checkout');
+      }
       
     } catch (error) {
       console.error('Error during checkout:', error);

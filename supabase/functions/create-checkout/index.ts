@@ -69,20 +69,38 @@ serve(async (req) => {
         throw new Error(`Product not found: ${item.productId}`);
       }
 
-      // Use server-side price, not client-provided price
+      // Add rental price line item
+      const rentalAmount = Math.round(Number(product.precio_diario) * item.rentalDays * 100);
       lineItems.push({
         price_data: {
           currency: "eur",
           product_data: {
-            name: product.nombre,
-            description: `Alquiler por ${item.rentalDays} días`,
+            name: `${product.nombre} - Alquiler`,
+            description: `${item.rentalDays} días de alquiler`,
             images: product.imagenes ? [product.imagenes[0]] : []
           },
-          unit_amount: Math.round(product.precio_diario * 100), // Server price only
+          unit_amount: rentalAmount,
           tax_behavior: "exclusive",
         },
-        quantity: item.rentalDays
+        quantity: 1
       });
+
+      // Add deposit line item if deposit exists
+      if (product.deposito && Number(product.deposito) > 0) {
+        const depositAmount = Math.round(Number(product.deposito) * 100);
+        lineItems.push({
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: `${product.nombre} - Fianza`,
+              description: 'Depósito de seguridad (reembolsable)',
+            },
+            unit_amount: depositAmount,
+            tax_behavior: "exclusive",
+          },
+          quantity: 1
+        });
+      }
     }
 
     // 4. Initialize Stripe and create checkout session
@@ -94,14 +112,16 @@ serve(async (req) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/cart`,
       customer_email: customerEmail,
       metadata: {
         user_id: user.id,
         cart_items: JSON.stringify(cartItems.map(item => ({
           productId: item.productId,
-          rentalDays: item.rentalDays
+          rentalDays: item.rentalDays,
+          startDate: item.startDate,
+          endDate: item.endDate
         })))
       }
     });
