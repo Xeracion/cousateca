@@ -286,6 +286,39 @@ const ProductsPanel: React.FC<ProductsPanelProps> = ({
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
+                          {!product.disponible && (
+                            <Button 
+                              variant="default" 
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                              onClick={async () => {
+                                try {
+                                  const { error } = await supabase
+                                    .from('productos')
+                                    .update({ disponible: true })
+                                    .eq('id', product.id);
+                                  
+                                  if (error) throw error;
+                                  
+                                  toast({
+                                    title: "Producto reactivado",
+                                    description: `${product.nombre} ahora está disponible públicamente`
+                                  });
+                                  onProductsChange();
+                                } catch (error: any) {
+                                  toast({
+                                    title: "Error",
+                                    description: error.message,
+                                    variant: "destructive"
+                                  });
+                                }
+                              }}
+                              disabled={isLoading}
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Reactivar
+                            </Button>
+                          )}
                           <Button 
                             variant="outline" 
                             size="sm"

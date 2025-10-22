@@ -43,8 +43,8 @@ const ReservationTable: React.FC<ReservationTableProps> = ({
         ) : (
           reservas.map((r) => (
             <TableRow key={r.id}>
-              <TableCell>{r.usuario_id}</TableCell>
-              <TableCell>{r.producto_id}</TableCell>
+              <TableCell>{r.perfil?.email || r.usuario_id}</TableCell>
+              <TableCell>{r.producto?.nombre || r.producto_id}</TableCell>
               <TableCell>{r.fecha_inicio?.slice(0, 10)}</TableCell>
               <TableCell>{r.fecha_fin?.slice(0, 10) || r.fecha_fin_prevista?.slice(0, 10)}</TableCell>
               <TableCell>{r.precio_total || "-"}</TableCell>

@@ -27,12 +27,13 @@ const ReservationsPanel = () => {
       if (productsError) throw productsError;
       setProducts(productsData || []);
       
-      // Cargar reservas con información de productos
+      // Cargar reservas con información de productos y perfiles (email)
       const { data: reservasData, error: reservasError } = await supabase
         .from('reservas')
         .select(`
           *,
-          producto:producto_id (id, nombre)
+          producto:productos!inner(id, nombre),
+          perfil:perfiles!inner(id, email:id)
         `)
         .order('fecha_inicio', { ascending: false });
       
@@ -53,6 +54,9 @@ const ReservationsPanel = () => {
   // Manejar la actualización de estado de reserva
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
+      // Obtener la reserva para saber el producto_id
+      const reserva = reservas.find(r => r.id === id);
+      
       const { error } = await supabase
         .from('reservas')
         .update({ estado: newStatus })
@@ -60,9 +64,23 @@ const ReservationsPanel = () => {
       
       if (error) throw error;
       
+      // Si la reserva se confirma, ocultar el producto
+      if (newStatus === 'confirmado' && reserva?.producto_id) {
+        const { error: productError } = await supabase
+          .from('productos')
+          .update({ disponible: false })
+          .eq('id', reserva.producto_id);
+        
+        if (productError) {
+          console.error('Error ocultando producto:', productError);
+        }
+      }
+      
       toast({
         title: "Estado actualizado",
-        description: `La reserva ha sido actualizada a: ${newStatus}`
+        description: newStatus === 'confirmado' 
+          ? "La reserva ha sido confirmada y el producto se ha ocultado de la vista pública"
+          : `La reserva ha sido actualizada a: ${newStatus}`
       });
       
       // Recargar datos
