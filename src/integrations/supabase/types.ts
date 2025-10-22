@@ -51,6 +51,7 @@ export type Database = {
         Row: {
           created_at: string | null
           direccion: string | null
+          email: string | null
           id: string
           nombre: string | null
           telefono: string | null
@@ -59,6 +60,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           direccion?: string | null
+          email?: string | null
           id: string
           nombre?: string | null
           telefono?: string | null
@@ -67,6 +69,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           direccion?: string | null
+          email?: string | null
           id?: string
           nombre?: string | null
           telefono?: string | null
@@ -276,10 +279,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin_user: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin_user: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
