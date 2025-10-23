@@ -5,8 +5,6 @@ import { Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartButton } from "./CartButton";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 
 interface MobileNavProps {
   itemCount: number;
@@ -29,10 +27,6 @@ export const MobileNav = ({ itemCount, user, isAdmin, handleLogout }: MobileNavP
           <div className="flex flex-col h-full">
             <div className="mb-8 mt-6">
               <span className="text-xl font-bold text-rental-500">Cousateca</span>
-            </div>
-            <div className="relative w-full mb-6">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-              <Input type="search" placeholder="Buscar productos..." className="pl-8 pr-4 py-2 w-full" />
             </div>
             <nav className="flex flex-col space-y-4">
               <Link to="/" className="text-gray-700 hover:text-rental-500 font-medium py-2">

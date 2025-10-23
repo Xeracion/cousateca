@@ -3,7 +3,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SearchBar } from "./SearchBar";
 import { CartButton } from "./CartButton";
 import { UserDropdownMenu } from "./UserDropdownMenu";
 
@@ -32,9 +31,8 @@ export const DesktopNav = ({ itemCount, user, isAdmin }: DesktopNavProps) => {
         </Link>
       </nav>
 
-      {/* Search, Cart, User (Desktop) */}
+      {/* Cart, User (Desktop) */}
       <div className="hidden md:flex items-center space-x-4">
-        <SearchBar />
         <CartButton itemCount={itemCount} />
         
         {/* User Dropdown Menu */}
