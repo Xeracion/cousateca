@@ -35,6 +35,7 @@ const PaymentSuccessPage = () => {
       // Retry logic: try to verify reservations multiple times
       const maxRetries = 2;
       const delayBetweenRetries = 2000; // 2 seconds
+      let reservationFound = false;
       
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         // Wait before checking (2 seconds on first attempt, 2 seconds on retries)
@@ -53,7 +54,7 @@ const PaymentSuccessPage = () => {
             }
           } else if (reservations && reservations.length > 0) {
             setReservationCount(reservations.length);
-            toast.success(`${reservations.length} reserva(s) creada(s) exitosamente`);
+            reservationFound = true;
             setLoading(false);
             return; // Exit successfully
           } else if (attempt < maxRetries) {
@@ -65,6 +66,11 @@ const PaymentSuccessPage = () => {
             toast.error('Error al verificar tu reserva. Por favor, verifica tus reservas en tu perfil.');
           }
         }
+      }
+      
+      // Show success toast only once after all retries
+      if (reservationFound) {
+        toast.success(`Reserva confirmada exitosamente`);
       }
       
       // If we get here, all retries failed but payment was successful

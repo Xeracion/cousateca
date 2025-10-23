@@ -90,6 +90,8 @@ const UserProfilePage = () => {
   const loadUserData = async (userId: string) => {
     setLoading(true);
     try {
+      console.log('Loading user data for:', userId);
+      
       // Cargar perfil
       const { data: perfilData, error: perfilError } = await supabase
         .from("perfiles")
@@ -97,7 +99,11 @@ const UserProfilePage = () => {
         .eq("id", userId)
         .single();
       
-      if (perfilError) throw perfilError;
+      if (perfilError) {
+        console.error('Error loading profile:', perfilError);
+        throw perfilError;
+      }
+      console.log('Profile loaded:', perfilData);
       setPerfil(perfilData);
       setFormData({
         nombre: perfilData.nombre || "",
@@ -106,6 +112,7 @@ const UserProfilePage = () => {
       });
       
       // Cargar reservas
+      console.log('Loading reservations...');
       const { data: reservasData, error: reservasError } = await supabase
         .from("reservas")
         .select(`
@@ -119,9 +126,14 @@ const UserProfilePage = () => {
         .eq("usuario_id", userId)
         .order("created_at", { ascending: false });
       
-      if (reservasError) throw reservasError;
+      if (reservasError) {
+        console.error('Error loading reservations:', reservasError);
+        throw reservasError;
+      }
+      console.log('Reservations loaded:', reservasData?.length || 0);
       setReservas(reservasData);
     } catch (error: any) {
+      console.error('Error in loadUserData:', error);
       toast({
         title: "Error al cargar datos",
         description: error.message,

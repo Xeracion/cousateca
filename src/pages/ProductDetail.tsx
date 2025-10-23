@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 import { Calendar as CalendarIcon, ChevronRight, Truck, Shield, Clock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { formatCurrency, formatDate, getDefaultEndDate } from "@/lib/utils";
@@ -200,37 +201,77 @@ const ProductDetail = () => {
                 <Separator className="my-6" />
                 
                 <div className="mb-6">
-                  <p className="font-medium mb-2">Selecciona fechas de alquiler</p>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start text-left font-normal">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange?.from ? (
-                          dateRange.to ? (
-                            <>
-                              {format(dateRange.from, "d MMM, yyyy", { locale: es })} -{" "}
-                              {format(dateRange.to, "d MMM, yyyy", { locale: es })}
-                            </>
-                          ) : (
-                            format(dateRange.from, "d MMM, yyyy", { locale: es })
-                          )
-                        ) : (
-                          <span>Selecciona fechas de alquiler</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={dateRange?.from}
-                        selected={dateRange}
-                        onSelect={setDateRange}
-                        numberOfMonths={2}
-                        disabled={(date) => date < new Date()}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <p className="font-medium mb-4">Selecciona fechas de alquiler</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Fecha de recogida */}
+                    <div>
+                      <Label className="text-sm text-gray-600 mb-2 block">Fecha de recogida</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left font-normal">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.from ? (
+                              format(dateRange.from, "d MMM, yyyy", { locale: es })
+                            ) : (
+                              <span>Selecciona fecha</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange?.from}
+                            onSelect={(date) => {
+                              if (date) {
+                                setDateRange({ from: date, to: dateRange?.to });
+                              }
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    {/* Fecha de devolución */}
+                    <div>
+                      <Label className="text-sm text-gray-600 mb-2 block">Fecha de devolución</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start text-left font-normal"
+                            disabled={!dateRange?.from}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.to ? (
+                              format(dateRange.to, "d MMM, yyyy", { locale: es })
+                            ) : (
+                              <span>Selecciona fecha</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange?.to}
+                            onSelect={(date) => {
+                              if (date && dateRange?.from) {
+                                setDateRange({ from: dateRange.from, to: date });
+                              }
+                            }}
+                            disabled={(date) => {
+                              if (!dateRange?.from) return true;
+                              return date <= dateRange.from;
+                            }}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="bg-gray-50 p-4 rounded-md mb-6">
