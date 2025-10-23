@@ -14,7 +14,7 @@ interface CartContextType {
   items: CartItem[];
   addToCart: (item: CartItem) => void;
   removeFromCart: (productId: string) => void;
-  clearCart: () => void;
+  clearCart: (showToast?: boolean) => void;
   totalPrice: number;
   itemCount: number;
 }
@@ -95,9 +95,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.info("Producto eliminado del carrito");
   };
 
-  const clearCart = () => {
+  const clearCart = (showToast = true) => {
     setItems([]);
-    toast.info("Carrito vaciado");
+    if (showToast) {
+      toast.info("Carrito vaciado");
+    }
   };
 
   return (

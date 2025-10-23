@@ -83,7 +83,7 @@ serve(async (req) => {
             fecha_fin: item.endDate,
             precio_total: totalPrice,
             stripe_session_id: session.id,
-            estado: 'pendiente'
+            estado: 'confirmado'
           })
           .select();
 
@@ -96,6 +96,18 @@ serve(async (req) => {
             userId: userId,
             sessionId: session.id
           });
+
+          // Hide product from public catalog
+          const { error: productUpdateError } = await supabaseClient
+            .from('productos')
+            .update({ disponible: false })
+            .eq('id', item.productId);
+
+          if (productUpdateError) {
+            console.error('❌ Error hiding product from catalog:', productUpdateError);
+          } else {
+            console.log('✅ Product hidden from catalog:', item.productId);
+          }
         }
       }
     }

@@ -29,16 +29,16 @@ const PaymentSuccessPage = () => {
 
       setSessionId(session_id);
       
-      // Clear the cart
-      clearCart();
+      // Clear the cart without showing toast
+      clearCart(false);
       
       // Retry logic: try to verify reservations multiple times
-      const maxRetries = 3;
-      const delayBetweenRetries = 3000; // 3 seconds
+      const maxRetries = 2;
+      const delayBetweenRetries = 2000; // 2 seconds
       
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        // Wait before checking (5 seconds on first attempt, 3 seconds on retries)
-        await new Promise(resolve => setTimeout(resolve, attempt === 1 ? 5000 : delayBetweenRetries));
+        // Wait before checking (2 seconds on first attempt, 2 seconds on retries)
+        await new Promise(resolve => setTimeout(resolve, attempt === 1 ? 2000 : delayBetweenRetries));
         
         try {
           const { data: reservations, error: reservationsError } = await supabase
