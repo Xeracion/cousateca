@@ -1,16 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import heroImage from "@/assets/hero-storage.jpg";
 const Hero = () => {
   return <div className="relative overflow-hidden bg-white">
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1600585152915-d208bec867a1?q=80&w=1400&auto=format&fit=crop" 
-          srcSet="https://images.unsplash.com/photo-1600585152915-d208bec867a1?q=80&w=800&auto=format&fit=crop 800w,
-                  https://images.unsplash.com/photo-1600585152915-d208bec867a1?q=80&w=1400&auto=format&fit=crop 1400w,
-                  https://images.unsplash.com/photo-1600585152915-d208bec867a1?q=80&w=1920&auto=format&fit=crop 1920w"
-          sizes="100vw"
-          alt="Trastero doméstico con cajas y objetos del hogar" 
+          src={heroImage}
+          alt="Trastero doméstico organizado con estanterías de madera y objetos del hogar" 
           className="w-full h-full object-cover"
           fetchPriority="high"
         />
