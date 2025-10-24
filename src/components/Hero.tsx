@@ -5,12 +5,12 @@ const Hero = () => {
   return <div className="relative overflow-hidden bg-white">
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1400&auto=format&fit=crop" 
-          srcSet="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=800&auto=format&fit=crop 800w,
-                  https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1400&auto=format&fit=crop 1400w,
-                  https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?q=80&w=1920&auto=format&fit=crop 1920w"
+          src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1400&auto=format&fit=crop" 
+          srcSet="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=800&auto=format&fit=crop 800w,
+                  https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1400&auto=format&fit=crop 1400w,
+                  https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1920&auto=format&fit=crop 1920w"
           sizes="100vw"
-          alt="Hero background" 
+          alt="Trastero lleno de cajas y productos almacenados" 
           className="w-full h-full object-cover"
           fetchPriority="high"
         />
