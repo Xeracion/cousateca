@@ -19,6 +19,7 @@ import AdminPanel from "./pages/AdminPanel";
 import AuthPage from "./pages/AuthPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
