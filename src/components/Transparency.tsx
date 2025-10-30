@@ -48,7 +48,7 @@ const Transparency = () => {
     {
       date: "22 Diciembre 2024",
       title: "Electrónica",
-      description: "Nuevas aspiradoras y equipos de limpieza disponibles"
+      description: "Nuevas cámaras disponibles"
     }
   ];
 
