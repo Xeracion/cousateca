@@ -1,59 +1,46 @@
 import React from "react";
 import { TrendingUp, Package, Users, Calendar } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
 const Transparency = () => {
-  const stats = [
-    {
-      icon: Package,
-      label: "Préstamos Realizados",
-      value: "53",
-      description: "Objetos prestados a la comunidad",
-      trend: "+12 este mes"
-    },
-    {
-      icon: Users,
-      label: "Usuarios Activos",
-      value: "28",
-      description: "Miembros de la comunidad",
-      trend: "+5 nuevos"
-    },
-    {
-      icon: TrendingUp,
-      label: "Tasa de Devolución",
-      value: "98%",
-      description: "Objetos devueltos a tiempo",
-      trend: "Excelente"
-    },
-    {
-      icon: Calendar,
-      label: "Días de Ahorro",
-      value: "340",
-      description: "Días de uso compartido",
-      trend: "Impacto positivo"
-    }
-  ];
-
-  const recentUpdates = [
-    {
-      date: "15 Enero 2025",
-      title: "Nuevas herramientas de jardinería",
-      description: "Añadidas 5 nuevas herramientas para la temporada de primavera"
-    },
-    {
-      date: "8 Enero 2025",
-      title: "Equipamiento deportivo",
-      description: "Incorporados kayaks y material de camping"
-    },
-    {
-      date: "22 Diciembre 2024",
-      title: "Electrónica",
-      description: "Incorporado material de camping"
-    }
-  ];
-
-  return (
-    <section id="transparencia" className="py-16 bg-gradient-to-b from-background to-muted/20">
+  const stats = [{
+    icon: Package,
+    label: "Préstamos Realizados",
+    value: "53",
+    description: "Objetos prestados a la comunidad",
+    trend: "+12 este mes"
+  }, {
+    icon: Users,
+    label: "Usuarios Activos",
+    value: "28",
+    description: "Miembros de la comunidad",
+    trend: "+5 nuevos"
+  }, {
+    icon: TrendingUp,
+    label: "Tasa de Devolución",
+    value: "98%",
+    description: "Objetos devueltos a tiempo",
+    trend: "Excelente"
+  }, {
+    icon: Calendar,
+    label: "Días de Ahorro",
+    value: "340",
+    description: "Días de uso compartido",
+    trend: "Impacto positivo"
+  }];
+  const recentUpdates = [{
+    date: "15 Enero 2025",
+    title: "Nuevas herramientas de jardinería",
+    description: "Añadidas 5 nuevas herramientas para la temporada de primavera"
+  }, {
+    date: "8 Enero 2025",
+    title: "Equipamiento deportivo",
+    description: "Incorporados kayaks y material de camping"
+  }, {
+    date: "22 Diciembre 2024",
+    title: "Electrónica",
+    description: "Incorporado material de camping"
+  }];
+  return <section id="transparencia" className="py-16 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
@@ -67,9 +54,8 @@ const Transparency = () => {
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+          const Icon = stat.icon;
+          return <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     {stat.label}
@@ -87,9 +73,8 @@ const Transparency = () => {
                     {stat.trend}
                   </p>
                 </CardContent>
-              </Card>
-            );
-          })}
+              </Card>;
+        })}
         </div>
 
         {/* Actualizaciones del Catálogo */}
@@ -98,8 +83,7 @@ const Transparency = () => {
             Últimas Actualizaciones del Catálogo
           </h3>
           <div className="space-y-4">
-            {recentUpdates.map((update, index) => (
-              <Card key={index} className="hover:shadow-md transition-shadow">
+            {recentUpdates.map((update, index) => <Card key={index} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -115,8 +99,7 @@ const Transparency = () => {
                     </time>
                   </div>
                 </CardHeader>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
 
@@ -127,19 +110,12 @@ const Transparency = () => {
               <CardTitle className="text-xl">¿Tienes preguntas sobre nuestros datos?</CardTitle>
               <CardDescription>
                 Estamos comprometidos con la transparencia total. Contáctanos en{" "}
-                <a 
-                  href="mailto:info@xeracion.org" 
-                  className="text-primary hover:underline font-medium"
-                >
-                  info@xeracion.org
-                </a>
+                <a href="mailto:info@xeracion.org" className="text-primary hover:underline font-medium">info@cousateca.org</a>
               </CardDescription>
             </CardHeader>
           </Card>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Transparency;
