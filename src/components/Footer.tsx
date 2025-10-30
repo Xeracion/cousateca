@@ -22,9 +22,9 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="/#transparencia" className="text-gray-400 hover:text-rental-300">
+                <Link to="/transparencia" className="text-gray-400 hover:text-rental-300">
                   Transparencia
-                </a>
+                </Link>
               </li>
               <li>
                 <Link to="/categories" className="text-gray-400 hover:text-rental-300">

@@ -20,6 +20,7 @@ import AuthPage from "./pages/AuthPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import TransparencyPage from "./pages/TransparencyPage";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/transparencia" element={<TransparencyPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
