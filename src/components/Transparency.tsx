@@ -47,7 +47,7 @@ const Transparency = () => {
     },
     {
       date: "22 Diciembre 2024",
-      title: "Electrodomésticos",
+      title: "Electrónica",
       description: "Nuevas aspiradoras y equipos de limpieza disponibles"
     }
   ];
