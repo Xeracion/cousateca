@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import Categories from "@/components/Categories";
 import HowItWorks from "@/components/HowItWorks";
+import Transparency from "@/components/Transparency";
 import CallToAction from "@/components/CallToAction";
 
 const Index = () => {
@@ -17,6 +18,7 @@ const Index = () => {
         <FeaturedProducts />
         <Categories />
         <HowItWorks />
+        <Transparency />
         <CallToAction />
       </main>
       <Footer />
