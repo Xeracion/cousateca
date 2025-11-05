@@ -152,25 +152,19 @@ const ProductDetail = () => {
             {/* Product Images */}
             <div>
               <div className="bg-white rounded-lg overflow-hidden mb-4">
-                <Carousel>
-                  <CarouselContent>
-                    {product.imagenes.map((image: string, index: number) => (
-                      <CarouselItem key={index}>
-                        <div className="aspect-square overflow-hidden">
-                          <img src={image} alt={`${product.nombre} - Imagen ${index + 1}`} className="w-full h-full object-cover" />
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious />
-                  <CarouselNext />
-                </Carousel>
+                <div className="aspect-square overflow-hidden">
+                  <img 
+                    src={product.imagenes[activeImage]} 
+                    alt={`${product.nombre} - Imagen ${activeImage + 1}`} 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
               </div>
               <div className="flex space-x-2">
                 {product.imagenes.map((image: string, index: number) => (
                   <div 
                     key={index} 
-                    className={`cursor-pointer border-2 rounded-md overflow-hidden ${activeImage === index ? "border-rental-500" : "border-transparent"}`} 
+                    className={`cursor-pointer border-2 rounded-md overflow-hidden transition-all ${activeImage === index ? "border-rental-500" : "border-gray-300 hover:border-rental-300"}`} 
                     onClick={() => setActiveImage(index)}
                   >
                     <img src={image} alt={`Miniatura ${index + 1}`} className="w-16 h-16 object-cover" />
