@@ -448,7 +448,16 @@ const AuthPage = () => {
                           htmlFor="terms" 
                           className="text-sm leading-tight cursor-pointer"
                         >
-                          Declaro haber leído y aceptado las Condiciones Generales de Alquiler
+                          Declaro haber leído y aceptado las{" "}
+                          <a
+                            href="/condiciones-generales.pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-rental-500 hover:text-rental-600 underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Condiciones Generales de Alquiler
+                          </a>
                         </Label>
                       </div>
                     </CardContent>
