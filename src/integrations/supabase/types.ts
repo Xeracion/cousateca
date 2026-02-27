@@ -190,6 +190,51 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          comentario: string
+          created_at: string
+          id: string
+          nombre: string
+          producto_id: string
+          usuario_id: string
+          valoracion: number
+        }
+        Insert: {
+          comentario: string
+          created_at?: string
+          id?: string
+          nombre: string
+          producto_id: string
+          usuario_id: string
+          valoracion: number
+        }
+        Update: {
+          comentario?: string
+          created_at?: string
+          id?: string
+          nombre?: string
+          producto_id?: string
+          usuario_id?: string
+          valoracion?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "v_catalogo_productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null

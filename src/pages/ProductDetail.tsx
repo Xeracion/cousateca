@@ -18,6 +18,7 @@ import { DateRange } from "react-day-picker";
 import { format, addDays, differenceInDays } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
+import ProductReviews from "@/components/reviews/ProductReviews";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -344,6 +345,9 @@ const ProductDetail = () => {
               </div>
             </div>
           </div>
+
+          {/* Reviews Section */}
+          <ProductReviews productId={product.id} />
         </div>
       </main>
       <Footer />
