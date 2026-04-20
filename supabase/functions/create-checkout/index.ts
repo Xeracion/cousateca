@@ -72,11 +72,21 @@ serve(async (req) => {
     // Create line items for Stripe
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
+    const foundIds = new Set(products.map((p: any) => p.id));
+    const missingIds = cartItems
+      .map((i: any) => i.productId)
+      .filter((id: string) => !foundIds.has(id));
+
+    if (missingIds.length > 0) {
+      console.error('Missing products in cart:', missingIds);
+      throw new Error(
+        `Algunos productos del carrito ya no están disponibles. Por favor, elimínalos e inténtalo de nuevo.`
+      );
+    }
+
     for (const item of cartItems) {
       const product = products.find((p: any) => p.id === item.productId);
-      if (!product) {
-        throw new Error(`Producto no encontrado: ${item.productId}`);
-      }
+      if (!product) continue;
 
       // Add rental price line item
       const rentalAmount = Math.round(Number(product.precio_diario) * item.rentalDays * 100);
