@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from '@/data/products';
 import { useToast } from "@/components/ui/use-toast";
@@ -105,6 +105,7 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const retryCountRef = useRef(0);
   const maxRetries = 3;
 
   const fetchData = async (showLoadingState = true) => {
@@ -196,6 +197,7 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
         const mappedRetryProducts = cleanedRetryData.map(mapSupabaseProductToProduct);
         setProducts(mappedRetryProducts);
         console.log("✅ Productos cargados correctamente tras limpiar sesión:", mappedRetryProducts.length);
+        retryCountRef.current = 0;
         setRetryCount(0);
         return;
       }
@@ -224,22 +226,24 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
       const mappedProducts = cleanedData.map(mapSupabaseProductToProduct);
       setProducts(mappedProducts);
       console.log("🎯 Productos procesados correctamente:", mappedProducts.length);
-      
+
       // Reset retry count on success
+      retryCountRef.current = 0;
       setRetryCount(0);
-      
+
     } catch (error: any) {
       console.error("💥 Error detallado al cargar productos:", error);
       setError(error.message || "Error desconocido");
-      
+
       // Implement retry logic
-      if (retryCount < maxRetries) {
-        console.log(`🔄 Reintentando... (${retryCount + 1}/${maxRetries})`);
-        setRetryCount(prev => prev + 1);
-        setTimeout(() => fetchData(false), 2000 * (retryCount + 1)); // Exponential backoff
+      if (retryCountRef.current < maxRetries) {
+        retryCountRef.current += 1;
+        console.log(`🔄 Reintentando... (${retryCountRef.current}/${maxRetries})`);
+        setRetryCount(retryCountRef.current);
+        setTimeout(() => fetchData(false), 2000 * retryCountRef.current); // Exponential backoff
         return;
       }
-      
+
       toast({
         title: "Error al cargar productos",
         description: error.message || "No se pudieron cargar los productos. Verifica tu conexión.",
@@ -258,6 +262,7 @@ export const useProductsRealtime = (initialProducts: Product[] = [], filterOptio
   };
 
   useEffect(() => {
+    retryCountRef.current = 0;
     fetchData();
 
     // Suscripción realtime para TODOS los eventos de la tabla productos
