@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,11 +14,17 @@ import { useProductsRealtime } from "@/hooks/useProductsRealtime";
 
 const ProductsPage = () => {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") ?? "");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortOption, setSortOption] = useState<string>("featured");
   const [showFilters, setShowFilters] = useState(false);
   const { products, loading } = useProductsRealtime();
+
+  // Sincronizar la búsqueda con el parámetro de la URL (ej. desde el buscador del header)
+  React.useEffect(() => {
+    setSearchQuery(searchParams.get("search") ?? "");
+  }, [searchParams]);
 
   // Filtrar productos basado en búsqueda y categoría
   const filteredProducts = products.filter((product) => {
