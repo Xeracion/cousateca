@@ -60,7 +60,7 @@ const UserProfilePage = () => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
-        navigate("/auth");
+        navigate("/acceso");
         return;
       }
       setUser(data.user);
@@ -73,7 +73,7 @@ const UserProfilePage = () => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_OUT") {
-          navigate("/auth");
+          navigate("/acceso");
         } else if (session?.user) {
           setUser(session.user);
           loadUserData(session.user.id);
@@ -297,7 +297,7 @@ const UserProfilePage = () => {
                         <p className="text-gray-500 mb-4">Aún no tienes reservas realizadas</p>
                         <Button 
                           className="bg-rental-500 hover:bg-rental-600"
-                          onClick={() => navigate("/products")}
+                          onClick={() => navigate("/productos")}
                         >
                           Explorar Productos
                         </Button>

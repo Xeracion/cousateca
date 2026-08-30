@@ -21,13 +21,13 @@ export const DesktopNav = ({ itemCount, user, isAdmin }: DesktopNavProps) => {
         <Link to="/" className="text-gray-700 hover:text-rental-500 font-medium">
           Inicio
         </Link>
-        <Link to="/products" className="text-gray-700 hover:text-rental-500 font-medium">
+        <Link to="/productos" className="text-gray-700 hover:text-rental-500 font-medium">
           Productos
         </Link>
-        <Link to="/categories" className="text-gray-700 hover:text-rental-500 font-medium">
+        <Link to="/categorias" className="text-gray-700 hover:text-rental-500 font-medium">
           Categorías
         </Link>
-        <Link to="/how-it-works" className="text-gray-700 hover:text-rental-500 font-medium">
+        <Link to="/como-funciona" className="text-gray-700 hover:text-rental-500 font-medium">
           Cómo funciona
         </Link>
       </nav>
@@ -43,7 +43,7 @@ export const DesktopNav = ({ itemCount, user, isAdmin }: DesktopNavProps) => {
         {user ? (
           <UserDropdownMenu user={user} isAdmin={isAdmin} />
         ) : (
-          <Link to="/auth">
+          <Link to="/acceso">
             <Button variant="ghost" size="icon" aria-label="Mi cuenta">
               <User className="h-5 w-5" />
             </Button>

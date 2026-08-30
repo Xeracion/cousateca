@@ -19,7 +19,7 @@ const EmptyCart = () => {
         </p>
         <Button 
           className="bg-rental-500 hover:bg-rental-600"
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/productos")}
         >
           Explorar Productos
         </Button>

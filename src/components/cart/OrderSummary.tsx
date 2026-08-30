@@ -136,7 +136,7 @@ const OrderSummary = ({ items, totalPrice }: OrderSummaryProps) => {
             Términos de Servicio
           </Link>
           y
-          <Link to="/privacy" className="text-rental-500 hover:underline mx-1">
+          <Link to="/privacidad" className="text-rental-500 hover:underline mx-1">
             Política de Privacidad
           </Link>
         </p>

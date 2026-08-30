@@ -32,7 +32,7 @@ const FeaturedProducts = () => {
             <h2 className="text-2xl sm:text-3xl font-bold mb-2">Los básicos</h2>
             <p className="text-gray-600">Te ofrecemos las siguientes Cousas para alquilar</p>
           </div>
-          <Link to="/products">
+          <Link to="/productos">
             <Button variant="outline" className="mt-4 md:mt-0 border-rental-500 text-rental-500 hover:bg-rental-50">
               Ver todos los productos
             </Button>
@@ -49,7 +49,7 @@ const FeaturedProducts = () => {
             {featuredProducts.map(product => <ProductCard key={product.id} product={product} />)}
           </div> : <div className="text-center py-12">
             <p className="text-gray-600 mb-4">No hay productos destacados disponibles actualmente.</p>
-            <Link to="/products">
+            <Link to="/productos">
               <Button className="bg-rental-500 hover:bg-rental-600">
                 Ver todos los productos
               </Button>

@@ -64,7 +64,7 @@ const HowItWorksPage = () => {
               Alquilar productos de alta calidad nunca ha sido tan fácil.
               Nuestro proceso simple asegura que obtengas lo que necesitas, cuando lo necesitas.
             </p>
-            <Link to="/products">
+            <Link to="/productos">
               <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100">
                 Encuentra la Cousa que estabas buscando
               </Button>
@@ -130,12 +130,12 @@ const HowItWorksPage = () => {
               Explora nuestra extensa colección de productos de alta calidad y encuentra exactamente lo que necesitas.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link to="/products">
+              <Link to="/productos">
                 <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100 w-full sm:w-auto">
                   Explorar Productos
                 </Button>
               </Link>
-              <Link to="/categories">
+              <Link to="/categorias">
                 <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100 w-full sm:w-auto">
                   Ver Categorías
                 </Button>

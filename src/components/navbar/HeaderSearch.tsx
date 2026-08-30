@@ -16,7 +16,7 @@ export const HeaderSearch = ({ className = "", onSearch }: HeaderSearchProps) =>
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = query.trim();
-    navigate(trimmed ? `/products?search=${encodeURIComponent(trimmed)}` : "/products");
+    navigate(trimmed ? `/productos?search=${encodeURIComponent(trimmed)}` : "/productos");
     onSearch?.();
   };
 

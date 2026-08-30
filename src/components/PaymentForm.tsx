@@ -45,7 +45,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           description: "Debes iniciar sesión para continuar con la reserva",
           variant: "destructive",
         });
-        navigate("/auth");
+        navigate("/acceso");
         return;
       }
       
@@ -81,7 +81,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           title: "Reserva confirmada",
           description: "Tu reserva ha sido registrada correctamente",
         });
-        navigate("/profile");
+        navigate("/perfil");
       }, 2000);
       
     } catch (error: any) {

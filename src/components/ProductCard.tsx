@@ -79,7 +79,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
       </CardContent>
       <CardFooter className="pt-0">
-        <Link to={`/product/${product.id}`} className="w-full">
+        <Link to={`/producto/${product.id}`} className="w-full">
           <Button className="w-full bg-rental-500 hover:bg-rental-600">
             Ver Detalles
           </Button>

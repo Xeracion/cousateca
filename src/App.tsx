@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { CartProvider } from "@/context/CartContext";
 
 // Pages
@@ -24,6 +24,17 @@ import TransparencyPage from "./pages/TransparencyPage";
 
 const queryClient = new QueryClient();
 
+// Redirecciones de rutas antiguas con parámetros dinámicos a las nuevas rutas en español
+const LegacyProductRedirect = () => {
+  const { id } = useParams();
+  return <Navigate to={`/producto/${id}`} replace />;
+};
+
+const LegacyCategoryRedirect = () => {
+  const { id } = useParams();
+  return <Navigate to={`/categoria/${id}`} replace />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -33,18 +44,31 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/categories" element={<CategoriesPage />} />
-            <Route path="/category/:id" element={<CategoryDetail />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/productos" element={<ProductsPage />} />
+            <Route path="/producto/:id" element={<ProductDetail />} />
+            <Route path="/carrito" element={<CartPage />} />
+            <Route path="/categorias" element={<CategoriesPage />} />
+            <Route path="/categoria/:id" element={<CategoryDetail />} />
+            <Route path="/como-funciona" element={<HowItWorksPage />} />
             <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/profile" element={<UserProfilePage />} />
-            <Route path="/payment/success" element={<PaymentSuccessPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/acceso" element={<AuthPage />} />
+            <Route path="/perfil" element={<UserProfilePage />} />
+            <Route path="/pago/exito" element={<PaymentSuccessPage />} />
+            <Route path="/privacidad" element={<PrivacyPage />} />
             <Route path="/transparencia" element={<TransparencyPage />} />
+
+            {/* Redirecciones desde las rutas antiguas en inglés para no romper enlaces existentes */}
+            <Route path="/products" element={<Navigate to="/productos" replace />} />
+            <Route path="/product/:id" element={<LegacyProductRedirect />} />
+            <Route path="/cart" element={<Navigate to="/carrito" replace />} />
+            <Route path="/categories" element={<Navigate to="/categorias" replace />} />
+            <Route path="/category/:id" element={<LegacyCategoryRedirect />} />
+            <Route path="/how-it-works" element={<Navigate to="/como-funciona" replace />} />
+            <Route path="/auth" element={<Navigate to="/acceso" replace />} />
+            <Route path="/profile" element={<Navigate to="/perfil" replace />} />
+            <Route path="/payment/success" element={<Navigate to="/pago/exito" replace />} />
+            <Route path="/privacy" element={<Navigate to="/privacidad" replace />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
