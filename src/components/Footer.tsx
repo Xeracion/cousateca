@@ -1,6 +1,42 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Instagram, MapPin, Phone, Mail } from "lucide-react";
+
+const EUStar = ({ angle }: {
+  angle: number;
+}) => {
+  const cx = 405;
+  const cy = 270;
+  const orbit = 180;
+  const outerR = 30;
+  const innerR = outerR * 0.381966;
+  const starCx = cx + orbit * Math.sin(angle);
+  const starCy = cy - orbit * Math.cos(angle);
+  const points = Array.from({
+    length: 10
+  }, (_, i) => {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const a = -Math.PI / 2 + i * Math.PI / 5;
+    return `${starCx + r * Math.cos(a)},${starCy + r * Math.sin(a)}`;
+  }).join(" ");
+  return <polygon points={points} fill="#FFCC00" />;
+};
+
+const EUFundedLogo = () => {
+  const stars = Array.from({
+    length: 12
+  }, (_, i) => i * (Math.PI * 2 / 12));
+  return <div className="flex flex-col items-center">
+      <svg viewBox="0 0 810 540" className="w-24 h-auto mb-2" role="img" aria-label="Bandera de la Unión Europea">
+        <rect width="810" height="540" fill="#003399" />
+        {stars.map((angle, i) => <EUStar key={i} angle={angle} />)}
+      </svg>
+      <p className="text-gray-400 text-sm text-center">
+        Cofinanciado por la Unión Europea
+      </p>
+    </div>;
+};
+
 const Footer = () => {
   return <footer className="bg-gray-900 text-white pt-12 pb-8">
       <div className="container mx-auto px-4">
@@ -66,12 +102,7 @@ const Footer = () => {
           {/* EU Flag Section */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Con el apoyo de</h3>
-            <div className="flex flex-col items-center">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png" alt="Bandera de la Unión Europea" className="w-20 h-auto mb-2" />
-              <p className="text-gray-400 text-sm text-center">
-                Proyecto financiado por la Unión Europea
-              </p>
-            </div>
+            <EUFundedLogo />
           </div>
         </div>
 
