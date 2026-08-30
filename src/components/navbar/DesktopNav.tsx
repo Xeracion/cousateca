@@ -5,6 +5,7 @@ import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartButton } from "./CartButton";
 import { UserDropdownMenu } from "./UserDropdownMenu";
+import { HeaderSearch } from "./HeaderSearch";
 
 interface DesktopNavProps {
   itemCount: number;
@@ -30,6 +31,9 @@ export const DesktopNav = ({ itemCount, user, isAdmin }: DesktopNavProps) => {
           Cómo funciona
         </Link>
       </nav>
+
+      {/* Search (Desktop) */}
+      <HeaderSearch className="hidden md:block w-48 lg:w-64" />
 
       {/* Cart, User (Desktop) */}
       <div className="hidden md:flex items-center space-x-4">
