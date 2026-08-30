@@ -45,7 +45,7 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
                     </div>
                     <div>
                       <Link 
-                        to={`/product/${item.product.id}`}
+                        to={`/producto/${item.product.id}`}
                         className="font-medium hover:text-rental-500"
                       >
                         {item.product.name}
@@ -108,7 +108,7 @@ const CartItemsList = ({ items, removeFromCart }: CartItemsListProps) => {
               <div className="flex-grow">
                 <div className="flex justify-between">
                   <Link 
-                    to={`/product/${item.product.id}`}
+                    to={`/producto/${item.product.id}`}
                     className="font-medium hover:text-rental-500"
                   >
                     {item.product.name}

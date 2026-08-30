@@ -89,7 +89,7 @@ const Categories = () => {
             <h2 className="text-2xl sm:text-3xl font-bold mb-2">Explora categorías</h2>
             <p className="text-gray-600">Encuentra los productos perfectos para tus necesidades</p>
           </div>
-          <Link to="/categories">
+          <Link to="/categorias">
             <Button variant="outline" className="mt-4 md:mt-0 border-rental-500 text-rental-500 hover:bg-rental-50">
               Todas las categorías
             </Button>

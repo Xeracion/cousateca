@@ -63,12 +63,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/categories" className="text-gray-400 hover:text-rental-300">
+                <Link to="/categorias" className="text-gray-400 hover:text-rental-300">
                   Categorías
                 </Link>
               </li>
               <li>
-                <Link to="/how-it-works" className="text-gray-400 hover:text-rental-300">
+                <Link to="/como-funciona" className="text-gray-400 hover:text-rental-300">
                   Cómo Funciona
                 </Link>
               </li>
@@ -112,7 +112,7 @@ const Footer = () => {
               &copy; {new Date().getFullYear()} Cousateca. Todos los derechos reservados.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
-              <Link to="/privacy" className="text-gray-400 hover:text-rental-300 text-sm">
+              <Link to="/privacidad" className="text-gray-400 hover:text-rental-300 text-sm">
                 Política de Privacidad
               </Link>
               <Link to="/terms" className="text-gray-400 hover:text-rental-300 text-sm">

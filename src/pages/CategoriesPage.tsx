@@ -133,7 +133,7 @@ const CategoriesPage = () => {
                       <p className="text-gray-600">{category.descripcion_es}</p>
                     </div>
                   </div>
-                  <Link to={`/category/${category.id}`}>
+                  <Link to={`/categoria/${category.id}`}>
                     <Button variant="outline" className="border-rental-500 text-rental-500 hover:bg-rental-50">
                       Ver Todos los {category.nombre_es}
                     </Button>
@@ -151,7 +151,7 @@ const CategoriesPage = () => {
                     <p className="text-gray-600 mb-4">
                       Aún no hay productos disponibles en esta categoría.
                     </p>
-                    <Link to="/products">
+                    <Link to="/productos">
                       <Button className="bg-rental-500 hover:bg-rental-600">
                         Explorar Todos los Productos
                       </Button>

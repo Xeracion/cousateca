@@ -21,7 +21,7 @@ const CartActions = ({ clearCart }: CartActionsProps) => {
       </Button>
       <Button 
         className="bg-rental-500 hover:bg-rental-600"
-        onClick={() => navigate("/products")}
+        onClick={() => navigate("/productos")}
       >
         Seguir Comprando
       </Button>

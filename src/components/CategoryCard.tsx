@@ -77,7 +77,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   };
 
   return (
-    <Link to={`/category/${category.id}`}>
+    <Link to={`/categoria/${category.id}`}>
       <Card className="hover:shadow-md transition-shadow product-card h-full">
         <CardContent className="flex flex-col items-center p-6 text-center">
           <div className="mb-4">

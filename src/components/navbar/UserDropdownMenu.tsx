@@ -49,13 +49,13 @@ export const UserDropdownMenu = ({ user, isAdmin }: UserDropdownMenuProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem asChild>
-          <Link to="/profile" className="flex items-center cursor-pointer">
+          <Link to="/perfil" className="flex items-center cursor-pointer">
             <User className="h-4 w-4 mr-2" />
             <span>Mi Cuenta</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to="/profile" className="flex items-center cursor-pointer">
+          <Link to="/perfil" className="flex items-center cursor-pointer">
             <Calendar className="h-4 w-4 mr-2" />
             <span>Mis Reservas</span>
           </Link>

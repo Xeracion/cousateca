@@ -38,7 +38,7 @@ const NotFound = () => {
                 Back to Home
               </Button>
             </Link>
-            <Link to="/products">
+            <Link to="/productos">
               <Button variant="outline" className="w-full sm:w-auto">
                 <Search className="mr-2 h-4 w-4" />
                 Browse Products

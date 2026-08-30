@@ -19,12 +19,12 @@ const Hero = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">¿Por qué comprar cuando puedes alquilar?</h1>
           <p className="text-lg sm:text-xl mb-8 text-white/90">Ahórrate el trastero y accede a productos premium a una fracción del costo. Desde electrónica hasta equipamiento para exteriores, tenemos todo lo que necesitas.</p>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <Link to="/products">
+            <Link to="/productos">
               <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100 w-full sm:w-auto">
                 Explorar productos
               </Button>
             </Link>
-            <Link to="/how-it-works">
+            <Link to="/como-funciona">
               <Button size="lg" variant="outline" className="border-white text-white w-full sm:w-auto bg-transparent">
                 Cómo funciona
               </Button>

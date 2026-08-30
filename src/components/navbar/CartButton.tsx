@@ -11,7 +11,7 @@ interface CartButtonProps {
 
 export const CartButton = ({ itemCount }: CartButtonProps) => {
   return (
-    <Link to="/cart">
+    <Link to="/carrito">
       <Button variant="ghost" size="icon" className="relative" aria-label="Carrito">
         <ShoppingCart className="h-5 w-5" />
         {itemCount > 0 && (

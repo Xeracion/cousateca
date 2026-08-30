@@ -84,7 +84,7 @@ const ProductDetail = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Producto No Encontrado</h1>
             <p className="mb-6">Lo sentimos, no pudimos encontrar el producto que estás buscando.</p>
-            <Button onClick={() => navigate("/products")}>
+            <Button onClick={() => navigate("/productos")}>
               Explorar Todos los Productos
             </Button>
           </div>
@@ -132,7 +132,7 @@ const ProductDetail = () => {
       startDate: dateRange.from,
       endDate: dateRange.to
     });
-    navigate("/cart");
+    navigate("/carrito");
   };
 
   return (
@@ -144,7 +144,7 @@ const ProductDetail = () => {
           <div className="flex items-center text-sm text-gray-500 mb-6">
             <a href="/" className="hover:text-rental-500">Inicio</a>
             <ChevronRight className="h-4 w-4 mx-1" />
-            <a href="/products" className="hover:text-rental-500">Productos</a>
+            <a href="/productos" className="hover:text-rental-500">Productos</a>
             <ChevronRight className="h-4 w-4 mx-1" />
             <span>{product.nombre}</span>
           </div>

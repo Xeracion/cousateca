@@ -127,7 +127,7 @@ const PaymentSuccessPage = () => {
                   <p className="font-mono text-xs break-all mt-2 text-gray-600">{sessionId}</p>
                 </div>
                 <div className="space-y-3">
-                  <Link to="/profile">
+                  <Link to="/perfil">
                     <Button className="w-full bg-rental-500 hover:bg-rental-600">
                       Ver Mi Perfil
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -195,7 +195,7 @@ const PaymentSuccessPage = () => {
               </div>
               
               <div className="space-y-4">
-                <Link to="/profile">
+                <Link to="/perfil">
                   <Button className="w-full bg-rental-500 hover:bg-rental-600">
                     Ver Mis Reservas
                     <ArrowRight className="ml-2 h-4 w-4" />

@@ -9,7 +9,7 @@ const CallToAction = () => {
         </h2>
         <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">Conviértete en alguien que ahorra dinero alquilando en lugar de comprar. 
 ¡Explora nuestro catálogo de Cousas!</p>
-        <Link to="/auth">
+        <Link to="/acceso">
           <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100">
             Únete y explora
           </Button>

@@ -36,22 +36,22 @@ export const MobileNav = ({ itemCount, user, isAdmin, handleLogout }: MobileNavP
               <Link to="/" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                 Inicio
               </Link>
-              <Link to="/products" className="text-gray-700 hover:text-rental-500 font-medium py-2">
+              <Link to="/productos" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                 Todos los Productos
               </Link>
-              <Link to="/categories" className="text-gray-700 hover:text-rental-500 font-medium py-2">
+              <Link to="/categorias" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                 Categorías
               </Link>
-              <Link to="/how-it-works" className="text-gray-700 hover:text-rental-500 font-medium py-2">
+              <Link to="/como-funciona" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                 Cómo Funciona
               </Link>
               
               {user ? (
                 <>
-                  <Link to="/profile" className="text-gray-700 hover:text-rental-500 font-medium py-2">
+                  <Link to="/perfil" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                     Mi Cuenta
                   </Link>
-                  <Link to="/profile" className="text-gray-700 hover:text-rental-500 font-medium py-2">
+                  <Link to="/perfil" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                     Mis Reservas
                   </Link>
                   {isAdmin && (
@@ -67,7 +67,7 @@ export const MobileNav = ({ itemCount, user, isAdmin, handleLogout }: MobileNavP
                   </button>
                 </>
               ) : (
-                <Link to="/auth" className="text-gray-700 hover:text-rental-500 font-medium py-2">
+                <Link to="/acceso" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                   Iniciar Sesión
                 </Link>
               )}
