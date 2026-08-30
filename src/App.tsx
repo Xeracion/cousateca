@@ -21,6 +21,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TransparencyPage from "./pages/TransparencyPage";
+import FaqPage from "./pages/FaqPage";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/pago/exito" element={<PaymentSuccessPage />} />
             <Route path="/privacidad" element={<PrivacyPage />} />
             <Route path="/transparencia" element={<TransparencyPage />} />
+            <Route path="/preguntas-frecuentes" element={<FaqPage />} />
 
             {/* Redirecciones desde las rutas antiguas en inglés para no romper enlaces existentes */}
             <Route path="/products" element={<Navigate to="/productos" replace />} />
@@ -68,6 +70,7 @@ const App = () => (
             <Route path="/profile" element={<Navigate to="/perfil" replace />} />
             <Route path="/payment/success" element={<Navigate to="/pago/exito" replace />} />
             <Route path="/privacy" element={<Navigate to="/privacidad" replace />} />
+            <Route path="/faq" element={<Navigate to="/preguntas-frecuentes" replace />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
