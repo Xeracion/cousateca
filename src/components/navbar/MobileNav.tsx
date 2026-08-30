@@ -42,7 +42,7 @@ export const MobileNav = ({ itemCount, user, isAdmin, handleLogout }: MobileNavP
               <Link to="/categorias" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                 Categorías
               </Link>
-              <Link to="/como-funciona" className="text-gray-700 hover:text-rental-500 font-medium py-2">
+              <Link to="/preguntas-frecuentes" className="text-gray-700 hover:text-rental-500 font-medium py-2">
                 Cómo Funciona
               </Link>
               

@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Search, Calendar, CreditCard, User, ThumbsUp, ArrowRight, CheckCircle } from "lucide-react";
 
 interface FaqItem {
   question: string;
@@ -15,6 +15,39 @@ interface FaqCategory {
   title: string;
   items: FaqItem[];
 }
+
+const steps = [
+  {
+    icon: <Search className="h-12 w-12 text-rental-500" />,
+    title: "Buscar y Seleccionar",
+    description: "Explora nuestro catálogo de productos de alta calidad y selecciona los artículos que necesitas para tu proyecto, evento o uso temporal.",
+    details: ["Filtra productos por categoría, precio y disponibilidad", "Visualiza especificaciones detalladas e imágenes", "Lee opiniones de otros clientes", "Compara diferentes opciones"]
+  },
+  {
+    icon: <Calendar className="h-12 w-12 text-rental-500" />,
+    title: "Elegir Período de Alquiler",
+    description: "Selecciona las fechas de alquiler deseadas y revisa nuestras opciones de precios flexibles para alquileres diarios, semanales o mensuales.",
+    details: ["Selecciona fechas de inicio y fin en nuestro calendario interactivo", "Comprueba la disponibilidad en tiempo real", "Visualiza precios transparentes basados en la duración", "Modifica las fechas según sea necesario antes de finalizar"]
+  },
+  {
+    icon: <CreditCard className="h-12 w-12 text-rental-500" />,
+    title: "Pago y Fianza",
+    description: "Completa tu pedido con nuestro proceso de pago seguro, incluyendo el depósito de fianza.",
+    details: ["Proporciona información de contacto", "Paga el alquiler y la fianza", "Elige el método de pago que prefieras", "Recibe confirmación y recibo instantáneos"]
+  },
+  {
+    icon: <User className="h-12 w-12 text-rental-500" />,
+    title: "Recogida y Devolución",
+    description: "Visita nuestra ubicación física para recoger y devolver los artículos alquilados.",
+    details: ["Recibe notificaciones recordatorias sobre fechas de recogida y devolución", "Visítanos en Rúa Almendra 9, Ferrol", "Presenta tu identificación para recoger los productos", "Devuelve los productos en buen estado al finalizar el alquiler"]
+  },
+  {
+    icon: <ThumbsUp className="h-12 w-12 text-rental-500" />,
+    title: "¡A disfrutar!",
+    description: "Utiliza los artículos alquilados según tus necesidades durante el período establecido.",
+    details: ["Acceso a atención al cliente durante todo el período de alquiler", "Opción de extender tu alquiler si es necesario (sujeto a disponibilidad)", "Proceso de devolución simple en nuestra ubicación física", "Contribuye compartiendo tu experiencia"]
+  }
+];
 
 const faqCategories: FaqCategory[] = [
   {
@@ -96,27 +129,70 @@ const FaqPage = () => {
         <section className="bg-rental-500 text-white py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
             <HelpCircle className="h-14 w-14 mx-auto mb-6" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Preguntas Frecuentes</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Cómo funciona y Preguntas Frecuentes</h1>
             <p className="text-xl max-w-2xl mx-auto mb-8">
-              Resolvemos las dudas más habituales sobre cómo funciona la Cousateca. Si no encuentras
-              lo que buscas, escríbenos y te ayudamos.
+              Alquilar productos de alta calidad nunca ha sido tan fácil. Descubre el proceso paso a
+              paso y resuelve las dudas más habituales sobre la Cousateca.
             </p>
-            <Link to="/como-funciona">
+            <Link to="/productos">
               <Button size="lg" className="bg-white text-rental-500 hover:bg-gray-100">
-                Ver cómo funciona paso a paso
+                Encuentra la Cousa que estabas buscando
               </Button>
             </Link>
           </div>
         </section>
 
-        {/* FAQ Categories */}
+        {/* Process Steps */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">Cómo funciona la Cousateca</h2>
+            <div className="max-w-4xl mx-auto">
+              {steps.map((step, index) => (
+                <div key={index} className="mb-16 last:mb-0">
+                  <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                    <div className="bg-rental-50 p-5 rounded-full flex-shrink-0">
+                      {step.icon}
+                    </div>
+                    <div>
+                      <div className="flex items-center mb-2">
+                        <div className="bg-rental-100 text-rental-700 font-semibold rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                          {index + 1}
+                        </div>
+                        <h3 className="text-2xl font-bold">{step.title}</h3>
+                      </div>
+                      <p className="text-gray-600 mb-4">{step.description}</p>
+                      <ul className="space-y-2">
+                        {step.details.map((detail, i) => (
+                          <li key={i} className="flex items-start">
+                            <CheckCircle className="h-5 w-5 text-rental-500 mr-2 flex-shrink-0 mt-0.5" />
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Arrow connector between steps */}
+                  {index < steps.length - 1 && (
+                    <div className="flex justify-center my-8">
+                      <ArrowRight className="h-8 w-8 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Categories */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">Preguntas Frecuentes</h2>
             <div className="max-w-3xl mx-auto space-y-12">
               {faqCategories.map((category) => (
                 <div key={category.title}>
                   <h2 className="text-2xl font-bold mb-4 text-rental-700">{category.title}</h2>
-                  <Accordion type="single" collapsible className="bg-gray-50 rounded-lg px-6">
+                  <Accordion type="single" collapsible className="bg-white rounded-lg px-6 shadow-sm">
                     {category.items.map((item, index) => (
                       <AccordionItem key={index} value={`${category.title}-${index}`}>
                         <AccordionTrigger className="text-left text-lg">

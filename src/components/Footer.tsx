@@ -68,13 +68,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/como-funciona" className="text-gray-400 hover:text-rental-300">
-                  Cómo Funciona
-                </Link>
-              </li>
-              <li>
                 <Link to="/preguntas-frecuentes" className="text-gray-400 hover:text-rental-300">
-                  Preguntas Frecuentes
+                  Cómo Funciona y Preguntas Frecuentes
                 </Link>
               </li>
             </ul>

@@ -27,7 +27,7 @@ export const DesktopNav = ({ itemCount, user, isAdmin }: DesktopNavProps) => {
         <Link to="/categorias" className="text-gray-700 hover:text-rental-500 font-medium">
           Categorías
         </Link>
-        <Link to="/como-funciona" className="text-gray-700 hover:text-rental-500 font-medium">
+        <Link to="/preguntas-frecuentes" className="text-gray-700 hover:text-rental-500 font-medium">
           Cómo funciona
         </Link>
       </nav>

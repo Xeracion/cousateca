@@ -13,7 +13,6 @@ import ProductDetail from "./pages/ProductDetail";
 import CartPage from "./pages/CartPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import CategoryDetail from "./pages/CategoryDetail";
-import HowItWorksPage from "./pages/HowItWorksPage";
 import NotFound from "./pages/NotFound";
 import AdminPanel from "./pages/AdminPanel";
 import AuthPage from "./pages/AuthPage";
@@ -50,7 +49,6 @@ const App = () => (
             <Route path="/carrito" element={<CartPage />} />
             <Route path="/categorias" element={<CategoriesPage />} />
             <Route path="/categoria/:id" element={<CategoryDetail />} />
-            <Route path="/como-funciona" element={<HowItWorksPage />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/acceso" element={<AuthPage />} />
             <Route path="/perfil" element={<UserProfilePage />} />
@@ -65,7 +63,8 @@ const App = () => (
             <Route path="/cart" element={<Navigate to="/carrito" replace />} />
             <Route path="/categories" element={<Navigate to="/categorias" replace />} />
             <Route path="/category/:id" element={<LegacyCategoryRedirect />} />
-            <Route path="/how-it-works" element={<Navigate to="/como-funciona" replace />} />
+            <Route path="/how-it-works" element={<Navigate to="/preguntas-frecuentes" replace />} />
+            <Route path="/como-funciona" element={<Navigate to="/preguntas-frecuentes" replace />} />
             <Route path="/auth" element={<Navigate to="/acceso" replace />} />
             <Route path="/profile" element={<Navigate to="/perfil" replace />} />
             <Route path="/payment/success" element={<Navigate to="/pago/exito" replace />} />

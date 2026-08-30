@@ -24,7 +24,7 @@ const Hero = () => {
                 Explorar productos
               </Button>
             </Link>
-            <Link to="/como-funciona">
+            <Link to="/preguntas-frecuentes">
               <Button size="lg" variant="outline" className="border-white text-white w-full sm:w-auto bg-transparent">
                 Cómo funciona
               </Button>
