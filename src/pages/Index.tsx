@@ -7,6 +7,7 @@ import FeaturedProducts from "@/components/FeaturedProducts";
 import Categories from "@/components/Categories";
 import HowItWorks from "@/components/HowItWorks";
 import CallToAction from "@/components/CallToAction";
+import FadeInSection from "@/components/FadeInSection";
 
 const Index = () => {
   return (
@@ -14,10 +15,18 @@ const Index = () => {
       <Navbar />
       <main className="flex-grow">
         <Hero />
-        <FeaturedProducts />
-        <Categories />
-        <HowItWorks />
-        <CallToAction />
+        <FadeInSection>
+          <FeaturedProducts />
+        </FadeInSection>
+        <FadeInSection>
+          <Categories />
+        </FadeInSection>
+        <FadeInSection>
+          <HowItWorks />
+        </FadeInSection>
+        <FadeInSection>
+          <CallToAction />
+        </FadeInSection>
       </main>
       <Footer />
     </div>
